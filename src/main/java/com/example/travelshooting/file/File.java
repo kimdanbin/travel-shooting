@@ -24,10 +24,12 @@ public class File {
     @JoinColumn(name = "leisure_product_id")
     private Product product;
 
+    @JoinColumn(name = "file_name")
     private String fileName;
 
     private String url;
 
+    @JoinColumn(name = "file_type")
     private String fileType;
 
 }
