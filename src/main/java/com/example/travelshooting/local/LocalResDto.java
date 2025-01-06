@@ -1,12 +1,11 @@
 package com.example.travelshooting.local;
 
-import com.example.travelshooting.common.BaseDtoDataType;
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
 @Builder
-public class LocalResDto implements BaseDtoDataType {
+public class LocalResDto {
 
     private Long id;
     private String categoryName;

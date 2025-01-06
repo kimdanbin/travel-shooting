@@ -15,7 +15,7 @@ public class LocalController {
     private final LocalService localService;
 
     @GetMapping("/locals")
-    public ResponseEntity<Page<LocalResDto>> searchPlaces(@RequestParam(required = false) String keyword, Pageable pageable) {
+    public ResponseEntity<Page<LocalResDto>> searchPlaces(@RequestParam String keyword, Pageable pageable) {
         return ResponseEntity.ok().body(localService.searchPlaces(keyword, pageable));
     }
 }
