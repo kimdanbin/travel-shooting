@@ -3,7 +3,7 @@ package com.example.travelshooting.common;
 import lombok.Getter;
 
 @Getter
-public class CommonResDto<T> {
+public class CommonResDto<T extends BaseDtoDataType> {
 
     private final String message;
 
