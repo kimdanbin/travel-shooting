@@ -37,4 +37,8 @@ public class Company extends BaseEntity {
         this.description = description;
     }
 
+    public void updateCompany(String description) {
+        this.description = description;
+    }
+
 }

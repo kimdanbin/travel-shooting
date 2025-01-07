@@ -23,7 +23,7 @@ public class CompanyService {
     private final CompanyRepository companyRepository;
     private final UserService userService;
 
-  @Transactional
+    @Transactional
     public CompanyResDto createCompany(CompanyReqDto companyReqDto) {
 
         User user = userService.getUserById(companyReqDto.getUserId());
@@ -45,9 +45,9 @@ public class CompanyService {
     public List<CompanyResDto> findAllCompanies(int page, int size) {
         // 페이지 번호와 크기를 기반으로 Pageable 객체 생성
         Pageable pageable = PageRequest.of(page, size);
-        Page<Company> companyPage  = companyRepository.findAll(pageable);
+        Page<Company> companyPage = companyRepository.findAll(pageable);
 
-        return companyPage .stream()
+        return companyPage.stream()
                 .map(company -> new CompanyResDto(
                         company.getId(),
                         company.getUser().getId(),
@@ -73,4 +73,21 @@ public class CompanyService {
                 findCompany.getUpdatedAt()
         );
     }
+
+    @Transactional
+    public CompanyResDto updateCompany(Long companyId, String description) {
+        Company findCompany = companyRepository.findByIdOrElseThrow(companyId);
+        findCompany.updateCompany(description);
+        companyRepository.save(findCompany);
+
+        return new CompanyResDto(
+                findCompany.getId(),
+                findCompany.getUser().getId(),
+                findCompany.getName(),
+                findCompany.getDescription(),
+                findCompany.getCreatedAt(),
+                findCompany.getUpdatedAt()
+        );
+    }
+
 }
