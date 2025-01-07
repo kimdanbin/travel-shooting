@@ -1,5 +1,6 @@
-package com.example.travelshooting.company;
+package com.example.travelshooting.company.dto;
 
+import com.example.travelshooting.company.Company;
 import com.example.travelshooting.user.User;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

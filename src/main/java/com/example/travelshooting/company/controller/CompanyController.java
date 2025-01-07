@@ -1,6 +1,9 @@
-package com.example.travelshooting.company;
+package com.example.travelshooting.company.controller;
 
 import com.example.travelshooting.common.CommonResDto;
+import com.example.travelshooting.company.dto.CompanyReqDto;
+import com.example.travelshooting.company.dto.CompanyResDto;
+import com.example.travelshooting.company.service.CompanyService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

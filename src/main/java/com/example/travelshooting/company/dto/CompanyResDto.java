@@ -1,4 +1,4 @@
-package com.example.travelshooting.company;
+package com.example.travelshooting.company.dto;
 
 import com.example.travelshooting.common.BaseDtoDataType;
 import lombok.Getter;

@@ -1,5 +1,9 @@
-package com.example.travelshooting.company;
+package com.example.travelshooting.company.service;
 
+import com.example.travelshooting.company.Company;
+import com.example.travelshooting.company.repository.CompanyRepository;
+import com.example.travelshooting.company.dto.CompanyReqDto;
+import com.example.travelshooting.company.dto.CompanyResDto;
 import com.example.travelshooting.user.User;
 import com.example.travelshooting.user.UserService;
 import jakarta.transaction.Transactional;
