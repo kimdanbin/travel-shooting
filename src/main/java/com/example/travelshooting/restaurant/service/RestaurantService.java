@@ -13,9 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -56,29 +55,33 @@ public class RestaurantService {
             throw new RuntimeException("XML 파싱 오류가 발생했습니다.");
         }
 
-        // placeName을 기준으로 중복 제거
-        Map<String, GgRestaurantApiDto> uniqueMap = apiDtos.stream()
-                .collect(Collectors.toMap(
-                        GgRestaurantApiDto::getPlaceName,
-                        apiDto -> apiDto,
-                        (existing, replacement) -> existing // 중복된 키가 있으면 기존 값을 유지
-                ));
+        // 기존에 저장된 데이터 조회 (업소명, 주소, 전화번호 기준으로 중복 여부를 체크)
+        List<Restaurant> existingRestaurants = restaurantRepository.findAll();
 
-        // 중복을 제거한 리스트
-        List<GgRestaurantApiDto> uniqueApiDtos = new ArrayList<>(uniqueMap.values());
-
-        List<Restaurant> savedRestaurants = uniqueApiDtos.stream()
+        // 중복 저장 방지
+        List<Restaurant> savedRestaurants = apiDtos.stream()
+                .filter(apiDto -> apiDto.getPlaceName() != null && !apiDto.getPlaceName().isEmpty())
                 .map(apiDto -> {
-                    Restaurant restaurant = new Restaurant(
-                            apiDto.getPlaceName(),
-                            apiDto.getAddressName(),
-                            apiDto.getRoadAddressName(),
-                            apiDto.getPhone(),
-                            apiDto.getLongitude(),
-                            apiDto.getLatitude()
-                    );
-                    return restaurantRepository.save(restaurant);
+
+                    boolean isExistingRestaurant = existingRestaurants.stream()
+                            .anyMatch(existing -> existing.getPlaceName().equals(apiDto.getPlaceName()) &&
+                                    existing.getAddressName().equals(apiDto.getAddressName()) &&
+                                    existing.getPhone().equals(apiDto.getPhone()));
+
+                    if (!isExistingRestaurant) {
+                        Restaurant restaurant = new Restaurant(
+                                apiDto.getPlaceName(),
+                                apiDto.getAddressName(),
+                                apiDto.getRoadAddressName(),
+                                apiDto.getPhone(),
+                                apiDto.getLongitude(),
+                                apiDto.getLatitude()
+                        );
+                        return restaurantRepository.save(restaurant);
+                    }
+                    return null;  // 중복된 데이터는 null로 처리
                 })
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
 
         return savedRestaurants.stream()
