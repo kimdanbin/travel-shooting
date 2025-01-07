@@ -34,7 +34,7 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private UserRole role;
 
-    private boolean isDeleted;
+    private boolean isDeleted = false;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Company> companies = new ArrayList<>();
