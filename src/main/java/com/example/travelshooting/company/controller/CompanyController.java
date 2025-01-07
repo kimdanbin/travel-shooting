@@ -25,8 +25,7 @@ public class CompanyController {
      * @param companyReqDto 생성할 업체의 정보를 담고있는 dto
      * @return 생성된 가게의 정보를 담고 있는 dto. 성공시 상태코드 201 반환
      */
-    @PostMapping
-    @RequestMapping("/admins/companies")
+    @PostMapping("/admins/companies")
     public ResponseEntity<CommonResDto<CompanyResDto>> createCompany(
             @Valid @RequestBody CompanyReqDto companyReqDto
     ) {
@@ -40,8 +39,7 @@ public class CompanyController {
      *
      * @return 전체 업체의 정보를 담고 있는 dto. 성공시 상태코드 200 반환
      */
-    @GetMapping
-    @RequestMapping("/partners/companies")
+    @GetMapping("/partners/companies")
     public ResponseEntity<CommonListResDto<CompanyResDto>> findAllCompanies(
             @RequestParam(defaultValue = "0") int page,  // 기본값 0
             @RequestParam(defaultValue = "10") int size  // 기본값 10
@@ -57,8 +55,7 @@ public class CompanyController {
      * @param companyId 조회할 업체의 id
      * @return 조회된 업체의 정보를 담고 있는 dto. 성공시 상태코드 200 반환
      */
-    @GetMapping
-    @RequestMapping("/partners/companies/{companyId}")
+    @GetMapping("/partners/companies/{companyId}")
     public ResponseEntity<CommonResDto<CompanyResDto>> findCompany(@PathVariable Long companyId) {
 
         CompanyResDto result = companyService.findCompany(companyId);
