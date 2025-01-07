@@ -31,4 +31,10 @@ public class Company extends BaseEntity {
     @OneToMany(mappedBy = "company", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Product> products = new ArrayList<>();
 
+    public Company(User user, String name, String description) {
+        this.user = user;
+        this.name = name;
+        this.description = description;
+    }
+
 }
