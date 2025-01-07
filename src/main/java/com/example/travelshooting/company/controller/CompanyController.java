@@ -84,4 +84,18 @@ public class CompanyController {
         return new ResponseEntity<>(new CommonResDto<>("업체 수정 완료", result), HttpStatus.OK);
     }
 
+    /**
+     * 업체 삭제 API
+     *
+     * @param companyId 삭제할 업체의 id
+     * @return 삭제 성공 시, 메시지와 함께 상태코드 200 반환
+     */
+    @DeleteMapping("/admins/companies/{companyId}")
+    public ResponseEntity<String> deleteCompany(@PathVariable Long companyId) {
+
+        companyService.deleteCompany(companyId);
+
+        return new ResponseEntity<>("업체 삭제 완료", HttpStatus.OK);
+    }
+
 }
