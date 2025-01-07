@@ -27,7 +27,7 @@ public class LocalService {
     @Value("${kakao.api.map.key}")
     private String apiKey;
 
-    private static final String KAKAO_API_URL = Const.KAKAO_API_URL;
+    private static final String KAKAO_API_URL = Const.KAKAO_LOCAL_API_URL;
 
     public Page<LocalResDto> searchPlaces(String keyword, Pageable pageable) {
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(KAKAO_API_URL)
