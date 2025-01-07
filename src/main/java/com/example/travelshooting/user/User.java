@@ -51,4 +51,12 @@ public class User extends BaseEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
 
+    public User(Long id, String email, String password, UserRole role, boolean isDeleted) {
+        this.id = id;
+        this.email = email;
+        this.password = password;
+        this.role = role;
+        this.isDeleted = isDeleted;
+    }
+
 }
