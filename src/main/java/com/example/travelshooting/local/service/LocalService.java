@@ -1,6 +1,7 @@
-package com.example.travelshooting.local;
+package com.example.travelshooting.local.service;
 
 import com.example.travelshooting.common.Const;
+import com.example.travelshooting.local.dto.LocalResDto;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,7 +28,7 @@ public class LocalService {
     @Value("${kakao.api.map.key}")
     private String apiKey;
 
-    private static final String KAKAO_API_URL = Const.KAKAO_API_URL;
+    private static final String KAKAO_API_URL = Const.KAKAO_LOCAL_API_URL;
 
     public Page<LocalResDto> searchPlaces(String keyword, Pageable pageable) {
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(KAKAO_API_URL)

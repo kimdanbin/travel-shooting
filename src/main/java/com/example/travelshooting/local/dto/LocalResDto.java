@@ -1,4 +1,4 @@
-package com.example.travelshooting.local;
+package com.example.travelshooting.local.dto;
 
 import lombok.Builder;
 import lombok.Getter;
