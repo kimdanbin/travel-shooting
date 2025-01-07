@@ -62,4 +62,5 @@ public class CompanyController {
 
         return new ResponseEntity<>(new CommonResDto<>("업체 단건 조회 완료", result), HttpStatus.OK);
     }
+
 }
