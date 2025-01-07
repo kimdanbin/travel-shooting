@@ -32,6 +32,9 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	// xml
+	implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.13.1'
 }
 
 tasks.named('test') {

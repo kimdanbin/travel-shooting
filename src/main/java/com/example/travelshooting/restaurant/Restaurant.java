@@ -22,8 +22,8 @@ public class Restaurant {
     private String addressName;
     private String roadAddressName;
     private String phone;
-    private String longitude;
-    private String latitude;
+    private String longitude; // 경도
+    private String latitude; // 위도
 
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Poster> posters = new ArrayList<>();

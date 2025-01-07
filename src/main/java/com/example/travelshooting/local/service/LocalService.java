@@ -1,6 +1,7 @@
-package com.example.travelshooting.local;
+package com.example.travelshooting.local.service;
 
 import com.example.travelshooting.common.Const;
+import com.example.travelshooting.local.dto.LocalResDto;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;

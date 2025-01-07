@@ -1,10 +1,11 @@
-package com.example.travelshooting.restaurant;
+package com.example.travelshooting.restaurant.dto;
 
 import com.example.travelshooting.common.BaseDtoDataType;
+import com.example.travelshooting.restaurant.Restaurant;
 import lombok.Getter;
 
 @Getter
-public class RestaurantResDto implements BaseDtoDataType {
+public class GgRestaurantResDto implements BaseDtoDataType {
 
     private Long id;
     private String placeName;
@@ -14,7 +15,7 @@ public class RestaurantResDto implements BaseDtoDataType {
     private String longitude;
     private String latitude;
 
-    public RestaurantResDto(Long id, String placeName, String addressName, String roadAddressName, String phone, String longitude, String latitude) {
+    public GgRestaurantResDto(Long id, String placeName, String addressName, String roadAddressName, String phone, String longitude, String latitude) {
         this.id = id;
         this.placeName = placeName;
         this.addressName = addressName;
@@ -24,8 +25,8 @@ public class RestaurantResDto implements BaseDtoDataType {
         this.latitude = latitude;
     }
 
-    public static RestaurantResDto toDto(Restaurant restaurant) {
-        return new RestaurantResDto(
+    public static GgRestaurantResDto toDto(Restaurant restaurant) {
+        return new GgRestaurantResDto(
                 restaurant.getId(),
                 restaurant.getPlaceName(),
                 restaurant.getAddressName(),
