@@ -1,5 +1,7 @@
-package com.example.travelshooting.local;
+package com.example.travelshooting.local.controller;
 
+import com.example.travelshooting.local.dto.LocalResDto;
+import com.example.travelshooting.local.service.LocalService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
