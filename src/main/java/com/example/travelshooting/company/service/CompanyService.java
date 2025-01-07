@@ -90,4 +90,9 @@ public class CompanyService {
         );
     }
 
+    @Transactional
+    public void deleteCompany(Long companyId) {
+        Company findCompany = companyRepository.findByIdOrElseThrow(companyId);
+        companyRepository.delete(findCompany);
+    }
 }
