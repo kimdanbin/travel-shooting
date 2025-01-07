@@ -4,6 +4,7 @@ import com.example.travelshooting.common.CommonListResDto;
 import com.example.travelshooting.common.CommonResDto;
 import com.example.travelshooting.company.dto.CompanyReqDto;
 import com.example.travelshooting.company.dto.CompanyResDto;
+import com.example.travelshooting.company.dto.UpdateCompanyReqDto;
 import com.example.travelshooting.company.service.CompanyService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -61,6 +62,26 @@ public class CompanyController {
         CompanyResDto result = companyService.findCompany(companyId);
 
         return new ResponseEntity<>(new CommonResDto<>("업체 단건 조회 완료", result), HttpStatus.OK);
+    }
+
+    /**
+     * 업체 수정 API
+     *
+     * @param companyId 수정할 업체의 id
+     * @return 수정된 업체의 정보를 담고 있는 dto. 성공시 상태코드 200 반환
+     */
+    @PatchMapping("/admins/companies/{companyId}")
+    public ResponseEntity<CommonResDto<CompanyResDto>> updateCompany(
+            @PathVariable Long companyId,
+            @RequestBody UpdateCompanyReqDto updateCompanyReqDto
+    ) {
+
+        CompanyResDto result = companyService.updateCompany(
+                companyId,
+                updateCompanyReqDto.getDescription()
+        );
+
+        return new ResponseEntity<>(new CommonResDto<>("업체 수정 완료", result), HttpStatus.OK);
     }
 
 }
