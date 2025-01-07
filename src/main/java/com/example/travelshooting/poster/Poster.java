@@ -45,7 +45,7 @@ public class Poster extends BaseEntity {
 
     private LocalDateTime travelEndAt;
 
-    private boolean isDeleted;
+    private boolean isDeleted = false;
 
     @OneToMany(mappedBy = "poster", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<LikePoster> likePosters = new ArrayList<>();

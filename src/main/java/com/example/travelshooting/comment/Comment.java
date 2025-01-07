@@ -27,6 +27,6 @@ public class Comment extends BaseEntity {
 
     private String content;
 
-    private boolean isDeleted;
+    private boolean isDeleted = false;
 
 }
