@@ -2,7 +2,7 @@ package com.example.travelshooting.poster;
 
 import com.example.travelshooting.comment.Comment;
 import com.example.travelshooting.common.BaseEntity;
-import com.example.travelshooting.file.File;
+import com.example.travelshooting.file.entity.PosterFile;
 import com.example.travelshooting.like.LikePoster;
 import com.example.travelshooting.product.Product;
 import com.example.travelshooting.restaurant.Restaurant;
@@ -54,6 +54,6 @@ public class Poster extends BaseEntity {
     private List<Comment> comments = new ArrayList<>();
 
     @OneToMany(mappedBy = "poster", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<File> files = new ArrayList<>();
+    private List<PosterFile> files = new ArrayList<>();
 
 }
