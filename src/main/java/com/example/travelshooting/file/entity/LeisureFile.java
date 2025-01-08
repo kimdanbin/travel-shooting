@@ -1,4 +1,4 @@
-package com.example.travelshooting.file;
+package com.example.travelshooting.file.entity;
 
 import com.example.travelshooting.poster.Poster;
 import com.example.travelshooting.product.Product;
@@ -7,10 +7,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "file")
+@Table(name = "leisure_file")
 @Getter
 @NoArgsConstructor
-public class File {
+public class LeisureFile {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,9 +27,16 @@ public class File {
     @JoinColumn(name = "file_name")
     private String fileName;
 
+    @Column(columnDefinition = "TEXT")
     private String url;
 
     @JoinColumn(name = "file_type")
     private String fileType;
+
+    public LeisureFile(String fileName, String url, String fileType) {
+        this.fileName = fileName;
+        this.url = url;
+        this.fileType = fileType;
+    }
 
 }

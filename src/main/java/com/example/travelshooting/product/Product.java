@@ -2,7 +2,7 @@ package com.example.travelshooting.product;
 
 import com.example.travelshooting.common.BaseEntity;
 import com.example.travelshooting.company.Company;
-import com.example.travelshooting.file.File;
+import com.example.travelshooting.file.entity.LeisureFile;
 import com.example.travelshooting.part.Part;
 import com.example.travelshooting.poster.Poster;
 import com.example.travelshooting.reservation.Reservation;
@@ -45,7 +45,7 @@ public class Product extends BaseEntity {
     private List<Reservation> reservations = new ArrayList<>();
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<File> files = new ArrayList<>();
+    private List<LeisureFile> files = new ArrayList<>();
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Part> parts = new ArrayList<>();
