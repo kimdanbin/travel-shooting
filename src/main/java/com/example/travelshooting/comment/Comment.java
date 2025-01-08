@@ -27,6 +27,17 @@ public class Comment extends BaseEntity {
 
     private String content;
 
-    private boolean isDeleted = false;
+    private boolean isDeleted;
+
+    public Comment(User user, Poster poster, String content) {
+        this.user = user;
+        this.poster = poster;
+        this.content = content;
+    }
+
+    public void updateComment(String content){
+        this.content = content;
+
+    }
 
 }
