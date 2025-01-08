@@ -11,7 +11,7 @@ public class PartService {
 
     private final PartRepository partRepository;
 
-    public Part findProductById(Long partId) {
+    public Part findPartById(Long partId) {
         return partRepository.findById(partId)
                 .orElseThrow(() -> new IllegalArgumentException("아이디 " + partId + "에 해당하는 레저/티켓 일정을 찾을 수 없습니다."));
     }
