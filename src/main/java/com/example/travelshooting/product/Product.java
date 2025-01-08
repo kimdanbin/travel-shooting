@@ -38,6 +38,9 @@ public class Product extends BaseEntity {
     @Column(nullable = false)
     private String address;
 
+    @Column(nullable = false)
+    private int quantity;
+
     @OneToMany(mappedBy = "product")
     private List<Poster> posters = new ArrayList<>();
 
@@ -49,4 +52,20 @@ public class Product extends BaseEntity {
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Part> parts = new ArrayList<>();
+
+    public Product(String name, String description, int price, String address, int quantity, Company company) {
+        this.name = name;
+        this.description = description;
+        this.price = price;
+        this.address = address;
+        this.quantity = quantity;
+        this.company = company;
+    }
+
+    public void updateProduct(String description, int price, String address, int quantity) {
+        this.description = description;
+        this.price = price;
+        this.address = address;
+        this.quantity = quantity;
+    }
 }

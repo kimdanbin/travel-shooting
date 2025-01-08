@@ -95,4 +95,9 @@ public class CompanyService {
         Company findCompany = companyRepository.findByIdOrElseThrow(companyId);
         companyRepository.delete(findCompany);
     }
+
+    public Company getCompanyById(Long companyId) {
+        return companyRepository.findById(companyId)
+                .orElseThrow(() -> new IllegalArgumentException("아이디 " + companyId + "에 해당하는 업체를 찾을 수 없습니다."));
+    }
 }
