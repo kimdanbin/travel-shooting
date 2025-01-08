@@ -8,6 +8,8 @@ import com.example.travelshooting.user.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import java.time.LocalDate;
 
@@ -15,6 +17,8 @@ import java.time.LocalDate;
 @Table(name = "reservation")
 @Getter
 @NoArgsConstructor
+@SQLDelete(sql = "UPDATE reservation SET is_deleted = true WHERE id = ?")
+@Where(clause = "is_deleted = false")
 public class Reservation extends BaseEntity {
 
     @Id
@@ -48,9 +52,10 @@ public class Reservation extends BaseEntity {
 
     private boolean isDeleted = false;
 
-    public Reservation(User user, Product product, LocalDate reservationDate, int number, int totalPrice) {
+    public Reservation(User user, Product product, Part part, LocalDate reservationDate, int number, int totalPrice) {
         this.user = user;
         this.product = product;
+        this.part = part;
         this.reservationDate = reservationDate;
         this.number = number;
         this.totalPrice = totalPrice;
