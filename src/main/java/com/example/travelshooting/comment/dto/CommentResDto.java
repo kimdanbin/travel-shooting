@@ -7,8 +7,8 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
-@RequiredArgsConstructor
 public class CommentResDto implements BaseDtoDataType {
+
     private Long id;
 
     @NotBlank(message = "댓글을 입력해주세요.")
@@ -21,6 +21,5 @@ public class CommentResDto implements BaseDtoDataType {
 
     public static CommentResDto toDto(Comment comment) {
         return new CommentResDto(comment);
-
     }
 }

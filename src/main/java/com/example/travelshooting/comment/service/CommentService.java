@@ -41,14 +41,16 @@ public class CommentService {
 
     @Transactional
     public CommentResDto updateComment(Long commentId, CommentReqDto commentReqDto) {
-        Comment comment = commentRepository.findByIdOrElseThrow(commentId);
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new IllegalArgumentException("아이디 " + commentId + "에 해당하는 댓글을 찾을 수 없습니다."));;
         comment.updateComment(commentReqDto.getComment());
         return CommentResDto.toDto(comment);
     }
 
     @Transactional
     public void deleteComment(Long commentId) {
-        Comment comment = commentRepository.findByIdOrElseThrow(commentId);
-        comment.deleteComment();
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new IllegalArgumentException("아이디 " + commentId + "에 해당하는 댓글을 찾을 수 없습니다."));;
+        commentRepository.delete(comment);
     }
 }
