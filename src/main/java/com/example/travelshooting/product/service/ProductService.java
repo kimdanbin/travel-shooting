@@ -63,8 +63,15 @@ public class ProductService {
         );
     }
 
+    @Transactional
+    public void deleteCompany(Long productId) {
+        Product findProduct = productRepository.findByIdOrElseThrow(productId);
+        productRepository.delete(findProduct);
+    }
+
     public Product findProductById(Long productId) {
         return productRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException("아이디 " + productId + "에 해당하는 레저/티켓 상품을 찾을 수 없습니다."));
     }
+
 }
