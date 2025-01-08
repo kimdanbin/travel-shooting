@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -34,6 +36,60 @@ public class ReservationService {
 
         Reservation reservation = new Reservation(user, product, part, reservationDate, number, totalPrice);
         reservationRepository.save(reservation);
+
+        return new ReservationResDto(
+                reservation.getId(),
+                user.getId(),
+                product.getId(),
+                part.getId(),
+                reservation.getReservationDate(),
+                reservation.getNumber(),
+                reservation.getTotalPrice(),
+                reservation.getStatus(),
+                reservation.getCreatedAt(),
+                reservation.getUpdatedAt()
+        );
+    }
+
+    @Transactional
+    public void deleteReservation(Long productId, Long reservationId) {
+        productService.findProductById(productId);
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new IllegalArgumentException("아이디 " + reservationId + "에 해당하는 레저/티켓 예약을 찾을 수 없습니다."));
+
+        reservationRepository.delete(reservation);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ReservationResDto> findAllByUserIdAndProductId(Long productId) {
+        User user = userService.getUserById(2L); // 임시 user, 이후 수정 예정
+        Product product = productService.findProductById(productId);
+        Part part = partService.findPartByProductId(productId);
+
+        List<Reservation> reservations = reservationRepository.findAllByUserIdAndProductId(user.getId(), product.getId());
+
+        return reservations.stream().map(reservation -> new ReservationResDto(
+                        reservation.getId(),
+                        user.getId(),
+                        product.getId(),
+                        part.getId(),
+                        reservation.getReservationDate(),
+                        reservation.getNumber(),
+                        reservation.getTotalPrice(),
+                        reservation.getStatus(),
+                        reservation.getCreatedAt(),
+                        reservation.getUpdatedAt()
+                ))
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public ReservationResDto findByUserIdAndProductIdAndId(Long productId, Long reservationId) {
+        User user = userService.getUserById(2L); // 임시 user, 이후 수정 예정
+        Product product = productService.findProductById(productId);
+        Part part = partService.findPartByProductId(productId);
+
+        Reservation reservation = reservationRepository.findByUserIdAndProductIdAndId(user.getId(), product.getId(), reservationId);
 
         return new ReservationResDto(
                 reservation.getId(),
