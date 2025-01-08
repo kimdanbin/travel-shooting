@@ -42,11 +42,9 @@ public class CommentService {
 
     @Transactional
     public CommentResDto updateComment(Long commentId, CommentReqDto commentReqDto) {
-        Comment comment = commentRepository.findByIdOrElseThrow(commentId);// 1. comment가 있는지 확인.,// 2. 있으면 comment를 조회해서 가져온다.
-        comment.updateComment(commentReqDto.getComment());  // 3. 가져온 comment를 입력받은 내용대로 수정.
-
-        Comment savedComment = commentRepository.save(comment);     // 4. 수정한 comment를 DB에 저장.
-
+        Comment comment = commentRepository.findByIdOrElseThrow(commentId);
+        comment.updateComment(commentReqDto.getComment());
+        Comment savedComment = commentRepository.save(comment);
         return CommentResDto.toDto(savedComment);
     }
 
