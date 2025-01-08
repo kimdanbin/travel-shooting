@@ -1,6 +1,5 @@
 package com.example.travelshooting.file.entity;
 
-import com.example.travelshooting.poster.Poster;
 import com.example.travelshooting.product.Product;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -17,10 +16,6 @@ public class LeisureFile {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "poster_id")
-    private Poster poster;
-
-    @ManyToOne
     @JoinColumn(name = "leisure_product_id")
     private Product product;
 
@@ -33,7 +28,15 @@ public class LeisureFile {
     @JoinColumn(name = "file_type")
     private String fileType;
 
+    // 임시
     public LeisureFile(String fileName, String url, String fileType) {
+        this.fileName = fileName;
+        this.url = url;
+        this.fileType = fileType;
+    }
+
+    public LeisureFile(Product product, String fileName, String url, String fileType) {
+        this.product = product;
         this.fileName = fileName;
         this.url = url;
         this.fileType = fileType;
