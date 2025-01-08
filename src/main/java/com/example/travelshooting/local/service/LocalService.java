@@ -1,9 +1,12 @@
 package com.example.travelshooting.local.service;
 
 import com.example.travelshooting.common.Const;
+import com.example.travelshooting.local.controller.LocalController;
 import com.example.travelshooting.local.dto.LocalResDto;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.hibernate.validator.internal.util.stereotypes.Lazy;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -24,6 +27,7 @@ import java.util.stream.StreamSupport;
 
 @Service
 public class LocalService {
+
 
     @Value("${kakao.api.map.key}")
     private String apiKey;
