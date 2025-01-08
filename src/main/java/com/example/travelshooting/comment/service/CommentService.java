@@ -7,6 +7,7 @@ import com.example.travelshooting.comment.Comment;
 import com.example.travelshooting.comment.repository.CommentRepository;
 import com.example.travelshooting.poster.Poster;
 import com.example.travelshooting.poster.repository.PosterRepository;
+import com.example.travelshooting.poster.service.PosterService;
 import com.example.travelshooting.user.User;
 import com.example.travelshooting.user.UserService;
 import jakarta.transaction.Transactional;
@@ -22,20 +23,18 @@ import java.util.stream.Collectors;
 public class CommentService {
     private final CommentRepository commentRepository;
     private final UserService userService;
-    private final PosterRepository posterRepository;
+    private final PosterService posterService;
 
     @Transactional
     public CommentResDto createComment(Long posterId, CommentReqDto commentReqDto) {
         User user = userService.getUserById(1L);//임시로 만듬
-        Poster poster = posterRepository.findByIdOrElseThrow(posterId);
+        Poster poster = posterService.getPosterById(posterId);
         Comment comment = new Comment(user, poster, commentReqDto.getComment());
         Comment savedComment = commentRepository.save(comment);
         return CommentResDto.toDto(savedComment);
     }
 
-    @Transactional
     public List<CommentResDto> getComments(Long posterId){
-        commentRepository.findByIdOrElseThrow(posterId);
         List<Comment> comments = commentRepository.findAllByPosterId(posterId);
         return comments.stream().map(CommentResDto::toDto).collect(Collectors.toList());
     }
@@ -44,13 +43,12 @@ public class CommentService {
     public CommentResDto updateComment(Long commentId, CommentReqDto commentReqDto) {
         Comment comment = commentRepository.findByIdOrElseThrow(commentId);
         comment.updateComment(commentReqDto.getComment());
-        Comment savedComment = commentRepository.save(comment);
-        return CommentResDto.toDto(savedComment);
+        return CommentResDto.toDto(comment);
     }
 
     @Transactional
     public void deleteComment(Long commentId) {
         Comment comment = commentRepository.findByIdOrElseThrow(commentId);
-        commentRepository.delete(comment);
+        comment.deleteComment();
     }
 }

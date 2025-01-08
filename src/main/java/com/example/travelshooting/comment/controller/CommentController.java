@@ -3,6 +3,7 @@ package com.example.travelshooting.comment.controller;
 import com.example.travelshooting.comment.dto.CommentReqDto;
 import com.example.travelshooting.comment.dto.CommentResDto;
 import com.example.travelshooting.comment.service.CommentService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,14 +14,14 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/posters/{posterId}/comments")
-public class CommnentController {
+public class CommentController {
     private final CommentService commentService;
 
 
     //댓글 생성
     @PostMapping
     public ResponseEntity<CommentResDto> createComment(@PathVariable Long posterId,
-                                                            @RequestBody CommentReqDto commentReqDto) {
+                                                       @Valid@RequestBody CommentReqDto commentReqDto) {
         CommentResDto commentResDto  = commentService.createComment(posterId, commentReqDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(commentResDto);
 
@@ -35,8 +36,8 @@ public class CommnentController {
     //댓글 수정
     @PatchMapping("/{commentId}")
     public ResponseEntity<CommentResDto> updateComment(@PathVariable Long commentId,
-                                                       @RequestBody CommentReqDto commentReqDto) {
-        CommentResDto commentResDto = commentService.updateComment(commentId,commentReqDto);
+                                                       @Valid@RequestBody CommentReqDto commentReqDto) {
+        CommentResDto commentResDto = commentService.updateComment(commentId, commentReqDto);
         return ResponseEntity.ok(commentResDto);
     }
     //댓글 삭제

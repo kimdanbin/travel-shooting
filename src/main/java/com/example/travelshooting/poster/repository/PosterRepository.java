@@ -9,10 +9,4 @@ import org.springframework.web.server.ResponseStatusException;
 
 @Repository
 public interface PosterRepository extends JpaRepository<Poster,Long> {
-    default Poster findByIdOrElseThrow(Long id) {
-        return findById(id).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "포스터가 없습니다."));
-    }
-
-
-
 }
