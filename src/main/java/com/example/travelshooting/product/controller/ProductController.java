@@ -51,4 +51,18 @@ public class ProductController {
         return new ResponseEntity<>(new CommonResDto<>("레저/티켓 수정 완료", result), HttpStatus.OK);
     }
 
+    /**
+     * 레저/티켓 상품 삭제 API
+     *
+     * @param productId 삭제할 레저/티켓 상품의 id
+     * @return 삭제 성공 시, 메시지와 함께 상태코드 200 반환
+     */
+    @DeleteMapping("/partners/companies/{companyId}/products/{productId}")
+    public ResponseEntity<String> deletepProduct(@PathVariable Long productId) {
+
+        productService.deleteCompany(productId);
+
+        return new ResponseEntity<>("레저/티켓 삭제 완료", HttpStatus.OK);
+    }
+
 }
