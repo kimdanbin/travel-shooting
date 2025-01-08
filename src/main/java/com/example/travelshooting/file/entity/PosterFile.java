@@ -1,7 +1,6 @@
 package com.example.travelshooting.file.entity;
 
 import com.example.travelshooting.poster.Poster;
-import com.example.travelshooting.product.Product;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,10 +19,6 @@ public class PosterFile {
     @JoinColumn(name = "poster_id")
     private Poster poster;
 
-    @ManyToOne
-    @JoinColumn(name = "leisure_product_id")
-    private Product product;
-
     @JoinColumn(name = "file_name")
     private String fileName;
 
@@ -33,7 +28,15 @@ public class PosterFile {
     @JoinColumn(name = "file_type")
     private String fileType;
 
+    // 임시
     public PosterFile(String fileName, String url, String fileType) {
+        this.fileName = fileName;
+        this.url = url;
+        this.fileType = fileType;
+    }
+
+    public PosterFile(Poster poster, String fileName, String url, String fileType) {
+        this.poster = poster;
         this.fileName = fileName;
         this.url = url;
         this.fileType = fileType;
