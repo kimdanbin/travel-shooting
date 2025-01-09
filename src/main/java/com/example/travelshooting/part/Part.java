@@ -21,7 +21,7 @@ public class Part extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "leisure_product_id", nullable = false)
     private Product product;
 
