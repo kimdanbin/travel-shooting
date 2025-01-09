@@ -13,13 +13,12 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/posters/{posterId}/attachments")
 public class PosterFileController {
 
     private final PosterFileService posterFileService;
 
     // 파일 업로드
-    @PostMapping
+    @PostMapping("/posters/{posterId}/attachments")
     public ResponseEntity<CommonListResDto<FileResDto>> uploadFile(
             @PathVariable Long posterId,
             @RequestParam List<MultipartFile> files
@@ -31,7 +30,7 @@ public class PosterFileController {
     }
 
     // 파일 삭제
-    @DeleteMapping("/{attachmentId}")
+    @DeleteMapping("/posters/{posterId}/attachments/{attachmentId}")
     public ResponseEntity<Void> deleteFile(
             @PathVariable Long posterId,
             @PathVariable Long attachmentId
@@ -40,5 +39,14 @@ public class PosterFileController {
         posterFileService.deleteFile(posterId, attachmentId);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    // 최신 shorts 5개 조회
+    @GetMapping("/attachments")
+    public ResponseEntity<CommonListResDto<FileResDto>> getNewFiveShorts() {
+
+        List<FileResDto> newFiveShorts = posterFileService.getNewFiveShorts();
+
+        return new ResponseEntity<>(new CommonListResDto<>("최신 shorts 5개 조회 완료", newFiveShorts), HttpStatus.OK);
     }
 }
