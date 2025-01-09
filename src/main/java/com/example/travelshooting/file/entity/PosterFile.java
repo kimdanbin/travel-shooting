@@ -1,5 +1,6 @@
 package com.example.travelshooting.file.entity;
 
+import com.example.travelshooting.common.BaseEntity;
 import com.example.travelshooting.poster.Poster;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -9,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "poster_file")
 @Getter
 @NoArgsConstructor
-public class PosterFile {
+public class PosterFile extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
