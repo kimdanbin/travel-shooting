@@ -67,7 +67,7 @@ public class ReservationPartnerService {
     }
 
     @Transactional
-    public ReservationResDto updateReservationStatus(Long productId, Long reservationId, ReservationStatus status) {
+    public ReservationResDto updateReservationStatus(Long productId, Long reservationId, String status) {
         User user = userService.getUserById(4L); // 임시 user, 이후 수정 예정
         Reservation reservation = reservationRepository.findByProductIdAndUserIdAndId(productId, user.getId(), reservationId);
 
@@ -75,7 +75,12 @@ public class ReservationPartnerService {
             throw new IllegalArgumentException("아이디 " + productId + "에 해당하는 예약 내역이 없습니다.");
         }
 
-        Reservation updatedReservation = reservationRepository.updateReservationStatus(status, reservationId);
+        if (!reservation.getStatus().equals(ReservationStatus.PENDING)) {
+            throw new IllegalArgumentException("이미 수락 또는 거절 상태입니다.");
+        }
+
+        reservation.updateStatus(ReservationStatus.valueOf(status));
+        Reservation updatedReservation = reservationRepository.save(reservation);
 
         return new ReservationResDto(
                 updatedReservation.getId(),
