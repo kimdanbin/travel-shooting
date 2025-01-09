@@ -8,7 +8,7 @@ import java.time.LocalTime;
 
 @Getter
 @RequiredArgsConstructor
-public class PartResDto implements BaseDtoDataType {
+public class PartResDto implements BaseDtoDataType{
 
     private final Long id;
     private final LocalTime openAt;
