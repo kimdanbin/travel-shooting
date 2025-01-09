@@ -1,7 +1,6 @@
 package com.example.travelshooting.reservation.service;
 
-import com.example.travelshooting.product.Product;
-import com.example.travelshooting.product.service.ProductService;
+import com.example.travelshooting.enums.ReservationStatus;
 import com.example.travelshooting.reservation.Reservation;
 import com.example.travelshooting.reservation.dto.ReservationResDto;
 import com.example.travelshooting.reservation.repository.ReservationRepository;
@@ -12,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -19,23 +19,75 @@ public class ReservationPartnerService {
 
     private final ReservationRepository reservationRepository;
     private final UserService userService;
-    private final ProductService productService;
 
     @Transactional(readOnly = true)
     public List<ReservationResDto> findByProductIdAndUserId(Long productId) {
         User partner = userService.getUserById(4L); // 임시 user, 이후 수정 예정
-        Product product = productService.findProductById(productId);
+        List<Reservation> reservations = reservationRepository.findByProductIdAndUserId(productId, partner.getId());
 
-        return reservationRepository.findByProductIdAndUserId(product.getId(), partner.getId());
+        if (reservations.isEmpty()) {
+            throw new IllegalArgumentException("아이디 " + productId + "에 해당하는 예약 내역이 없습니다.");
+        }
+
+        return reservations.stream().map(reservation -> new ReservationResDto(
+                reservation.getId(),
+                reservation.getUser().getId(),
+                reservation.getProduct().getId(),
+                reservation.getPart().getId(),
+                reservation.getReservationDate(),
+                reservation.getNumber(),
+                reservation.getTotalPrice(),
+                reservation.getStatus(),
+                reservation.getCreatedAt(),
+                reservation.getUpdatedAt()
+        )).collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
     public ReservationResDto findByProductIdAndUserIdAndId(Long productId, Long reservationId) {
-        User partner = userService.getUserById(4L); // 임시 user, 이후 수정 예정
-        Product product = productService.findProductById(productId);
-        Reservation reservation = reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new IllegalArgumentException("아이디 " + reservationId + "에 해당하는 레저/티켓 예약을 찾을 수 없습니다."));
+        User user = userService.getUserById(4L); // 임시 user, 이후 수정 예정
+        Reservation reservation = reservationRepository.findByProductIdAndUserIdAndId(productId, user.getId(), reservationId);
 
-        return reservationRepository.findByProductIdAndUserIdAndId(product.getId(), partner.getId(), reservation.getId());
+        if (reservation == null) {
+            throw new IllegalArgumentException("아이디 " + productId + "에 해당하는 예약 내역이 없습니다.");
+        }
+
+        return new ReservationResDto(
+                reservation.getId(),
+                reservation.getUser().getId(),
+                reservation.getProduct().getId(),
+                reservation.getPart().getId(),
+                reservation.getReservationDate(),
+                reservation.getNumber(),
+                reservation.getTotalPrice(),
+                reservation.getStatus(),
+                reservation.getCreatedAt(),
+                reservation.getUpdatedAt()
+                );
+    }
+
+    @Transactional
+    public ReservationResDto updateReservationStatus(Long productId, Long reservationId, ReservationStatus status) {
+        User user = userService.getUserById(4L); // 임시 user, 이후 수정 예정
+        Reservation reservation = reservationRepository.findByProductIdAndUserIdAndId(productId, user.getId(), reservationId);
+
+        if (reservation == null) {
+            throw new IllegalArgumentException("아이디 " + productId + "에 해당하는 예약 내역이 없습니다.");
+        }
+
+        Reservation updatedReservation = reservationRepository.updateReservationStatus(status, reservationId);
+
+        return new ReservationResDto(
+                updatedReservation.getId(),
+                updatedReservation.getUser().getId(),
+                updatedReservation.getProduct().getId(),
+                updatedReservation.getPart().getId(),
+                updatedReservation.getReservationDate(),
+                updatedReservation.getNumber(),
+                updatedReservation.getTotalPrice(),
+                updatedReservation.getStatus(),
+                updatedReservation.getCreatedAt(),
+                updatedReservation.getUpdatedAt()
+        );
     }
 }
