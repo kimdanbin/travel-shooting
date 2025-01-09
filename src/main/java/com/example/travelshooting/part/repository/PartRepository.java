@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface PartRepository extends JpaRepository<Part, Long> {
 
-    Part findByProductId(Long productId);
+    Part findPartByProductId(Long productId);
 }
