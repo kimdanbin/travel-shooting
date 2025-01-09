@@ -2,6 +2,7 @@ package com.example.travelshooting.reservation.service;
 
 import com.example.travelshooting.product.Product;
 import com.example.travelshooting.product.service.ProductService;
+import com.example.travelshooting.reservation.Reservation;
 import com.example.travelshooting.reservation.dto.ReservationResDto;
 import com.example.travelshooting.reservation.repository.ReservationRepository;
 import com.example.travelshooting.user.User;
@@ -26,5 +27,15 @@ public class ReservationPartnerService {
         Product product = productService.findProductById(productId);
 
         return reservationRepository.findByProductIdAndUserId(product.getId(), partner.getId());
+    }
+
+    @Transactional(readOnly = true)
+    public ReservationResDto findByProductIdAndUserIdAndId(Long productId, Long reservationId) {
+        User partner = userService.getUserById(4L); // 임시 user, 이후 수정 예정
+        Product product = productService.findProductById(productId);
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new IllegalArgumentException("아이디 " + reservationId + "에 해당하는 레저/티켓 예약을 찾을 수 없습니다."));
+
+        return reservationRepository.findByProductIdAndUserIdAndId(product.getId(), partner.getId(), reservation.getId());
     }
 }

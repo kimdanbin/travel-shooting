@@ -1,6 +1,7 @@
 package com.example.travelshooting.reservation.controller;
 
 import com.example.travelshooting.common.CommonListResDto;
+import com.example.travelshooting.common.CommonResDto;
 import com.example.travelshooting.reservation.dto.ReservationResDto;
 import com.example.travelshooting.reservation.service.ReservationPartnerService;
 import lombok.RequiredArgsConstructor;
@@ -29,5 +30,11 @@ public class ReservationPartnerController {
     }
 
     // 레저/티켓 예약 단 건 조회
+    @GetMapping("/{reservationId}")
+    public ResponseEntity<CommonResDto<ReservationResDto>> findByProductIdAndUserIdAndId(@PathVariable Long productId,
+                                                                                @PathVariable Long reservationId) {
+        ReservationResDto reservation = reservationPartnerService.findByProductIdAndUserIdAndId(productId, reservationId);
 
+        return new ResponseEntity<>(new CommonResDto<>("레저/티켓 예약 단 건 조회", reservation), HttpStatus.OK);
+    }
 }
