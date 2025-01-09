@@ -52,4 +52,16 @@ public class PartController {
         return new ResponseEntity<>(new CommonResDto<>("레저/티켓 일정 수정 완료", result), HttpStatus.OK);
     }
 
+    /**
+     * 레저/티켓 일정 삭제 API
+     *
+     * @param partId 삭제할 레저/티켓 일정의 id
+     * @return 삭제 성공 시, 메시지와 함께 상태코드 200 반환
+     */
+    @DeleteMapping("/partners/products/{productId}/parts/{partId}")
+    public ResponseEntity<String> deletePart(@PathVariable Long partId) {
+        partService.deleteCompany(partId);
+
+        return new ResponseEntity<>("레저/티켓 일정 삭제 완료", HttpStatus.OK);
+    }
 }

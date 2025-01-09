@@ -9,6 +9,7 @@ import com.example.travelshooting.product.Product;
 import com.example.travelshooting.product.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -32,6 +33,7 @@ public class PartService {
         );
     }
 
+    @Transactional
     public PartResDto updatePart(Long partId, UpdatePartReqDto updatePartReqDto) {
         Part findPart = partRepository.findByIdOrElseThrow(partId);
         findPart.updatePart(
@@ -47,6 +49,12 @@ public class PartService {
                 findPart.getCloseAt(),
                 findPart.getNumber()
         );
+    }
+
+    @Transactional
+    public void deleteCompany(Long partId) {
+        Part findPart = partRepository.findByIdOrElseThrow(partId);
+        partRepository.delete(findPart);
     }
 
     public Part findPartById(Long partId) {
