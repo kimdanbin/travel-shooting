@@ -5,6 +5,8 @@ import com.example.travelshooting.part.repository.PartRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class PartService {
@@ -24,5 +26,16 @@ public class PartService {
         }
 
         return part;
+    }
+
+    public List<Part> findPartsByProductId(Long productId) {
+
+        List<Part> parts = partRepository.findPartsByProductId(productId);
+
+        if (parts.isEmpty()) {
+            throw new IllegalArgumentException("아이디 " + productId + "에 해당하는 레저/티켓 일정을 찾을 수 없습니다.");
+        }
+
+        return parts;
     }
 }
