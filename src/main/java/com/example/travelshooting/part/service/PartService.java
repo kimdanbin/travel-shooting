@@ -3,6 +3,7 @@ package com.example.travelshooting.part.service;
 import com.example.travelshooting.part.Part;
 import com.example.travelshooting.part.dto.CreatePartReqDto;
 import com.example.travelshooting.part.dto.PartResDto;
+import com.example.travelshooting.part.dto.UpdatePartReqDto;
 import com.example.travelshooting.part.repository.PartRepository;
 import com.example.travelshooting.product.Product;
 import com.example.travelshooting.product.service.ProductService;
@@ -28,6 +29,23 @@ public class PartService {
                 savedPart.getOpenAt(),
                 savedPart.getCloseAt(),
                 savedPart.getNumber()
+        );
+    }
+
+    public PartResDto updatePart(Long partId, UpdatePartReqDto updatePartReqDto) {
+        Part findPart = partRepository.findByIdOrElseThrow(partId);
+        findPart.updatePart(
+                updatePartReqDto.getOpenAt(),
+                updatePartReqDto.getCloseAt(),
+                updatePartReqDto.getNumber()
+        );
+        partRepository.save(findPart);
+
+        return new PartResDto(
+                findPart.getId(),
+                findPart.getOpenAt(),
+                findPart.getCloseAt(),
+                findPart.getNumber()
         );
     }
 
