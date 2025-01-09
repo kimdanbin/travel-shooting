@@ -43,4 +43,11 @@ public class Part extends BaseEntity {
         this.number = number;
         this.product = product;
     }
+
+    public void updatePart(LocalTime openAt, LocalTime closeAt,  int number) {
+        this.openAt = openAt;
+        this.closeAt = closeAt;
+        this.number = number;
+    }
+
 }
