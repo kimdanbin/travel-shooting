@@ -59,4 +59,17 @@ public class PosterFileService {
         posterFileRepository.findById(attachmentId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         posterFileRepository.deleteById(attachmentId);
     }
+
+    // 최신 shorts 5개 조회
+    public List<FileResDto> getNewFiveShorts() {
+
+        List<PosterFile> newFiveShorts = posterFileRepository.getNewFiveShorts();
+        List<FileResDto> newFiveShortsDtos = new ArrayList<>();
+
+        for (PosterFile posterFile : newFiveShorts) {
+            newFiveShortsDtos.add(new FileResDto(posterFile));
+        }
+
+        return newFiveShortsDtos;
+    }
 }
