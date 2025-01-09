@@ -36,4 +36,11 @@ public class Part extends BaseEntity {
 
     @OneToMany(mappedBy = "part")
     private List<Reservation> reservations = new ArrayList<>();
+
+    public Part(LocalTime openAt, LocalTime closeAt,  int number, Product product) {
+        this.openAt = openAt;
+        this.closeAt = closeAt;
+        this.number = number;
+        this.product = product;
+    }
 }
