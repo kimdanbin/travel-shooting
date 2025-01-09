@@ -1,7 +1,11 @@
 package com.example.travelshooting.part.service;
 
 import com.example.travelshooting.part.Part;
+import com.example.travelshooting.part.dto.CreatePartReqDto;
+import com.example.travelshooting.part.dto.PartResDto;
 import com.example.travelshooting.part.repository.PartRepository;
+import com.example.travelshooting.product.Product;
+import com.example.travelshooting.product.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -11,7 +15,21 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PartService {
 
+    private final ProductService productService;
     private final PartRepository partRepository;
+
+    public PartResDto createPart(Long productId, CreatePartReqDto createPartReqDto) {
+        Product product = productService.findProductById(productId);
+        Part part = createPartReqDto.toEntity(product);
+        Part savedPart = partRepository.save(part);
+
+        return  new PartResDto(
+                savedPart.getId(),
+                savedPart.getOpenAt(),
+                savedPart.getCloseAt(),
+                savedPart.getNumber()
+        );
+    }
 
     public Part findPartById(Long partId) {
         return partRepository.findById(partId)
@@ -38,4 +56,5 @@ public class PartService {
 
         return parts;
     }
+
 }

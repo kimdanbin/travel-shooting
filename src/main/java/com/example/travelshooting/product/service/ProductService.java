@@ -2,9 +2,6 @@ package com.example.travelshooting.product.service;
 
 import com.example.travelshooting.company.Company;
 import com.example.travelshooting.company.service.CompanyService;
-import com.example.travelshooting.part.dto.PartResDto;
-import com.example.travelshooting.part.repository.PartRepository;
-import com.example.travelshooting.part.service.PartService;
 import com.example.travelshooting.product.Product;
 import com.example.travelshooting.product.dto.*;
 import com.example.travelshooting.product.repository.ProductRepository;
@@ -22,10 +19,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ProductService {
 
+//    private final PartService partService;
     private final ProductRepository productRepository;
     private final CompanyService companyService;
-    private final PartRepository partRepository;
-    private final PartService partService;
 
     @Transactional
     public CreateProductResDto createProduct(Long companyId, CreateProductReqDto createProductReqDto) {
@@ -75,23 +71,8 @@ public class ProductService {
     @Transactional(readOnly = true)
     public ProductDetailResDto findProduct(Long productId) {
         Product findProduct = productRepository.findByIdOrElseThrow(productId);
-        List<PartResDto> partResDtoList = partService.findPartsByProductId(productId)
-                .stream()
-                .map(part -> new PartResDto(part.getId(), part.getOpenAt(), part.getCloseAt(), part.getNumber()))
-                .collect(Collectors.toList());
 
-        return new ProductDetailResDto(
-                findProduct.getId(),
-                findProduct.getCompany().getId(),
-                findProduct.getName(),
-                findProduct.getDescription(),
-                findProduct.getPrice(),
-                findProduct.getAddress(),
-                findProduct.getQuantity(),
-                findProduct.getCreatedAt(),
-                findProduct.getUpdatedAt(),
-                partResDtoList
-        );
+        return ProductDetailResDto.toDto(findProduct);
     }
 
 
