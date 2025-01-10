@@ -39,9 +39,9 @@ public class ReservationService {
 
         return new ReservationResDto(
                 reservation.getId(),
-                user.getId(),
-                product.getId(),
-                part.getId(),
+                reservation.getUser().getId(),
+                reservation.getProduct().getId(),
+                reservation.getPart().getId(),
                 reservation.getReservationDate(),
                 reservation.getNumber(),
                 reservation.getTotalPrice(),
@@ -63,16 +63,17 @@ public class ReservationService {
     @Transactional(readOnly = true)
     public List<ReservationResDto> findAllByUserIdAndProductId(Long productId) {
         User user = userService.getUserById(2L); // 임시 user, 이후 수정 예정
-        Product product = productService.findProductById(productId);
-        Part part = partService.findPartByProductId(productId);
+        List<Reservation> reservations = reservationRepository.findAllByUserIdAndProductId(user.getId(), productId);
 
-        List<Reservation> reservations = reservationRepository.findAllByUserIdAndProductId(user.getId(), product.getId());
+        if (reservations.isEmpty()) {
+            throw new IllegalArgumentException("아이디 " + productId + "에 해당하는 예약 내역이 없습니다.");
+        }
 
         return reservations.stream().map(reservation -> new ReservationResDto(
                         reservation.getId(),
-                        user.getId(),
-                        product.getId(),
-                        part.getId(),
+                        reservation.getUser().getId(),
+                        reservation.getProduct().getId(),
+                        reservation.getPart().getId(),
                         reservation.getReservationDate(),
                         reservation.getNumber(),
                         reservation.getTotalPrice(),
@@ -86,16 +87,17 @@ public class ReservationService {
     @Transactional(readOnly = true)
     public ReservationResDto findByUserIdAndProductIdAndId(Long productId, Long reservationId) {
         User user = userService.getUserById(2L); // 임시 user, 이후 수정 예정
-        Product product = productService.findProductById(productId);
-        Part part = partService.findPartByProductId(productId);
+        Reservation reservation = reservationRepository.findByUserIdAndProductIdAndId(user.getId(), productId, reservationId);
 
-        Reservation reservation = reservationRepository.findByUserIdAndProductIdAndId(user.getId(), product.getId(), reservationId);
+        if (reservation == null) {
+            throw new IllegalArgumentException("아이디 " + productId + "에 해당하는 예약 내역이 없습니다.");
+        }
 
         return new ReservationResDto(
                 reservation.getId(),
-                user.getId(),
-                product.getId(),
-                part.getId(),
+                reservation.getUser().getId(),
+                reservation.getProduct().getId(),
+                reservation.getPart().getId(),
                 reservation.getReservationDate(),
                 reservation.getNumber(),
                 reservation.getTotalPrice(),
