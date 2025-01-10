@@ -33,6 +33,37 @@ public class PosterController {
         return new ResponseEntity<>(new CommonResDto<>("포스터 생성 완료", posterResDto), HttpStatus.CREATED);
     }
 
+    // 포스터 단건 조회
+    @GetMapping("/{posterId}")
+    public ResponseEntity<CommonResDto<PosterResDto>> findPoster(
+            @PathVariable Long posterId
+    ) {
+
+        PosterResDto posterResDto = posterService.findPoster(posterId);
+
+        return new ResponseEntity<>(new CommonResDto<>("포스터 단 건 조회 완료", posterResDto), HttpStatus.OK);
+    }
+
+    // 포스터 수정
+    @PatchMapping("/{posterId}")
+    public ResponseEntity<CommonResDto<PosterResDto>> updatePoster(
+            @PathVariable Long posterId,
+            @RequestBody PosterReqDto posterReqDto
+    ) {
+
+        PosterResDto posterResDto = posterService.updatePoster(
+                posterId,
+                posterReqDto.getRestaurantId(),
+                posterReqDto.getPaymentId(),
+                posterReqDto.getTitle(),
+                posterReqDto.getContent(),
+                posterReqDto.getTravelStartAt(),
+                posterReqDto.getTravelEndAt()
+        );
+
+        return new ResponseEntity<>(new CommonResDto<>("포스터 수정 완료", posterResDto), HttpStatus.OK);
+    }
+
     // 포스터 삭제
     @DeleteMapping("/{posterId}")
     public ResponseEntity<String> deletePoster(

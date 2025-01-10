@@ -66,4 +66,24 @@ public class Poster extends BaseEntity {
         this.travelEndAt = travelEndAt;
     }
 
+    public void updateRestaurant(Restaurant restaurant) {
+        this.restaurant = restaurant;
+    }
+
+    public void updateTitle(String title) {
+        this.title = title;
+    }
+
+    public void updateContent(String content) {
+        this.content = content;
+    }
+
+    public void updateTravelStartAt(LocalDateTime travelStartAt) {
+        this.travelStartAt = travelStartAt;
+    }
+
+    public void updateTravelEndAt(LocalDateTime travelEndAt) {
+        this.travelEndAt = travelEndAt;
+    }
+
 }
