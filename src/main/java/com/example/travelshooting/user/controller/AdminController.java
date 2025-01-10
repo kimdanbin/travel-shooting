@@ -1,0 +1,29 @@
+package com.example.travelshooting.user.controller;
+
+import com.example.travelshooting.common.CommonResDto;
+import com.example.travelshooting.user.dto.UserReqDto;
+import com.example.travelshooting.user.dto.UserResDto;
+import com.example.travelshooting.user.service.AdminService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/admins")
+public class AdminController {
+
+  private final AdminService adminService;
+
+  @PostMapping
+  public ResponseEntity<CommonResDto<UserResDto>> adminSignup(@Valid @RequestBody UserReqDto userReqDto) {
+    UserResDto adminSignup = adminService.adminSignup(userReqDto.getEmail(), userReqDto.getPassword(), userReqDto.getName());
+
+    return new ResponseEntity<>(new CommonResDto<>("관리자 회원가입 완료", adminSignup), HttpStatus.CREATED);
+  }
+}

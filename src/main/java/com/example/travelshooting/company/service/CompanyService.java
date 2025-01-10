@@ -5,7 +5,7 @@ import com.example.travelshooting.company.repository.CompanyRepository;
 import com.example.travelshooting.company.dto.CompanyReqDto;
 import com.example.travelshooting.company.dto.CompanyResDto;
 import com.example.travelshooting.user.User;
-import com.example.travelshooting.user.UserService;
+import com.example.travelshooting.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
