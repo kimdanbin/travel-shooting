@@ -6,13 +6,11 @@ import com.example.travelshooting.comment.dto.CommentResDto;
 import com.example.travelshooting.comment.Comment;
 import com.example.travelshooting.comment.repository.CommentRepository;
 import com.example.travelshooting.poster.Poster;
-import com.example.travelshooting.poster.repository.PosterRepository;
 import com.example.travelshooting.poster.service.PosterService;
 import com.example.travelshooting.user.User;
-import com.example.travelshooting.user.UserService;
+import com.example.travelshooting.user.service.UserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
