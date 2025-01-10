@@ -40,6 +40,15 @@ dependencies {
 
 	// xml
 	implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.13.1'
+
+	// JWT
+	compileOnly 'io.jsonwebtoken:jjwt-api:0.12.3'
+	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.3'
+	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.3'
+
+	// spring-security
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	testImplementation 'org.springframework.security:spring-security-test'
 }
 
 tasks.named('test') {
