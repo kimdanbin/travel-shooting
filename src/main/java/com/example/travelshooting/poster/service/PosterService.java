@@ -6,7 +6,7 @@ import com.example.travelshooting.poster.repository.PosterRepository;
 import com.example.travelshooting.restaurant.Restaurant;
 import com.example.travelshooting.restaurant.service.RestaurantService;
 import com.example.travelshooting.user.User;
-import com.example.travelshooting.user.UserService;
+import com.example.travelshooting.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
