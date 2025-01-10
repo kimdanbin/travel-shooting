@@ -2,16 +2,11 @@ package com.example.travelshooting.config.util;
 
 import com.example.travelshooting.user.User;
 import com.example.travelshooting.user.repository.UserRepository;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.UnsupportedJwtException;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -26,6 +21,7 @@ import java.util.function.Function;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class JwtProvider {
 
   /**
@@ -43,7 +39,7 @@ public class JwtProvider {
 
   private final UserRepository userRepository;
 
-  public String generateToken(Authentication authentication) throws EntityNotFoundException {
+  public String generateToken(Authentication authentication) {
     String username = authentication.getName();
     return this.generateTokenBy(username);
   }
@@ -55,21 +51,23 @@ public class JwtProvider {
 
   public boolean validToken(String token) throws JwtException {
     try {
-      return !tokenExpired(token);
+      return !this.tokenExpired(token);
     } catch (MalformedJwtException e) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "잘못된 JWT 토큰입니다.");
+      log.error("잘못된 JWT 토큰입니다.: {}", e.getMessage());
     } catch (ExpiredJwtException e) {
-      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "JWT 토큰이 만료되었습니다.");
+      log.error("JWT 토큰이 만료되었습니다.: {}", e.getMessage());
     } catch (UnsupportedJwtException e) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "지원되지 않는 JWT 토큰입니다.");
+      log.error("지원되지 않는 JWT 토큰입니다.: {}", e.getMessage());
     }
+
+    return false;
   }
 
-  private String generateTokenBy(String email) throws EntityNotFoundException {
+  private String generateTokenBy(String email) {
     Optional<User> user = userRepository.findByEmail(email);
 
     if (user.isEmpty()) {
-      throw new EntityNotFoundException("유효하지 않은 이메일 입니다.");
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "유효하지 않은 이메일 입니다.");
     }
 
     Date currentDate = new Date();

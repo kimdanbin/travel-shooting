@@ -18,22 +18,12 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
-/**
- * create on 2024. 12. 21. create by IntelliJ IDEA.
- *
- * <p> request마다 처리하는 JWT 기반 인증 필터. </p>
- *
- * @author Seokgyu Hwang (Chris)
- * @version 1.0
- * @since 1.0
- */
 @Component
 @RequiredArgsConstructor
 public class JwtAuthFilter extends OncePerRequestFilter {
 
   private final JwtProvider jwtProvider;
   private final UserDetailsService userDetailsService;
-  private static final String[] WHITE_LIST = {"/users/signup", "/users/login", "/partners", "/admins"};
 
   /**
    * {@inheritDoc}
@@ -41,11 +31,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
                                   FilterChain filterChain) throws ServletException, IOException {
-
-    if (isWhiteListRequest(request)) {
-      filterChain.doFilter(request, response);
-      return;
-    }
 
     authenticate(request);
     filterChain.doFilter(request, response);
@@ -106,15 +91,5 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     // SecurityContext에 인증 객체 저장.
     SecurityContextHolder.getContext().setAuthentication(authentication);
-  }
-
-  private boolean isWhiteListRequest(HttpServletRequest request) {
-    String requestURI = request.getRequestURI();
-    for (String whiteListUri : WHITE_LIST) {
-      if (requestURI.startsWith(whiteListUri)) {
-        return true;
-      }
-    }
-    return false;
   }
 }

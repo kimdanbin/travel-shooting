@@ -63,10 +63,7 @@ public class UserService {
 
         // 사용자 인증 후 인증 객체를 저장
         Authentication authentication = this.authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(
-                user.get().getEmail(),
-                user.get().getPassword())
-        );
+            new UsernamePasswordAuthenticationToken(email, password));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
