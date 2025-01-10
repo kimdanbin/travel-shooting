@@ -24,8 +24,6 @@ import java.util.List;
 @Where(clause = "is_deleted = false")
 public class User extends BaseEntity {
 
-    // 1. ERD 확인 하면서 컬럼 길이 지정하기!
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -36,7 +34,7 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private String password;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 10)
     private String name;
 
     @Column(name = "role", nullable = false)
