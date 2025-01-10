@@ -4,7 +4,6 @@ import com.example.travelshooting.common.BaseEntity;
 import com.example.travelshooting.company.Company;
 import com.example.travelshooting.file.entity.LeisureFile;
 import com.example.travelshooting.part.Part;
-import com.example.travelshooting.poster.Poster;
 import com.example.travelshooting.reservation.Reservation;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -40,9 +39,6 @@ public class Product extends BaseEntity {
 
     @Column(nullable = false)
     private int quantity;
-
-    @OneToMany(mappedBy = "product")
-    private List<Poster> posters = new ArrayList<>();
 
     @OneToMany(mappedBy = "product")
     private List<Reservation> reservations = new ArrayList<>();
