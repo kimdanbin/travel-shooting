@@ -20,7 +20,7 @@ public class PosterFileService {
 
     private final S3Service s3Service;
     private final PosterFileRepository posterFileRepository;
-    // 주석은포스터 서비스 만들어지면 추가 예정
+    // 주석은 포스터 서비스 만들어지면 추가 예정
 
     // 파일 업로드
     @Transactional

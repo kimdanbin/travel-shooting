@@ -8,9 +8,11 @@ import com.example.travelshooting.restaurant.repository.RestaurantRepository;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
@@ -87,5 +89,11 @@ public class RestaurantService {
         return savedRestaurants.stream()
                 .map(GgRestaurantResDto::toDto)
                 .collect(Collectors.toList());
+    }
+
+    // 맛집 아이디로 맛집 찾기
+    public Restaurant getRestaurantById(Long restaurantId) {
+        return restaurantRepository.findById(restaurantId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "아이디 " + restaurantId + "에 해당하는 맛집을 찾을 수 없습니다."));
     }
 }
