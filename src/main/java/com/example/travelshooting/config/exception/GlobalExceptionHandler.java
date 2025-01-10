@@ -9,8 +9,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.nio.file.AccessDeniedException;
@@ -28,16 +30,16 @@ public class GlobalExceptionHandler {
    * @param e HandlerMethodValidationException 인스턴스
    * @return {@code ResponseEntity<CommonResponseBody<String>>}
    */
-//  @ExceptionHandler(HandlerMethodValidationException.class)
-//  protected ResponseEntity<CommonResponseBody<String>> handleMethodValidationExceptions(
-//      HandlerMethodValidationException e) {
-//    String message = e.getParameterValidationResults().getFirst().getResolvableErrors().getFirst()
-//        .getDefaultMessage();
-//
-//    return ResponseEntity
-//        .status(HttpStatus.BAD_REQUEST)
-//        .body(new CommonResponseBody<>(message));
-//  }
+  @ExceptionHandler(HandlerMethodValidationException.class)
+  protected ResponseEntity<CommonResDto<String>> handleMethodValidationExceptions(
+      HandlerMethodValidationException e) {
+    String message = e.getParameterValidationResults().getFirst().getResolvableErrors().getFirst()
+        .getDefaultMessage();
+
+    return ResponseEntity
+        .status(HttpStatus.BAD_REQUEST)
+        .body(new CommonResDto<>(message));
+  }
 
   /**
    * Validation 예외 처리.
@@ -45,15 +47,15 @@ public class GlobalExceptionHandler {
    * @param e MethodArgumentNotValidException 인스턴스
    * @return {@code ResponseEntity<CommonResponseBody<String>>}
    */
-//  @ExceptionHandler(MethodArgumentNotValidException.class)
-//  public ResponseEntity<CommonResponseBody<String>> handleValidationExceptions(
-//      MethodArgumentNotValidException e) {
-//    String message = e.getBindingResult().getAllErrors().getFirst().getDefaultMessage();
-//
-//    return ResponseEntity
-//        .status(HttpStatus.BAD_REQUEST)
-//        .body(new CommonResponseBody<>(message));
-//  }
+  @ExceptionHandler(MethodArgumentNotValidException.class)
+  public ResponseEntity<CommonResDto<String>> handleValidationExceptions(
+      MethodArgumentNotValidException e) {
+    String message = e.getBindingResult().getAllErrors().getFirst().getDefaultMessage();
+
+    return ResponseEntity
+        .status(HttpStatus.BAD_REQUEST)
+        .body(new CommonResDto<>(message));
+  }
 
   /**
    * Security와 관련된 AuthenticationException 예외 처리.
