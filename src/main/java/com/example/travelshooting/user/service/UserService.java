@@ -7,6 +7,7 @@ import com.example.travelshooting.user.User;
 import com.example.travelshooting.user.dto.JwtAuthResDto;
 import com.example.travelshooting.user.dto.UserResDto;
 import com.example.travelshooting.user.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -54,8 +55,8 @@ public class UserService {
         // 사용자 확인.
         Optional<User> user = userRepository.findByEmail(email);
 
-        if (user.isPresent()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 존재하는 이메일입니다.");
+        if (user.isEmpty()) {
+            throw new EntityNotFoundException("유효하지 않는 이메일입니다.");
         }
 
         validatePassword(password, user.get().getPassword());
