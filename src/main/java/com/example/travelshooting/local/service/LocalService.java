@@ -3,6 +3,7 @@ package com.example.travelshooting.local.service;
 import com.example.travelshooting.local.dto.LocalResDto;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -22,7 +23,10 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 @Service
+@RequiredArgsConstructor
 public class LocalService {
+
+    private final RestTemplate restTemplate;
 
     @Value("${kakao.api.map.key}")
     private String apiKey;
@@ -42,7 +46,6 @@ public class LocalService {
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
         // API 호출
-        RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<String> response = restTemplate.exchange(
                 uri,
                 HttpMethod.GET,
