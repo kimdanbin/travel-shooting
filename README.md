@@ -5,14 +5,24 @@
 
 ---------
 
-# 🌟 핵심 기능
+# ✨ 핵심 기능
+- Refresh Token
+- 예약 및 결제
+- Kakao MAP 연동
+- 이미지 및 영상 업로드
+- 검색 기능 최적화
+
+---------
+
+# 📚 기능 설명
 - 레저/티켓
-  - 협력 업체는 관리자를 통해 업체 등록을 할 수 있습니다.
-    - 관리자가 직접 업체에 대한 검증을 하고, 업체를 등록 합니다.
-    - 등록된 업체는 파트너 권한을 얻습니다.
-  - 파트너는 레저/티켓 상품 등록을 할 수 있습니다.
-  - 사용자는 레저/티켓 상품에 대해 예약 및 결제를 할 수 있습니다.
-    - 카카오페이를 사용해 결제할 수 있습니다.
+  - 관리자가 직접 협력 업체에 대한 검증을 하고, 업체 정보를 등록 합니다.
+    - 협력 업체는 파트너 권한을 얻을 수 있습니다.
+  - 파트너는 레저/티켓 상품을 등록할 수 있습니다.
+  - 사용자는 레저/티켓 상품에 대해 예약 신청 및 결제를 할 수 있습니다.
+    - 파트너는 예약 승인 또는 거절을 할 수 있습니다.
+    - 사용자는 예약 승인일로부터 24시간 이내에 결제를 해야 하고, 24시간이 지나면 예약 취소가 됩니다.
+    - 사용자는 카카오페이를 통해 결제할 수 있습니다.
 - 여행 코스 검색
   - 레저/티켓 서비스를 이용한 사용자는 포스터를 통해 여행 경험을 기록할 수 있습니다.
     - 이미지 및 영상 업로드를 같이 할 수 있습니다.
@@ -20,12 +30,9 @@
   - 포스터를 기반으로 다양한 여행 코스를 검색할 수 있습니다.
 - 장소 검색
   - 여행 계획 시간을 줄일 수 있도록 장소 검색 기능도 제공합니다.
-    - 장소명
-    - 지번 주소
-    - 도로명 주소
-    - 전화번호
-    - 경도
-    - 위도
+  - 특정 키워드를 통해 여러 장소를 검색할 수 있습니다.
+- 맛집 검색
+  - 사용자가 포스터에 같이 작성한 맛집을 기준으로 맛집 검색을 할 수 있습니다.
    
 ---------
 
@@ -47,6 +54,7 @@
 - 중간 발표 피드백 개선
 - 2차 기능 구현
 - 화면 구현
+- 리팩토링
 - 최종 발표회 자료 제작 및 제출
 
 ## 2025.02.10
@@ -61,7 +69,6 @@
 <img src="https://img.shields.io/badge/redis-5.0+-red?logo=redis&logoColor=white" alt="Redis Badge">
 <img src="https://img.shields.io/badge/docker-latest-blue?logo=docker&logoColor=white" alt="Docker Badge">
 <img src="https://img.shields.io/badge/AWS-Active-brightgreen?logo=amazonaws&logoColor=white" alt="AWS Badge">
-<img src="https://img.shields.io/badge/Kakao%20Login-Active-brightgreen?logo=kakao&logoColor=white" alt="Kakao Login Badge">
 <img src="https://img.shields.io/badge/KakaoPay-Active-brightgreen?logo=kakaopay&logoColor=white" alt="KakaoPay Badge">
 <img src="https://img.shields.io/badge/Kakao%20Map-Active-brightgreen?logo=kakao&logoColor=white" alt="Kakao Map Badge">
 <img src="https://img.shields.io/badge/AWS%20Route%2053-Active-brightgreen?logo=aws&logoColor=white" alt="AWS Route 53 Badge">
@@ -70,7 +77,7 @@
 - Java : 17
 - IDE : IntelliJ
 - DB : MySQL
-- Kakao API
+- Open API
 - Redis
 - Spring Security
 - AWS
@@ -102,13 +109,13 @@
 ---------
 
 # 👨‍💻 기능별 담당자
-|담당자|역할|1차 기능|2차 기능|블로그 주소|깃허브 주소|
-|:----|:----|:----|:----|:----|:----|
-|김지연|리더|1. 장소 검색 <br> 2. Kakao Map 기반 음식점 정보 저장 <br> 3. 레저/티켓 예약 CRD <br> 4. 레저/티켓 결제|-|https://velog.io/@yeoni9094/posts </br> https://blog.naver.com/yeondata|https://github.com/jiyeon0926|
-|김단빈|부리더|1. 포스터 CUD <br> 2. 첨부파일|1. 배포|https://dreamcompass.tistory.com/|https://github.com/kimdanbin|
-|안정민|팀원|1. JWT <br> 2. 인증/인가 <br> 3. 사용자 CRUD <br> 4. 포스터 검색|-|https://velog.io/@devtony/posts|https://github.com/JeongMinAhnn|
-|이아름|팀원|1. 레저/티켓 업체 CRUD <br> 2. 레저/티켓 상품 CRUD <br> 3. 신고|1. 카카오 로그인|https://muerha.tistory.com/|https://github.com/aaahreum|
-|박시환|팀원|1. 댓글 CRUD <br> 2. 좋아요 <br> 3. 맛집 검색|1. 대댓글 CRUD|||
+|담당자|역할|기능|블로그 주소|깃허브 주소|
+|:----|:----|:----|:----|:----|
+|김지연|리더|1. 장소 검색 <br> 2. Open API 기반 음식점 정보 저장 <br> 3. 레저/티켓 예약 CRD <br> 4. 레저/티켓 결제|https://velog.io/@yeoni9094/posts </br> https://blog.naver.com/yeondata|https://github.com/jiyeon0926|
+|김단빈|부리더|1. 포스터 CUD <br> 2. 첨부파일 <br> 3. 배포|https://dreamcompass.tistory.com/|https://github.com/kimdanbin|
+|안정민|팀원|1. JWT <br> 2. 인증/인가 <br> 3. 사용자 CRUD <br> 4. 여행 코스 검색|https://velog.io/@devtony/posts|https://github.com/JeongMinAhnn|
+|이아름|팀원|1. 레저/티켓 업체 CRUD <br> 2. 레저/티켓 상품 CRUD <br> 3. 신고 <br> 4. 검색 기능 최적화|https://muerha.tistory.com/|https://github.com/aaahreum|
+|박시환|팀원|1. 댓글 CRUD <br> 2. 좋아요 <br> 3. 맛집 검색 <br> 4. 대댓글 CRUD|https://nangman99.tistory.com/|https://github.com/baksihwan|
 
 ---------
 
