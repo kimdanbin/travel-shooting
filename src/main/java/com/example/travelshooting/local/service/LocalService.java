@@ -13,6 +13,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -34,6 +36,7 @@ public class LocalService {
     @Value("${kakao.api.map.url}")
     private String KAKAO_API_URL;
 
+    @Transactional(readOnly = true)
     public Page<LocalResDto> searchPlaces(String keyword, Pageable pageable) {
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(KAKAO_API_URL)
                 .queryParam("query", keyword);
@@ -45,18 +48,18 @@ public class LocalService {
         headers.set("Authorization", "KakaoAK " + apiKey);
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
-        // API 호출
-        ResponseEntity<String> response = restTemplate.exchange(
-                uri,
-                HttpMethod.GET,
-                entity,
-                String.class
-        );
-
         long totalElements = 0;
         List<LocalResDto> localResDto = new ArrayList<>();
 
+        // API 호출
         try {
+            ResponseEntity<String> response = restTemplate.exchange(
+                    uri,
+                    HttpMethod.GET,
+                    entity,
+                    String.class
+            );
+
             // JSON 응답 데이터 파싱
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode root = objectMapper.readTree(response.getBody());
@@ -76,6 +79,9 @@ public class LocalService {
                             .latitude(document.path("y").asText())
                             .build())
                     .collect(Collectors.toList());
+        } catch (ResourceAccessException e) {
+            e.printStackTrace();
+            throw new ResourceAccessException("타임아웃이 발생했습니다.");
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("JSON 파싱 오류가 발생했습니다.");
