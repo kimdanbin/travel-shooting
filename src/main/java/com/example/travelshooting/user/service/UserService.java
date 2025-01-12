@@ -86,8 +86,10 @@ public class UserService {
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND , "아이디 " + userId + "에 해당하는 사용자를 찾을 수 없습니다."));
     }
 
-    public User findUserByEmail(String email) {
-        Optional<User> user = userRepository.findByEmail(email);
+    public User getAuthenticatedUser() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String authEmail = auth.getName();
+        Optional<User> user = userRepository.findByEmail(authEmail);
 
         return user.get();
     }
