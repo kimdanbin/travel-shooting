@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -41,17 +42,20 @@ public class GgRestaurantService {
                 .build()
                 .toUriString();
 
-        String xmlData = restTemplate.getForObject(url, String.class);
         XmlMapper xmlMapper = new XmlMapper();
         List<GgRestaurantApiDto> apiDtos;
 
         try {
+            String xmlData = restTemplate.getForObject(url, String.class);
             apiDtos = xmlMapper.readValue(xmlData, xmlMapper.getTypeFactory().constructCollectionType(List.class, GgRestaurantApiDto.class));
 
             // 음식점명이 null인 항목 제거
             apiDtos = apiDtos.stream()
                     .filter(apiDto -> apiDto.getPlaceName() != null && !apiDto.getPlaceName().isEmpty())
                     .collect(Collectors.toList());
+        } catch (ResourceAccessException e) {
+            e.printStackTrace();
+            throw new ResourceAccessException("타임아웃이 발생했습니다.");
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("XML 파싱 오류가 발생했습니다.");
