@@ -10,6 +10,9 @@ import lombok.NoArgsConstructor;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class GgRestaurantApiDto {
 
+    @JsonProperty("SIGUN_NM")
+    private String city;
+
     @JsonProperty("RESTRT_NM")
     private String placeName;
 

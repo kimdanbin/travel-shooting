@@ -18,6 +18,8 @@ public class Restaurant {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String region;
+    private String city;
     private String placeName;
     private String addressName;
     private String roadAddressName;
@@ -28,7 +30,9 @@ public class Restaurant {
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Poster> posters = new ArrayList<>();
 
-    public Restaurant(String placeName, String addressName, String roadAddressName, String phone, String longitude, String latitude) {
+    public Restaurant(String region, String city, String placeName, String addressName, String roadAddressName, String phone, String longitude, String latitude) {
+        this.region = region;
+        this.city = city;
         this.placeName = placeName;
         this.addressName = addressName;
         this.roadAddressName = roadAddressName;

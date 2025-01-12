@@ -1,7 +1,7 @@
 package com.example.travelshooting.restaurant.controller;
 
 import com.example.travelshooting.common.CommonListResDto;
-import com.example.travelshooting.restaurant.service.RestaurantService;
+import com.example.travelshooting.restaurant.service.GgRestaurantService;
 import com.example.travelshooting.restaurant.dto.GgRestaurantResDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,11 +18,11 @@ import java.util.List;
 @RequestMapping("/restaurants")
 public class RestaurantController {
 
-    private final RestaurantService restaurantService;
+    private final GgRestaurantService ggRestaurantService;
 
     @PostMapping("/regions/gyeonggi")
     public ResponseEntity<CommonListResDto<GgRestaurantResDto>> saveRestaurants(@RequestParam int pIndex, @RequestParam int pSize) {
-        List<GgRestaurantResDto> result = restaurantService.saveGgRestaurants(pIndex, pSize);
+        List<GgRestaurantResDto> result = ggRestaurantService.saveGgRestaurants(pIndex, pSize);
         return new ResponseEntity<>(new CommonListResDto<>("경기도 맛집 정보 저장 완료", result), HttpStatus.CREATED);
     }
 }

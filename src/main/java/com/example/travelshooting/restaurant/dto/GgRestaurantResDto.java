@@ -8,6 +8,8 @@ import lombok.Getter;
 public class GgRestaurantResDto implements BaseDtoDataType {
 
     private Long id;
+    private String region;
+    private String city;
     private String placeName;
     private String addressName;
     private String roadAddressName;
@@ -15,8 +17,10 @@ public class GgRestaurantResDto implements BaseDtoDataType {
     private String longitude;
     private String latitude;
 
-    public GgRestaurantResDto(Long id, String placeName, String addressName, String roadAddressName, String phone, String longitude, String latitude) {
+    public GgRestaurantResDto(Long id, String region, String city, String placeName, String addressName, String roadAddressName, String phone, String longitude, String latitude) {
         this.id = id;
+        this.region = region;
+        this.city = city;
         this.placeName = placeName;
         this.addressName = addressName;
         this.roadAddressName = roadAddressName;
@@ -28,6 +32,8 @@ public class GgRestaurantResDto implements BaseDtoDataType {
     public static GgRestaurantResDto toDto(Restaurant restaurant) {
         return new GgRestaurantResDto(
                 restaurant.getId(),
+                restaurant.getRegion(),
+                restaurant.getCity(),
                 restaurant.getPlaceName(),
                 restaurant.getAddressName(),
                 restaurant.getRoadAddressName(),

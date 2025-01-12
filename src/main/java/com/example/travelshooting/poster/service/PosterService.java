@@ -4,7 +4,7 @@ import com.example.travelshooting.poster.Poster;
 import com.example.travelshooting.poster.dto.PosterResDto;
 import com.example.travelshooting.poster.repository.PosterRepository;
 import com.example.travelshooting.restaurant.Restaurant;
-import com.example.travelshooting.restaurant.service.RestaurantService;
+import com.example.travelshooting.restaurant.service.GgRestaurantService;
 import com.example.travelshooting.user.User;
 import com.example.travelshooting.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
 public class PosterService {
     private final PosterRepository posterRepository;
     private final UserService userService;
-    private final RestaurantService restaurantService;
+    private final GgRestaurantService ggRestaurantService;
 
     // 포스터 생성
     public PosterResDto createPoster(Long restaurantId, Long paymentId, String title, String content, LocalDateTime travelStartAt, LocalDateTime travelEndAt) {
@@ -32,7 +32,7 @@ public class PosterService {
         if (restaurantId == null) {
             restaurant = null;
         } else {
-            restaurant = restaurantService.getRestaurantById(restaurantId);
+            restaurant = ggRestaurantService.getRestaurantById(restaurantId);
         }
 
         // payment 도 나중에 구현되면 추가
@@ -68,7 +68,7 @@ public class PosterService {
         if (restaurantId == null) {
             restaurant = null;
         } else {
-            restaurant = restaurantService.getRestaurantById(restaurantId);
+            restaurant = ggRestaurantService.getRestaurantById(restaurantId);
         }
 
         // payment 도 나중에 구현되면 추가

@@ -9,12 +9,18 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.web.client.RestTemplate;
 
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
 
   private final UserDetailsService userDetailsService;
+
+  @Bean
+  RestTemplate restTemplate() {
+    return new RestTemplate();
+  }
 
   @Bean
   BCryptPasswordEncoder passwordEncoder() {
