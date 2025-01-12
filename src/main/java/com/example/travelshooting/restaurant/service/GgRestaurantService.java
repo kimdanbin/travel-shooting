@@ -21,14 +21,16 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class RestaurantService {
+public class GgRestaurantService {
 
     private final RestaurantRepository restaurantRepository;
+    private final RestTemplate restTemplate;
 
     @Value("${gg.api.food.key}")
     private String apiKey;
 
-    private static final String GG_API_FOOD_URL = Const.GG_API_FOOD_URL;
+    @Value("${gg.api.food.url}")
+    private String GG_API_FOOD_URL;
 
     @Transactional
     public List<GgRestaurantResDto> saveGgRestaurants(int pIndex, int pSize) {
@@ -39,9 +41,7 @@ public class RestaurantService {
                 .build()
                 .toUriString();
 
-        RestTemplate restTemplate = new RestTemplate();
         String xmlData = restTemplate.getForObject(url, String.class);
-
         XmlMapper xmlMapper = new XmlMapper();
         List<GgRestaurantApiDto> apiDtos;
 
@@ -72,6 +72,8 @@ public class RestaurantService {
 
                     if (!isExistingRestaurant) {
                         Restaurant restaurant = new Restaurant(
+                                Const.GG_NAME,
+                                apiDto.getCity(),
                                 apiDto.getPlaceName(),
                                 apiDto.getAddressName(),
                                 apiDto.getRoadAddressName(),
