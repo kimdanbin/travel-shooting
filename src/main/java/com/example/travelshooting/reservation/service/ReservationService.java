@@ -10,8 +10,12 @@ import com.example.travelshooting.reservation.repository.ReservationRepository;
 import com.example.travelshooting.user.User;
 import com.example.travelshooting.user.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -28,7 +32,10 @@ public class ReservationService {
 
     @Transactional
     public ReservationResDto createReservation(Long productId, Long partId, LocalDate reservationDate, int number) {
-        User user = userService.getUserById(2L); // 임시 user, 이후 수정 예정
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String authEmail = auth.getName();
+        User user = userService.findUserByEmail(authEmail);
+
         Product product = productService.findProductById(productId);
         Part part = partService.findPartById(partId);
 
@@ -54,19 +61,21 @@ public class ReservationService {
     @Transactional
     public void deleteReservation(Long productId, Long reservationId) {
         productService.findProductById(productId);
-        Reservation reservation = reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new IllegalArgumentException("아이디 " + reservationId + "에 해당하는 레저/티켓 예약을 찾을 수 없습니다."));
+        Reservation reservation = reservationRepository.findByIdOrElseThrow(reservationId);
 
         reservationRepository.delete(reservation);
     }
 
     @Transactional(readOnly = true)
     public List<ReservationResDto> findAllByUserIdAndProductId(Long productId) {
-        User user = userService.getUserById(2L); // 임시 user, 이후 수정 예정
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String authEmail = auth.getName();
+        User user = userService.findUserByEmail(authEmail);
+
         List<Reservation> reservations = reservationRepository.findAllByUserIdAndProductId(user.getId(), productId);
 
         if (reservations.isEmpty()) {
-            throw new IllegalArgumentException("아이디 " + productId + "에 해당하는 예약 내역이 없습니다.");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "예약 내역이 없습니다.");
         }
 
         return reservations.stream().map(reservation -> new ReservationResDto(
@@ -86,11 +95,14 @@ public class ReservationService {
 
     @Transactional(readOnly = true)
     public ReservationResDto findByUserIdAndProductIdAndId(Long productId, Long reservationId) {
-        User user = userService.getUserById(2L); // 임시 user, 이후 수정 예정
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String authEmail = auth.getName();
+        User user = userService.findUserByEmail(authEmail);
+
         Reservation reservation = reservationRepository.findByUserIdAndProductIdAndId(user.getId(), productId, reservationId);
 
         if (reservation == null) {
-            throw new IllegalArgumentException("아이디 " + productId + "에 해당하는 예약 내역이 없습니다.");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "예약 내역이 없습니다.");
         }
 
         return new ReservationResDto(
