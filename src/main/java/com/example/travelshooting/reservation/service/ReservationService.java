@@ -11,8 +11,6 @@ import com.example.travelshooting.user.User;
 import com.example.travelshooting.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -32,12 +30,16 @@ public class ReservationService {
 
     @Transactional
     public ReservationResDto createReservation(Long productId, Long partId, LocalDate reservationDate, int number) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String authEmail = auth.getName();
-        User user = userService.findUserByEmail(authEmail);
-
+        User user = userService.getAuthenticatedUser();
         Product product = productService.findProductById(productId);
         Part part = partService.findPartById(partId);
+
+        int totalNumber = reservationRepository.findTotalNumberByPartId(part.getId());
+
+        if (part.getNumber() < totalNumber + number) {
+            int overNumber = Math.abs(part.getNumber() - totalNumber - number);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "신청 가능한 인원을 초과했습니다. 초과된 인원: " + overNumber);
+        }
 
         int totalPrice = product.getPrice() * number;
 
@@ -60,18 +62,19 @@ public class ReservationService {
 
     @Transactional
     public void deleteReservation(Long productId, Long reservationId) {
-        productService.findProductById(productId);
-        Reservation reservation = reservationRepository.findByIdOrElseThrow(reservationId);
+        User user = userService.getAuthenticatedUser();
+        Reservation reservation = reservationRepository.findByUserIdAndProductIdAndId(user.getId(), productId, reservationId);
+
+        if (reservation == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "예약 내역이 없습니다.");
+        }
 
         reservationRepository.delete(reservation);
     }
 
     @Transactional(readOnly = true)
     public List<ReservationResDto> findAllByUserIdAndProductId(Long productId) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String authEmail = auth.getName();
-        User user = userService.findUserByEmail(authEmail);
-
+        User user = userService.getAuthenticatedUser();
         List<Reservation> reservations = reservationRepository.findAllByUserIdAndProductId(user.getId(), productId);
 
         if (reservations.isEmpty()) {
@@ -95,10 +98,7 @@ public class ReservationService {
 
     @Transactional(readOnly = true)
     public ReservationResDto findByUserIdAndProductIdAndId(Long productId, Long reservationId) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String authEmail = auth.getName();
-        User user = userService.findUserByEmail(authEmail);
-
+        User user = userService.getAuthenticatedUser();
         Reservation reservation = reservationRepository.findByUserIdAndProductIdAndId(user.getId(), productId, reservationId);
 
         if (reservation == null) {

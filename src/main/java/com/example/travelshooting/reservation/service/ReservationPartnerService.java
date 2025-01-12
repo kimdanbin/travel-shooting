@@ -8,8 +8,6 @@ import com.example.travelshooting.user.User;
 import com.example.travelshooting.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -26,10 +24,7 @@ public class ReservationPartnerService {
 
     @Transactional(readOnly = true)
     public List<ReservationResDto> findByProductIdAndUserId(Long productId) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String authEmail = auth.getName();
-        User user = userService.findUserByEmail(authEmail);
-
+        User user = userService.getAuthenticatedUser();
         List<Reservation> reservations = reservationRepository.findByProductIdAndUserId(productId, user.getId());
 
         if (reservations.isEmpty()) {
@@ -52,10 +47,7 @@ public class ReservationPartnerService {
 
     @Transactional(readOnly = true)
     public ReservationResDto findByProductIdAndUserIdAndId(Long productId, Long reservationId) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String authEmail = auth.getName();
-        User user = userService.findUserByEmail(authEmail);
-
+        User user = userService.getAuthenticatedUser();
         Reservation reservation = reservationRepository.findByProductIdAndUserIdAndId(productId, user.getId(), reservationId);
 
         if (reservation == null) {
@@ -78,10 +70,7 @@ public class ReservationPartnerService {
 
     @Transactional
     public ReservationResDto updateReservationStatus(Long productId, Long reservationId, String status) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String authEmail = auth.getName();
-        User user = userService.findUserByEmail(authEmail);
-
+        User user = userService.getAuthenticatedUser();
         Reservation reservation = reservationRepository.findByProductIdAndUserIdAndId(productId, user.getId(), reservationId);
 
         if (reservation == null) {
