@@ -7,8 +7,12 @@ import com.example.travelshooting.reservation.repository.ReservationRepository;
 import com.example.travelshooting.user.User;
 import com.example.travelshooting.user.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,11 +26,14 @@ public class ReservationPartnerService {
 
     @Transactional(readOnly = true)
     public List<ReservationResDto> findByProductIdAndUserId(Long productId) {
-        User partner = userService.getUserById(4L); // 임시 user, 이후 수정 예정
-        List<Reservation> reservations = reservationRepository.findByProductIdAndUserId(productId, partner.getId());
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String authEmail = auth.getName();
+        User user = userService.findUserByEmail(authEmail);
+
+        List<Reservation> reservations = reservationRepository.findByProductIdAndUserId(productId, user.getId());
 
         if (reservations.isEmpty()) {
-            throw new IllegalArgumentException("아이디 " + productId + "에 해당하는 예약 내역이 없습니다.");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "예약 내역이 없습니다.");
         }
 
         return reservations.stream().map(reservation -> new ReservationResDto(
@@ -45,11 +52,14 @@ public class ReservationPartnerService {
 
     @Transactional(readOnly = true)
     public ReservationResDto findByProductIdAndUserIdAndId(Long productId, Long reservationId) {
-        User user = userService.getUserById(4L); // 임시 user, 이후 수정 예정
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String authEmail = auth.getName();
+        User user = userService.findUserByEmail(authEmail);
+
         Reservation reservation = reservationRepository.findByProductIdAndUserIdAndId(productId, user.getId(), reservationId);
 
         if (reservation == null) {
-            throw new IllegalArgumentException("아이디 " + productId + "에 해당하는 예약 내역이 없습니다.");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "예약 내역이 없습니다.");
         }
 
         return new ReservationResDto(
@@ -68,15 +78,18 @@ public class ReservationPartnerService {
 
     @Transactional
     public ReservationResDto updateReservationStatus(Long productId, Long reservationId, String status) {
-        User user = userService.getUserById(4L); // 임시 user, 이후 수정 예정
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String authEmail = auth.getName();
+        User user = userService.findUserByEmail(authEmail);
+
         Reservation reservation = reservationRepository.findByProductIdAndUserIdAndId(productId, user.getId(), reservationId);
 
         if (reservation == null) {
-            throw new IllegalArgumentException("아이디 " + productId + "에 해당하는 예약 내역이 없습니다.");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "예약 내역이 없습니다.");
         }
 
         if (!reservation.getStatus().equals(ReservationStatus.PENDING)) {
-            throw new IllegalArgumentException("이미 수락 또는 거절 상태입니다.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 수락 또는 거절 상태입니다.");
         }
 
         reservation.updateStatus(ReservationStatus.valueOf(status));
