@@ -1,6 +1,5 @@
 package com.example.travelshooting.payment.service;
 
-import com.example.travelshooting.common.Const;
 import com.example.travelshooting.enums.PaymentStatus;
 import com.example.travelshooting.enums.ReservationStatus;
 import com.example.travelshooting.payment.Payment;
@@ -84,7 +83,7 @@ public class PaymentService {
             try {
                 JsonNode root = objectMapper.readTree(response.getBody());
                 String tid = root.path("tid").asText(); // 결제 고유 번호
-                String redirectUrl = root.path(Const.KAKAO_PAY_NEXT_URL).asText();  // 결제 페이지 URL
+                String redirectUrl = root.path("next_redirect_pc_url").asText();  // 결제 페이지 URL
 
                 // 결제 정보 저장
                 savePayment(reservation, tid, reservation.getTotalPrice());
