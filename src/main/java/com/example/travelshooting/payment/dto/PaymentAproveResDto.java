@@ -1,13 +1,13 @@
 package com.example.travelshooting.payment.dto;
 
+import com.example.travelshooting.common.BaseDtoDataType;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public class PaymentAproveResDto {
-
+public class PaymentAproveResDto implements BaseDtoDataType {
     // 요청 고유 번호
     private final String aid;
 
