@@ -17,7 +17,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
         return findById(reservationId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "아이디 " + reservationId + "에 해당하는 레저/티켓 예약을 찾을 수 없습니다."));
     }
 
-    @Query("SELECT SUM(r.number) FROM Reservation r WHERE r.part.id = :partId")
+    @Query("SELECT COALESCE(SUM(r.number), 0) FROM Reservation r WHERE r.part.id = :partId")
     int findTotalNumberByPartId(@Param("partId") Long partId);
 
     List<Reservation> findAllByUserIdAndProductId(Long userId, Long productId);
