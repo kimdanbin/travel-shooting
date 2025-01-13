@@ -3,7 +3,7 @@ package com.example.travelshooting.file.service;
 import com.example.travelshooting.file.dto.FileResDto;
 import com.example.travelshooting.file.entity.PosterFile;
 import com.example.travelshooting.file.repository.PosterFileRepository;
-import com.example.travelshooting.poster.Poster;
+import com.example.travelshooting.poster.entity.Poster;
 import com.example.travelshooting.poster.service.PosterService;
 import com.example.travelshooting.s3.S3Service;
 import lombok.RequiredArgsConstructor;

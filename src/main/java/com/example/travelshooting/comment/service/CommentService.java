@@ -5,7 +5,7 @@ import com.example.travelshooting.comment.dto.CommentReqDto;
 import com.example.travelshooting.comment.dto.CommentResDto;
 import com.example.travelshooting.comment.Comment;
 import com.example.travelshooting.comment.repository.CommentRepository;
-import com.example.travelshooting.poster.Poster;
+import com.example.travelshooting.poster.entity.Poster;
 import com.example.travelshooting.poster.service.PosterService;
 import com.example.travelshooting.user.User;
 import com.example.travelshooting.user.service.UserService;

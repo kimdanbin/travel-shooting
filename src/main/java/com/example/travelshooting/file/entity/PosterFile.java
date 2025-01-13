@@ -1,7 +1,7 @@
 package com.example.travelshooting.file.entity;
 
 import com.example.travelshooting.common.BaseEntity;
-import com.example.travelshooting.poster.Poster;
+import com.example.travelshooting.poster.entity.Poster;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
