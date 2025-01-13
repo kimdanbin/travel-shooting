@@ -52,7 +52,7 @@ public class PosterService {
     // 포스터 단건 조회
     public PosterResDto findPoster(Long posterId) {
 
-        return new PosterResDto(getPosterById(posterId));
+        return new PosterResDto(findPosterById(posterId));
     }
 
     // 포스터 수정
@@ -61,7 +61,7 @@ public class PosterService {
         // 나중에 로그인 로직 구현되면 수정
         User user = userService.getUserById(1L);
 
-        Poster poster = getPosterById(posterId);
+        Poster poster = findPosterById(posterId);
 
         Restaurant restaurant;
 
@@ -89,7 +89,7 @@ public class PosterService {
     }
 
     // 포스터 아이디로 포스터 찾기
-    public Poster getPosterById(Long posterId) {
+    public Poster findPosterById(Long posterId) {
         return posterRepository.findById(posterId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "아이디 " + posterId + "에 해당하는 포스터를 찾을 수 없습니다."));
     }

@@ -9,8 +9,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -108,7 +110,7 @@ public class ProductService {
 
     public Product findProductById(Long productId) {
         return productRepository.findById(productId)
-                .orElseThrow(() -> new IllegalArgumentException("아이디 " + productId + "에 해당하는 레저/티켓 상품을 찾을 수 없습니다."));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "아이디 " + productId + "에 해당하는 레저/티켓 상품을 찾을 수 없습니다."));
     }
 
 }

@@ -26,7 +26,7 @@ public class CommentService {
     @Transactional
     public CommentResDto createComment(Long posterId, CommentReqDto commentReqDto) {
         User user = userService.getUserById(1L);//임시로 만듬
-        Poster poster = posterService.getPosterById(posterId);
+        Poster poster = posterService.findPosterById(posterId);
         Comment comment = new Comment(user, poster, commentReqDto.getComment());
         Comment savedComment = commentRepository.save(comment);
         return CommentResDto.toDto(savedComment);
