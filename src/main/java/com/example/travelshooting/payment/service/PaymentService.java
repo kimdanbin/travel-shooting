@@ -2,6 +2,7 @@ package com.example.travelshooting.payment.service;
 
 import com.example.travelshooting.common.Const;
 import com.example.travelshooting.enums.PaymentStatus;
+import com.example.travelshooting.enums.ReservationStatus;
 import com.example.travelshooting.payment.Payment;
 import com.example.travelshooting.payment.dto.PaymentAproveResDto;
 import com.example.travelshooting.payment.dto.PaymentReadyResDto;
@@ -18,9 +19,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -47,20 +51,29 @@ public class PaymentService {
         User user = userService.getAuthenticatedUser();
         Product product = productService.findProductById(productId);
 
-        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
-        body.add("cid", Const.KAKAO_PAY_TEST_CID);
-        body.add("partner_order_id", reservation.getId().toString());
-        body.add("partner_user_id", user.getId().toString());
-        body.add("item_name", product.getName());
-        body.add("quantity", String.valueOf(reservation.getNumber()));
-        body.add("total_amount", String.valueOf(reservation.getTotalPrice()));
-        body.add("tax_free_amount", "0");
-        body.add("approval_url", Const.KAKAO_PAY_APPROVE_URL);
-        body.add("cancel_url", Const.KAKAO_PAY_CANCEL_URL);
-        body.add("fail_url", Const.KAKAO_PAY_FAIL_URL);
+        if (!reservation.getStatus().equals(ReservationStatus.APPROVED)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "예약 승인이 먼저 되어야 합니다.");
+        }
+
+        String approvalUrl = UriComponentsBuilder.fromHttpUrl("http://localhost:8080")
+                .path("/products/{productId}/reservations/{reservationId}/payment/approve")
+                .buildAndExpand(productId, reservationId)
+                .toUriString();
+
+        Map<String, String> body = new HashMap<>();
+        body.put("cid", "TC0ONETIME");
+        body.put("partner_order_id", reservation.getId().toString());
+        body.put("partner_user_id", user.getId().toString());
+        body.put("item_name", product.getName());
+        body.put("quantity", String.valueOf(reservation.getNumber()));
+        body.put("total_amount", String.valueOf(reservation.getTotalPrice()));
+        body.put("tax_free_amount", "0");
+        body.put("approval_url", approvalUrl);
+        body.put("cancel_url", "http://localhost:8080/payment/cancel");
+        body.put("fail_url", "http://localhost:8080/payment/fail");
 
         HttpHeaders headers = getHttpHeaders();
-        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
+        HttpEntity<Map<String, String>> request = new HttpEntity<>(body, headers);
 
         ResponseEntity<String> response = restTemplate.exchange(
                 KAKAO_PAY_READY_URL, HttpMethod.POST, request, String.class
@@ -93,20 +106,20 @@ public class PaymentService {
     }
 
     // 최종적으로 결제 완료 처리를 하는 단계
-    public PaymentAproveResDto payApprove(Long productId, Long reservationId, Long paymentId, String pgToken) {
+    public PaymentAproveResDto payApprove(Long productId, Long reservationId, String pgToken) {
         Reservation reservation = reservationService.findByProductIdAndId(productId, reservationId);
         User user = userService.getAuthenticatedUser();
-        Payment payment = paymentRepository.findByIdOrElseThrow(paymentId);
+        Payment payment = paymentRepository.findByReservationId(reservationId);
 
-        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
-        body.add("cid", Const.KAKAO_PAY_TEST_CID);
-        body.add("tid", payment.getTid());
-        body.add("partner_order_id", reservation.getId().toString());
-        body.add("partner_user_id", user.getId().toString());
-        body.add("pg_token", pgToken);
+        Map<String, String> body = new HashMap<>();
+        body.put("cid", "TC0ONETIME");
+        body.put("tid", payment.getTid());
+        body.put("partner_order_id", reservation.getId().toString());
+        body.put("partner_user_id", user.getId().toString());
+        body.put("pg_token", pgToken);
 
         HttpHeaders headers = getHttpHeaders();
-        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
+        HttpEntity<Map<String, String>> request = new HttpEntity<>(body, headers);
 
         ResponseEntity<String> response = restTemplate.exchange(
                 KAKAO_PAY_APPROVE_URL,
@@ -153,8 +166,8 @@ public class PaymentService {
 
     private HttpHeaders getHttpHeaders() {
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "KakaoAK " + apiKey);
-        headers.set("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
+        headers.set("Authorization", "SECRET_KEY " + apiKey);
+        headers.set("Content-type", "application/json");
 
         return headers;
     }
