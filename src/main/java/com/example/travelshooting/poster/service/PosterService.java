@@ -23,7 +23,7 @@ public class PosterService {
     private final GgRestaurantService ggRestaurantService;
 
     // 포스터 생성
-    public PosterResDto createPoster(Long restaurantId, Long paymentId, String title, String content, LocalDateTime travelStartAt, LocalDateTime travelEndAt) {
+    public PosterResDto createPoster(Long restaurantId, Long paymentId, int expenses, String title, String content, LocalDateTime travelStartAt, LocalDateTime travelEndAt) {
 
         User user = userService.getAuthenticatedUser();
 
@@ -40,6 +40,7 @@ public class PosterService {
         Poster poster = Poster.builder()
                 .user(user)
                 .restaurant(restaurant)
+                .expenses(expenses)
                 .title(title)
                 .content(content)
                 .travelStartAt(travelStartAt)
@@ -57,7 +58,7 @@ public class PosterService {
 
     // 포스터 수정
     @Transactional
-    public PosterResDto updatePoster(Long posterId, Long restaurantId, Long paymentId, String title, String content, LocalDateTime travelStartAt, LocalDateTime travelEndAt) {
+    public PosterResDto updatePoster(Long posterId, Long restaurantId, Long paymentId, int expenses, String title, String content, LocalDateTime travelStartAt, LocalDateTime travelEndAt) {
 
         User user = userService.getAuthenticatedUser();
         Poster poster = findPosterById(posterId);
@@ -77,6 +78,7 @@ public class PosterService {
         // payment 도 나중에 구현되면 추가
 
         poster.updateRestaurant(restaurant);
+        poster.updateExpenses(expenses);
         poster.updateTitle(title);
         poster.updateContent(content);
         poster.updateTravelStartAt(travelStartAt);
