@@ -3,6 +3,8 @@ package com.example.travelshooting.file.service;
 import com.example.travelshooting.file.dto.FileResDto;
 import com.example.travelshooting.file.entity.LeisureFile;
 import com.example.travelshooting.file.repository.LeisureFileRepository;
+import com.example.travelshooting.product.Product;
+import com.example.travelshooting.product.service.ProductService;
 import com.example.travelshooting.s3.S3Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,29 +22,24 @@ public class LeisureFileService {
 
     private final S3Service s3Service;
     private final LeisureFileRepository leisureFileRepository;
-
-    // 나중에 서비스로 대체 예정
-//    private final ProductRepository productRepository;
+    private final ProductService productService;
 
     // 파일 업로드
     @Transactional
     public List<FileResDto> uploadFile(Long leisureId, List<MultipartFile> files) {
 
-//        Product product = productRepository.findById(leisureId)
-//                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        Product product = productService.findProductById(leisureId);
 
         List<FileResDto> savedFiles = new ArrayList<>();
 
         try {
             for (MultipartFile file : files) {
 
-                String originalFilename = file.getOriginalFilename();
-                String contentType = file.getContentType();
-                String fileUrl = s3Service.uploadFile(file);
+                String originalFilename = file.getOriginalFilename(); // 파일 이름
+                String contentType = file.getContentType(); // 파일 타입
+                String fileUrl = s3Service.uploadFile(file); // aws 에 올라간 파일 url
 
-                // 서비스 만들어지면 교체
-//                LeisureFile savedLeisureFile = leisureFileRepository.save(new LeisureFile(product, originalFilename, fileUrl, contentType));
-                LeisureFile savedLeisureFile = leisureFileRepository.save(new LeisureFile(originalFilename, fileUrl, contentType));
+                LeisureFile savedLeisureFile = leisureFileRepository.save(new LeisureFile(product, originalFilename, fileUrl, contentType));
 
                 savedFiles.add(new FileResDto(savedLeisureFile));
             }
@@ -61,7 +58,7 @@ public class LeisureFileService {
     // 파일 삭제
     @Transactional
     public void deleteFile(Long leisureId, Long attachmentId) {
-//        leisureRepository.findById(leisureId); 레저서비스 만들어지면 추가 예정
+        productService.findProductById(leisureId);
         leisureFileRepository.findById(attachmentId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         leisureFileRepository.deleteById(attachmentId);
     }
