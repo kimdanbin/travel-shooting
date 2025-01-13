@@ -1,6 +1,6 @@
 package com.example.travelshooting.poster.entity;
 
-import com.example.travelshooting.comment.Comment;
+import com.example.travelshooting.comment.entity.Comment;
 import com.example.travelshooting.common.BaseEntity;
 import com.example.travelshooting.file.entity.PosterFile;
 import com.example.travelshooting.like.LikePoster;
@@ -11,6 +11,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @SQLDelete(sql = "UPDATE poster SET is_deleted = true WHERE id = ?")
+@Where(clause = "is_deleted = false")
 public class Poster extends BaseEntity {
 
     @Id

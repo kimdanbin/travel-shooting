@@ -10,6 +10,7 @@ import com.example.travelshooting.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
@@ -24,8 +25,7 @@ public class PosterService {
     // 포스터 생성
     public PosterResDto createPoster(Long restaurantId, Long paymentId, String title, String content, LocalDateTime travelStartAt, LocalDateTime travelEndAt) {
 
-        // 나중에 로그인 로직 구현되면 수정
-        User user = userService.getUserById(1L);
+        User user = userService.getAuthenticatedUser();
 
         Restaurant restaurant;
 
@@ -38,7 +38,7 @@ public class PosterService {
         // payment 도 나중에 구현되면 추가
 
         Poster poster = Poster.builder()
-//                .user(user)
+                .user(user)
                 .restaurant(restaurant)
                 .title(title)
                 .content(content)
@@ -56,12 +56,15 @@ public class PosterService {
     }
 
     // 포스터 수정
+    @Transactional
     public PosterResDto updatePoster(Long posterId, Long restaurantId, Long paymentId, String title, String content, LocalDateTime travelStartAt, LocalDateTime travelEndAt) {
 
-        // 나중에 로그인 로직 구현되면 수정
-        User user = userService.getUserById(1L);
-
+        User user = userService.getAuthenticatedUser();
         Poster poster = findPosterById(posterId);
+
+        if (!user.getId().equals(poster.getUser().getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "본인이 작성한 포스터만 수정 가능합니다.");
+        }
 
         Restaurant restaurant;
 
@@ -84,6 +87,13 @@ public class PosterService {
 
     // 포스터 삭제
     public void deletePoster(Long posterId) {
+
+        User user = userService.getAuthenticatedUser();
+        Poster poster = findPosterById(posterId);
+
+        if (!user.getId().equals(poster.getUser().getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "본인이 작성한 포스터만 삭제 가능합니다.");
+        }
 
         posterRepository.deleteById(posterId);
     }
