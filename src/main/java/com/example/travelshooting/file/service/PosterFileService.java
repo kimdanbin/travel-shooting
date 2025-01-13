@@ -3,6 +3,8 @@ package com.example.travelshooting.file.service;
 import com.example.travelshooting.file.dto.FileResDto;
 import com.example.travelshooting.file.entity.PosterFile;
 import com.example.travelshooting.file.repository.PosterFileRepository;
+import com.example.travelshooting.poster.Poster;
+import com.example.travelshooting.poster.service.PosterService;
 import com.example.travelshooting.s3.S3Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,10 +23,13 @@ public class PosterFileService {
     private final S3Service s3Service;
     private final PosterFileRepository posterFileRepository;
     // 주석은 포스터 서비스 만들어지면 추가 예정
+    private final PosterService posterService;
 
     // 파일 업로드
     @Transactional
     public List<FileResDto> uploadFile(Long posterId, List<MultipartFile> files) {
+
+        Poster poster = posterService.findPosterById(posterId);
 
         List<FileResDto> savedFiles = new ArrayList<>();
 
@@ -35,8 +40,7 @@ public class PosterFileService {
                 String contentType = file.getContentType();
                 String fileUrl = s3Service.uploadFile(file);
 
-//                PosterFile savedPosterFile = posterFileRepository.save(new PosterFile(poster, originalFilename, fileUrl, contentType));
-                PosterFile savedPosterFile = posterFileRepository.save(new PosterFile(originalFilename, fileUrl, contentType));
+                PosterFile savedPosterFile = posterFileRepository.save(new PosterFile(poster, originalFilename, fileUrl, contentType));
 
                 savedFiles.add(new FileResDto(savedPosterFile));
             }
@@ -55,7 +59,7 @@ public class PosterFileService {
     // 파일 삭제
     @Transactional
     public void deleteFile(Long posterId, Long attachmentId) {
-//        posterRepository.findById(posterId); 포스터 서비스 만들어지면 추가 예정
+        posterService.findPosterById(posterId);
         posterFileRepository.findById(attachmentId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         posterFileRepository.deleteById(attachmentId);
     }
