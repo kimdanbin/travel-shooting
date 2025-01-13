@@ -1,6 +1,6 @@
 package com.example.travelshooting.poster.service;
 
-import com.example.travelshooting.poster.Poster;
+import com.example.travelshooting.poster.entity.Poster;
 import com.example.travelshooting.poster.dto.PosterResDto;
 import com.example.travelshooting.poster.repository.PosterRepository;
 import com.example.travelshooting.restaurant.Restaurant;

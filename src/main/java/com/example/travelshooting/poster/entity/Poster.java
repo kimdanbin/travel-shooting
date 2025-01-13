@@ -1,4 +1,4 @@
-package com.example.travelshooting.poster;
+package com.example.travelshooting.poster.entity;
 
 import com.example.travelshooting.comment.Comment;
 import com.example.travelshooting.common.BaseEntity;
@@ -10,6 +10,7 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -19,6 +20,7 @@ import java.util.List;
 @Table(name = "poster")
 @Getter
 @NoArgsConstructor
+@SQLDelete(sql = "UPDATE poster SET is_deleted = true WHERE id = ?")
 public class Poster extends BaseEntity {
 
     @Id

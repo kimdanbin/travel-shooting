@@ -1,6 +1,6 @@
 package com.example.travelshooting.restaurant;
 
-import com.example.travelshooting.poster.Poster;
+import com.example.travelshooting.poster.entity.Poster;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

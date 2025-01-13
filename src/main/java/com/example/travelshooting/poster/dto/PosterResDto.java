@@ -1,7 +1,7 @@
 package com.example.travelshooting.poster.dto;
 
 import com.example.travelshooting.common.BaseDtoDataType;
-import com.example.travelshooting.poster.Poster;
+import com.example.travelshooting.poster.entity.Poster;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 

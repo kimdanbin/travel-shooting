@@ -1,6 +1,6 @@
 package com.example.travelshooting.like;
 
-import com.example.travelshooting.poster.Poster;
+import com.example.travelshooting.poster.entity.Poster;
 import com.example.travelshooting.user.User;
 import jakarta.persistence.*;
 import lombok.Getter;
