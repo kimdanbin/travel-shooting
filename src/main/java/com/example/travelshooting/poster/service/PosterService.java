@@ -10,6 +10,7 @@ import com.example.travelshooting.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
@@ -22,10 +23,9 @@ public class PosterService {
     private final GgRestaurantService ggRestaurantService;
 
     // 포스터 생성
-    public PosterResDto createPoster(Long restaurantId, Long paymentId, String title, String content, LocalDateTime travelStartAt, LocalDateTime travelEndAt) {
+    public PosterResDto createPoster(Long restaurantId, Long paymentId, int expenses, String title, String content, LocalDateTime travelStartAt, LocalDateTime travelEndAt) {
 
-        // 나중에 로그인 로직 구현되면 수정
-        User user = userService.getUserById(1L);
+        User user = userService.getAuthenticatedUser();
 
         Restaurant restaurant;
 
@@ -38,8 +38,9 @@ public class PosterService {
         // payment 도 나중에 구현되면 추가
 
         Poster poster = Poster.builder()
-//                .user(user)
+                .user(user)
                 .restaurant(restaurant)
+                .expenses(expenses)
                 .title(title)
                 .content(content)
                 .travelStartAt(travelStartAt)
@@ -56,12 +57,15 @@ public class PosterService {
     }
 
     // 포스터 수정
-    public PosterResDto updatePoster(Long posterId, Long restaurantId, Long paymentId, String title, String content, LocalDateTime travelStartAt, LocalDateTime travelEndAt) {
+    @Transactional
+    public PosterResDto updatePoster(Long posterId, Long restaurantId, Long paymentId, int expenses, String title, String content, LocalDateTime travelStartAt, LocalDateTime travelEndAt) {
 
-        // 나중에 로그인 로직 구현되면 수정
-        User user = userService.getUserById(1L);
-
+        User user = userService.getAuthenticatedUser();
         Poster poster = findPosterById(posterId);
+
+        if (!user.getId().equals(poster.getUser().getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "본인이 작성한 포스터만 수정 가능합니다.");
+        }
 
         Restaurant restaurant;
 
@@ -74,6 +78,7 @@ public class PosterService {
         // payment 도 나중에 구현되면 추가
 
         poster.updateRestaurant(restaurant);
+        poster.updateExpenses(expenses);
         poster.updateTitle(title);
         poster.updateContent(content);
         poster.updateTravelStartAt(travelStartAt);
@@ -84,6 +89,13 @@ public class PosterService {
 
     // 포스터 삭제
     public void deletePoster(Long posterId) {
+
+        User user = userService.getAuthenticatedUser();
+        Poster poster = findPosterById(posterId);
+
+        if (!user.getId().equals(poster.getUser().getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "본인이 작성한 포스터만 삭제 가능합니다.");
+        }
 
         posterRepository.deleteById(posterId);
     }

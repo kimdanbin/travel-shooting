@@ -1,4 +1,4 @@
-package com.example.travelshooting.comment;
+package com.example.travelshooting.comment.entity;
 
 import com.example.travelshooting.common.BaseEntity;
 import com.example.travelshooting.poster.entity.Poster;

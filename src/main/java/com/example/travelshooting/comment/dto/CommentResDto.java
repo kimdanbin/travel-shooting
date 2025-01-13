@@ -1,10 +1,9 @@
 package com.example.travelshooting.comment.dto;
 
-import com.example.travelshooting.comment.Comment;
+import com.example.travelshooting.comment.entity.Comment;
 import com.example.travelshooting.common.BaseDtoDataType;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 @Getter
 public class CommentResDto implements BaseDtoDataType {
