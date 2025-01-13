@@ -1,11 +1,11 @@
 package com.example.travelshooting.poster.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
 @Getter
 public class PosterReqDto {
 
@@ -13,12 +13,19 @@ public class PosterReqDto {
 
     private Long paymentId;
 
+    @NotNull(message = "여행경비를 입력해주세요")
+    private int expenses;
+
+    @NotBlank(message = "제목을 입력해주세요.")
     private String title;
 
+    @NotBlank(message = "내용을 입력해주세요.")
     private String content;
 
+    @NotBlank(message = "여행 시작 날짜를 입력해주세요.")
     private LocalDateTime travelStartAt;
 
+    @NotBlank(message = "여행 종료 날짜를 입력해주세요.")
     private LocalDateTime travelEndAt;
 
     public PosterReqDto(Long restaurantId, Long paymentId, String title, String content, LocalDateTime travelStartAt, LocalDateTime travelEndAt) {
