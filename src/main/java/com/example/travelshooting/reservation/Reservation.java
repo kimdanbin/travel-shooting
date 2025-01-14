@@ -5,7 +5,7 @@ import com.example.travelshooting.enums.ReservationStatus;
 import com.example.travelshooting.part.Part;
 import com.example.travelshooting.payment.Payment;
 import com.example.travelshooting.product.Product;
-import com.example.travelshooting.user.User;
+import com.example.travelshooting.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

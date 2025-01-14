@@ -10,7 +10,7 @@ import com.example.travelshooting.product.Product;
 import com.example.travelshooting.product.service.ProductService;
 import com.example.travelshooting.reservation.Reservation;
 import com.example.travelshooting.reservation.service.ReservationService;
-import com.example.travelshooting.user.User;
+import com.example.travelshooting.user.entity.User;
 import com.example.travelshooting.user.service.UserService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
