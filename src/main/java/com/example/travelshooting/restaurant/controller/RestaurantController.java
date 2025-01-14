@@ -15,7 +15,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/restaurants")
+@RequestMapping("/admins/restaurants")
 public class RestaurantController {
 
     private final GgRestaurantService ggRestaurantService;

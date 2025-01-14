@@ -2,7 +2,7 @@ package com.example.travelshooting.product.service;
 
 import com.example.travelshooting.company.Company;
 import com.example.travelshooting.company.service.CompanyService;
-import com.example.travelshooting.product.Product;
+import com.example.travelshooting.product.entity.Product;
 import com.example.travelshooting.product.dto.*;
 import com.example.travelshooting.product.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;

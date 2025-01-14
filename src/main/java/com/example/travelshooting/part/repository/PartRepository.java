@@ -1,6 +1,6 @@
 package com.example.travelshooting.part.repository;
 
-import com.example.travelshooting.part.Part;
+import com.example.travelshooting.part.entity.Part;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;

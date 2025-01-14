@@ -3,7 +3,7 @@ package com.example.travelshooting.file.service;
 import com.example.travelshooting.file.dto.FileResDto;
 import com.example.travelshooting.file.entity.LeisureFile;
 import com.example.travelshooting.file.repository.LeisureFileRepository;
-import com.example.travelshooting.product.Product;
+import com.example.travelshooting.product.entity.Product;
 import com.example.travelshooting.product.service.ProductService;
 import com.example.travelshooting.s3.S3Service;
 import lombok.RequiredArgsConstructor;

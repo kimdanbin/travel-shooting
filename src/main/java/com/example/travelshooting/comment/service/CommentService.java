@@ -28,7 +28,7 @@ public class CommentService {
     @Transactional
     public CommentResDto createComment(Long posterId, CommentReqDto commentReqDto) {
 
-        User user = userService.getAuthenticatedUser();
+        User user = userService.findAuthenticatedUser();
         Poster poster = posterService.findPosterById(posterId);
 
         Comment comment = new Comment(user, poster, commentReqDto.getComment());
@@ -47,7 +47,7 @@ public class CommentService {
     @Transactional
     public CommentResDto updateComment(Long commentId, CommentReqDto commentReqDto) {
 
-        User user = userService.getAuthenticatedUser();
+        User user = userService.findAuthenticatedUser();
         Comment comment = findCommentById(commentId);
 
         if (!user.getId().equals(comment.getUser().getId())) {
@@ -62,7 +62,7 @@ public class CommentService {
     @Transactional
     public void deleteComment(Long commentId) {
 
-        User user = userService.getAuthenticatedUser();
+        User user = userService.findAuthenticatedUser();
         Comment comment = findCommentById(commentId);
 
         if (!user.getId().equals(comment.getUser().getId())) {

@@ -1,10 +1,10 @@
 package com.example.travelshooting.reservation.service;
 
-import com.example.travelshooting.part.Part;
+import com.example.travelshooting.part.entity.Part;
 import com.example.travelshooting.part.service.PartService;
-import com.example.travelshooting.product.Product;
+import com.example.travelshooting.product.entity.Product;
 import com.example.travelshooting.product.service.ProductService;
-import com.example.travelshooting.reservation.Reservation;
+import com.example.travelshooting.reservation.entity.Reservation;
 import com.example.travelshooting.reservation.dto.ReservationResDto;
 import com.example.travelshooting.reservation.repository.ReservationRepository;
 import com.example.travelshooting.user.entity.User;
@@ -30,7 +30,7 @@ public class ReservationService {
 
     @Transactional
     public ReservationResDto createReservation(Long productId, Long partId, LocalDate reservationDate, int number) {
-        User user = userService.getAuthenticatedUser();
+        User user = userService.findAuthenticatedUser();
         Product product = productService.findProductById(productId);
         Part part = partService.findPartById(partId);
 
@@ -62,7 +62,7 @@ public class ReservationService {
 
     @Transactional
     public void deleteReservation(Long productId, Long reservationId) {
-        User user = userService.getAuthenticatedUser();
+        User user = userService.findAuthenticatedUser();
         Reservation reservation = reservationRepository.findByUserIdAndProductIdAndId(user.getId(), productId, reservationId);
 
         if (reservation == null) {
@@ -74,7 +74,7 @@ public class ReservationService {
 
     @Transactional(readOnly = true)
     public List<ReservationResDto> findAllByUserIdAndProductId(Long productId) {
-        User user = userService.getAuthenticatedUser();
+        User user = userService.findAuthenticatedUser();
         List<Reservation> reservations = reservationRepository.findAllByUserIdAndProductId(user.getId(), productId);
 
         if (reservations.isEmpty()) {
@@ -98,7 +98,7 @@ public class ReservationService {
 
     @Transactional(readOnly = true)
     public ReservationResDto findByUserIdAndProductIdAndId(Long productId, Long reservationId) {
-        User user = userService.getAuthenticatedUser();
+        User user = userService.findAuthenticatedUser();
         Reservation reservation = reservationRepository.findByUserIdAndProductIdAndId(user.getId(), productId, reservationId);
 
         if (reservation == null) {

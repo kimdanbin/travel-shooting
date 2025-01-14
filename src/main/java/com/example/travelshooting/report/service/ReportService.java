@@ -4,7 +4,7 @@ import com.example.travelshooting.comment.dto.CommentResDto;
 import com.example.travelshooting.comment.service.CommentService;
 import com.example.travelshooting.enums.ReportType;
 import com.example.travelshooting.poster.service.PosterService;
-import com.example.travelshooting.report.Report;
+import com.example.travelshooting.report.entity.Report;
 import com.example.travelshooting.report.dto.ReportReqDto;
 import com.example.travelshooting.report.dto.ReportResDto;
 import com.example.travelshooting.report.repository.ReportRepository;
@@ -32,7 +32,7 @@ public class ReportService {
     @Transactional
     public ReportResDto reportPoster(Long posterId, ReportReqDto reportReqDto) {
 
-        User user = userService.getAuthenticatedUser();
+        User user = userService.findAuthenticatedUser();
         Report report = new Report(user, ReportType.POSTER, posterId, reportReqDto.getReason());
         reportRepository.save(report);
 
@@ -60,7 +60,7 @@ public class ReportService {
     @Transactional
     public ReportResDto reportComment(Long commentId, ReportReqDto reportReqDto) {
 
-        User user = userService.getAuthenticatedUser();
+        User user = userService.findAuthenticatedUser();
         Report report = new Report(user, ReportType.COMMENT, commentId, reportReqDto.getReason());
         reportRepository.save(report);
 

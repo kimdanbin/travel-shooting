@@ -3,7 +3,7 @@ package com.example.travelshooting.poster.service;
 import com.example.travelshooting.poster.entity.Poster;
 import com.example.travelshooting.poster.dto.PosterResDto;
 import com.example.travelshooting.poster.repository.PosterRepository;
-import com.example.travelshooting.restaurant.Restaurant;
+import com.example.travelshooting.restaurant.entity.Restaurant;
 import com.example.travelshooting.restaurant.service.GgRestaurantService;
 import com.example.travelshooting.user.entity.User;
 import com.example.travelshooting.user.service.UserService;
@@ -25,7 +25,7 @@ public class PosterService {
     // 포스터 생성
     public PosterResDto createPoster(Long restaurantId, Long paymentId, int expenses, String title, String content, LocalDateTime travelStartAt, LocalDateTime travelEndAt) {
 
-        User user = userService.getAuthenticatedUser();
+        User user = userService.findAuthenticatedUser();
 
         Restaurant restaurant;
 
@@ -60,7 +60,7 @@ public class PosterService {
     @Transactional
     public PosterResDto updatePoster(Long posterId, Long restaurantId, Long paymentId, int expenses, String title, String content, LocalDateTime travelStartAt, LocalDateTime travelEndAt) {
 
-        User user = userService.getAuthenticatedUser();
+        User user = userService.findAuthenticatedUser();
         Poster poster = findPosterById(posterId);
 
         if (!user.getId().equals(poster.getUser().getId())) {
@@ -90,7 +90,7 @@ public class PosterService {
     // 포스터 삭제
     public void deletePoster(Long posterId) {
 
-        User user = userService.getAuthenticatedUser();
+        User user = userService.findAuthenticatedUser();
         Poster poster = findPosterById(posterId);
 
         if (!user.getId().equals(poster.getUser().getId())) {

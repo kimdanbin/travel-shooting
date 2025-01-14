@@ -6,7 +6,7 @@ import com.example.travelshooting.company.Company;
 import com.example.travelshooting.enums.UserRole;
 import com.example.travelshooting.like.LikePoster;
 import com.example.travelshooting.poster.entity.Poster;
-import com.example.travelshooting.reservation.Reservation;
+import com.example.travelshooting.reservation.entity.Reservation;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -1,8 +1,8 @@
-package com.example.travelshooting.payment;
+package com.example.travelshooting.payment.entity;
 
 import com.example.travelshooting.common.BaseEntity;
 import com.example.travelshooting.enums.PaymentStatus;
-import com.example.travelshooting.reservation.Reservation;
+import com.example.travelshooting.reservation.entity.Reservation;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
