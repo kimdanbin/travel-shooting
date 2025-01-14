@@ -28,6 +28,7 @@ public class WebConfig {
   private final AuthenticationEntryPoint authEntryPoint;
   private final AccessDeniedHandler accessDeniedHandler;
 
+  private static final String[] WHITE_LIST = {"/users/signup", "/users/login", "/partners", "/admins","/**"};
   private static final String[] WHITE_LIST = {"/users/signup", "/users/login", "/admins", "/products/{productId}/reservations/{reservationId}/payment/approve"};
 
   @Bean
