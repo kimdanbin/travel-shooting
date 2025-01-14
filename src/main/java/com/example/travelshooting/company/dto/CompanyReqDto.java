@@ -1,7 +1,7 @@
 package com.example.travelshooting.company.dto;
 
 import com.example.travelshooting.company.Company;
-import com.example.travelshooting.user.User;
+import com.example.travelshooting.user.entity.User;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;

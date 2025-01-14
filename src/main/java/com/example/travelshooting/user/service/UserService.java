@@ -3,7 +3,7 @@ package com.example.travelshooting.user.service;
 import com.example.travelshooting.config.util.JwtProvider;
 import com.example.travelshooting.enums.AuthenticationScheme;
 import com.example.travelshooting.enums.UserRole;
-import com.example.travelshooting.user.User;
+import com.example.travelshooting.user.entity.User;
 import com.example.travelshooting.user.dto.ChangePasswordReqDto;
 import com.example.travelshooting.user.dto.JwtAuthResDto;
 import com.example.travelshooting.user.dto.PasswordVrfReqDto;
@@ -116,12 +116,11 @@ public class UserService {
     }
   }
 
-  public User getUserById(Long userId) {
-    return userRepository.findById(userId)
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "아이디 " + userId + "에 해당하는 사용자를 찾을 수 없습니다."));
+  public User findUserById(Long userId) {
+    return userRepository.findUserById(userId);
   }
 
-  public User getAuthenticatedUser() {
+  public User findAuthenticatedUser() {
     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
     String authEmail = auth.getName();
     Optional<User> user = userRepository.findByEmail(authEmail);
