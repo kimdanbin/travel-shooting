@@ -6,7 +6,7 @@ import com.example.travelshooting.payment.Payment;
 import com.example.travelshooting.payment.dto.PaymentAproveResDto;
 import com.example.travelshooting.payment.dto.PaymentReadyResDto;
 import com.example.travelshooting.payment.repository.PaymentRepository;
-import com.example.travelshooting.product.Product;
+import com.example.travelshooting.product.entity.Product;
 import com.example.travelshooting.product.service.ProductService;
 import com.example.travelshooting.reservation.Reservation;
 import com.example.travelshooting.reservation.service.ReservationService;

@@ -1,8 +1,8 @@
 package com.example.travelshooting.reservation.service;
 
-import com.example.travelshooting.part.Part;
+import com.example.travelshooting.part.entity.Part;
 import com.example.travelshooting.part.service.PartService;
-import com.example.travelshooting.product.Product;
+import com.example.travelshooting.product.entity.Product;
 import com.example.travelshooting.product.service.ProductService;
 import com.example.travelshooting.reservation.Reservation;
 import com.example.travelshooting.reservation.dto.ReservationResDto;

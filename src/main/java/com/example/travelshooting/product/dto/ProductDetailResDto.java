@@ -2,7 +2,7 @@ package com.example.travelshooting.product.dto;
 
 import com.example.travelshooting.common.BaseDtoDataType;
 import com.example.travelshooting.part.dto.PartResDto;
-import com.example.travelshooting.product.Product;
+import com.example.travelshooting.product.entity.Product;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 

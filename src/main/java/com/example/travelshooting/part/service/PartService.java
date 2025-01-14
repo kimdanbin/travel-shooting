@@ -1,11 +1,11 @@
 package com.example.travelshooting.part.service;
 
-import com.example.travelshooting.part.Part;
+import com.example.travelshooting.part.entity.Part;
 import com.example.travelshooting.part.dto.CreatePartReqDto;
 import com.example.travelshooting.part.dto.PartResDto;
 import com.example.travelshooting.part.dto.UpdatePartReqDto;
 import com.example.travelshooting.part.repository.PartRepository;
-import com.example.travelshooting.product.Product;
+import com.example.travelshooting.product.entity.Product;
 import com.example.travelshooting.product.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

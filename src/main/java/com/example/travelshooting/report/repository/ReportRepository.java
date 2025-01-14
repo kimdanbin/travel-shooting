@@ -1,7 +1,7 @@
 package com.example.travelshooting.report.repository;
 
 import com.example.travelshooting.enums.ReportType;
-import com.example.travelshooting.report.Report;
+import com.example.travelshooting.report.entity.Report;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;

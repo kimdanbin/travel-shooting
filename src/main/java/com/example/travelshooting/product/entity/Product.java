@@ -1,9 +1,9 @@
-package com.example.travelshooting.product;
+package com.example.travelshooting.product.entity;
 
 import com.example.travelshooting.common.BaseEntity;
-import com.example.travelshooting.company.Company;
+import com.example.travelshooting.company.entity.Company;
 import com.example.travelshooting.file.entity.LeisureFile;
-import com.example.travelshooting.part.Part;
+import com.example.travelshooting.part.entity.Part;
 import com.example.travelshooting.reservation.Reservation;
 import jakarta.persistence.*;
 import lombok.Getter;

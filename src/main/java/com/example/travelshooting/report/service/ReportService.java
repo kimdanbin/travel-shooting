@@ -4,7 +4,7 @@ import com.example.travelshooting.comment.dto.CommentResDto;
 import com.example.travelshooting.comment.service.CommentService;
 import com.example.travelshooting.enums.ReportType;
 import com.example.travelshooting.poster.service.PosterService;
-import com.example.travelshooting.report.Report;
+import com.example.travelshooting.report.entity.Report;
 import com.example.travelshooting.report.dto.ReportReqDto;
 import com.example.travelshooting.report.dto.ReportResDto;
 import com.example.travelshooting.report.repository.ReportRepository;

@@ -2,9 +2,9 @@ package com.example.travelshooting.reservation;
 
 import com.example.travelshooting.common.BaseEntity;
 import com.example.travelshooting.enums.ReservationStatus;
-import com.example.travelshooting.part.Part;
+import com.example.travelshooting.part.entity.Part;
 import com.example.travelshooting.payment.Payment;
-import com.example.travelshooting.product.Product;
+import com.example.travelshooting.product.entity.Product;
 import com.example.travelshooting.user.User;
 import jakarta.persistence.*;
 import lombok.Getter;

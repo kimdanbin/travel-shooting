@@ -1,4 +1,4 @@
-package com.example.travelshooting.report;
+package com.example.travelshooting.report.entity;
 
 import com.example.travelshooting.common.BaseEntity;
 import com.example.travelshooting.enums.ReportType;

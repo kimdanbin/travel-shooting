@@ -1,7 +1,7 @@
-package com.example.travelshooting.company;
+package com.example.travelshooting.company.entity;
 
 import com.example.travelshooting.common.BaseEntity;
-import com.example.travelshooting.product.Product;
+import com.example.travelshooting.product.entity.Product;
 import com.example.travelshooting.user.User;
 import jakarta.persistence.*;
 import lombok.Getter;

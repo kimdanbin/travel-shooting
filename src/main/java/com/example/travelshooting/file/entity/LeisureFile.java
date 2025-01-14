@@ -1,6 +1,6 @@
 package com.example.travelshooting.file.entity;
 
-import com.example.travelshooting.product.Product;
+import com.example.travelshooting.product.entity.Product;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
