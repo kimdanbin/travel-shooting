@@ -36,7 +36,7 @@ public class PaymentService {
     private final ProductService productService;
 
     @Value("${kakao.api.pay.key}")
-    private String apiKey;
+    private String SecretKey;
 
     @Value("${kakao.api.pay.ready.url}")
     private String KAKAO_PAY_READY_URL;
@@ -49,9 +49,14 @@ public class PaymentService {
         Reservation reservation = reservationService.findByProductIdAndId(productId, reservationId);
         User user = userService.getAuthenticatedUser();
         Product product = productService.findProductById(productId);
+        Payment payment = paymentRepository.findByReservationId(reservation.getId());
 
         if (!reservation.getStatus().equals(ReservationStatus.APPROVED)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "예약 승인이 먼저 되어야 합니다.");
+        }
+
+        if (payment != null && payment.getStatus().equals(PaymentStatus.APPROVED)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 결제된 예약입니다.");
         }
 
         String approvalUrl = UriComponentsBuilder.fromHttpUrl("http://localhost:8080")
@@ -86,7 +91,7 @@ public class PaymentService {
                 String redirectUrl = root.path("next_redirect_pc_url").asText();  // 결제 페이지 URL
 
                 // 결제 정보 저장
-                savePayment(reservation, tid, reservation.getTotalPrice());
+                savePayment(reservation, tid, user.getId(), reservation.getTotalPrice());
 
                 return new PaymentReadyResDto(redirectUrl);
             } catch (Exception e) {
@@ -98,8 +103,8 @@ public class PaymentService {
         }
     }
 
-    public Payment savePayment(Reservation reservation, String tid, int totalPrice) {
-        Payment payment = new Payment(reservation, tid, totalPrice);
+    public Payment savePayment(Reservation reservation, String tid, Long userId, int totalPrice) {
+        Payment payment = new Payment(reservation, tid, userId, totalPrice);
 
         return paymentRepository.save(payment);
     }
@@ -107,14 +112,13 @@ public class PaymentService {
     // 최종적으로 결제 완료 처리를 하는 단계
     public PaymentAproveResDto payApprove(Long productId, Long reservationId, String pgToken) {
         Reservation reservation = reservationService.findByProductIdAndId(productId, reservationId);
-        User user = userService.getAuthenticatedUser();
         Payment payment = paymentRepository.findByReservationId(reservationId);
 
         Map<String, String> body = new HashMap<>();
         body.put("cid", "TC0ONETIME");
         body.put("tid", payment.getTid());
         body.put("partner_order_id", reservation.getId().toString());
-        body.put("partner_user_id", user.getId().toString());
+        body.put("partner_user_id", payment.getUserId().toString());
         body.put("pg_token", pgToken);
 
         HttpHeaders headers = getHttpHeaders();
@@ -165,7 +169,7 @@ public class PaymentService {
 
     private HttpHeaders getHttpHeaders() {
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "SECRET_KEY " + apiKey);
+        headers.set("Authorization", "SECRET_KEY " + SecretKey);
         headers.set("Content-type", "application/json");
 
         return headers;

@@ -29,11 +29,15 @@ public class Payment extends BaseEntity {
     private PaymentStatus status = PaymentStatus.READY;
 
     @Column(nullable = false)
+    private Long userId;
+
+    @Column(nullable = false)
     private int totalPrice;
 
-    public Payment(Reservation reservation, String tid, int totalPrice) {
+    public Payment(Reservation reservation, String tid, Long userId, int totalPrice) {
         this.reservation = reservation;
         this.tid = tid;
+        this.userId = userId;
         this.totalPrice = totalPrice;
     }
 
