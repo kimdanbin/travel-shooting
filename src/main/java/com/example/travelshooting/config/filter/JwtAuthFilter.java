@@ -45,18 +45,20 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     // 토큰 검증.
     String token = getTokenFromRequest(request);
 
-    if (!jwtProvider.validToken(token)) {
-      return;
+    if (token != null) {
+      if (!jwtProvider.validToken(token)) {
+        return;
+      }
+
+      // 토큰으로부텨 username을 추출.
+      String username = jwtProvider.getUsername(token);
+
+      // username에 해당되는 사용자를 찾는다.
+      UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+
+      // SecurityContext에 인증 객체 저장.
+      setAuthentication(request, userDetails);
     }
-
-    // 토큰으로부텨 username을 추출.
-    String username = jwtProvider.getUsername(token);
-
-    // username에 해당되는 사용자를 찾는다.
-    UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-
-    // SecurityContext에 인증 객체 저장.
-    setAuthentication(request, userDetails);
   }
 
   /**
