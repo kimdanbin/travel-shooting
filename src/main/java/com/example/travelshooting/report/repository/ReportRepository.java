@@ -11,7 +11,7 @@ import org.springframework.web.server.ResponseStatusException;
 public interface ReportRepository extends JpaRepository<Report, Long> {
 
     default Report findByIdOrElseThrow(Long reportId) {
-        return findById(reportId).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "신고 내역이 존재하지 않습니다."));
+        return findById(reportId).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,  "아이디 " + reportId + "에 해당하는 신고를 찾을 수 없습니다."));
     }
 
     int countByFkIdAndType(Long posterId, ReportType type);
