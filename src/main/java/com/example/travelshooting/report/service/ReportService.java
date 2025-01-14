@@ -11,10 +11,14 @@ import com.example.travelshooting.report.repository.ReportRepository;
 import com.example.travelshooting.user.User;
 import com.example.travelshooting.user.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -74,6 +78,37 @@ public class ReportService {
                 report.getFkId(),
                 report.getReason(),
                 report.getCreatedAt()
+        );
+    }
+
+    @Transactional(readOnly = true)
+    public List<ReportResDto> findAllReports(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Report> reportPage = reportRepository.findAll(pageable);
+
+        return reportPage.stream()
+                .map(Report -> new ReportResDto(
+                        Report.getId(),
+                        Report.getUser().getId(),
+                        Report.getType(),
+                        Report.getFkId(),
+                        Report.getReason(),
+                        Report.getCreatedAt()
+                ))
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public ReportResDto findReport(Long reportId) {
+        Report findReport = reportRepository.findByIdOrElseThrow(reportId);
+
+        return new ReportResDto(
+                findReport.getId(),
+                findReport.getUser().getId(),
+                findReport.getType(),
+                findReport.getFkId(),
+                findReport.getReason(),
+                findReport.getCreatedAt()
         );
     }
 }
