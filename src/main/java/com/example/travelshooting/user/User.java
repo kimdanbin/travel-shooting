@@ -58,6 +58,10 @@ public class User extends BaseEntity {
     @OneToMany(mappedBy = "user")
     private List<Comment> comments = new ArrayList<>();
 
+    public void updatePassword(String newPassword) {
+        this.password = newPassword;
+    }
+
     public User(String email, String password, String name, UserRole role) {
         this.email = email;
         this.password = password;

@@ -1,19 +1,13 @@
 package com.example.travelshooting.user.controller;
 
 import com.example.travelshooting.common.CommonResDto;
-import com.example.travelshooting.user.dto.JwtAuthResDto;
-import com.example.travelshooting.user.dto.LoginReqDto;
-import com.example.travelshooting.user.dto.UserReqDto;
-import com.example.travelshooting.user.dto.UserResDto;
+import com.example.travelshooting.user.dto.*;
 import com.example.travelshooting.user.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -38,8 +32,36 @@ public class UserController {
     return new ResponseEntity<>(new CommonResDto<>("로그인 완료", login), HttpStatus.OK);
   }
 
+  // 로그아웃
+//  @PostMapping("/logout")
+//  public ResponseEntity<CommonResDto<String>> logout(HttpServletRequest request,
+//                                                     HttpServletResponse response, Authentication authentication)
+//      throws UsernameNotFoundException {
+//    // 인증 정보가 있다면 로그아웃 처리.
+//    if (authentication != null && authentication.isAuthenticated()) {
+//      new SecurityContextLogoutHandler().logout(request, response, authentication);
+//
+//      return ResponseEntity.ok(new CommonResDto<>("로그아웃 성공."));
+//    }
+//    throw new UsernameNotFoundException("로그인이 먼저 필요합니다.");
+//  }
   // 비밀번호 확인 후 회원탈퇴
-
+  @DeleteMapping("/{userId}")
+  public ResponseEntity<String> deleteUser(
+      @PathVariable Long userId,
+      @RequestBody PasswordVrfReqDto requestDto) {
+    userService.deleteUser(userId, requestDto);
+    return ResponseEntity.ok("회원 탈퇴 성공");
+  }
 
   // 비밀번호 변경
+  @PutMapping("/{userId}/password")
+  public ResponseEntity<String> changePassword(
+      @PathVariable Long userId,
+      @Valid @RequestBody ChangePasswordReqDto passwordRequestDto) {
+
+    userService.changePassword(userId, passwordRequestDto);
+
+    return ResponseEntity.ok("비밀번호 변경 완료");
+  }
 }

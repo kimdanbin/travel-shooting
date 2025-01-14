@@ -20,6 +20,7 @@ public class PartnerController {
 
   private final PartnerService partnerService;
 
+  // 파트너(협력 업체) 회원가입
   @PostMapping
   public ResponseEntity<CommonResDto<UserResDto>> partnerSignup(@Valid @RequestBody UserReqDto userReqDto) {
     UserResDto partnerSignup = partnerService.partnerSignup(userReqDto.getEmail(), userReqDto.getPassword(), userReqDto.getName());

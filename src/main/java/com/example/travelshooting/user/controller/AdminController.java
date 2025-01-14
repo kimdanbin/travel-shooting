@@ -20,6 +20,7 @@ public class AdminController {
 
   private final AdminService adminService;
 
+  // 관리자 회원가입
   @PostMapping
   public ResponseEntity<CommonResDto<UserResDto>> adminSignup(@Valid @RequestBody UserReqDto userReqDto) {
     UserResDto adminSignup = adminService.adminSignup(userReqDto.getEmail(), userReqDto.getPassword(), userReqDto.getName());
