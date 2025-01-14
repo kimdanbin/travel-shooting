@@ -8,7 +8,7 @@ import com.example.travelshooting.report.Report;
 import com.example.travelshooting.report.dto.ReportReqDto;
 import com.example.travelshooting.report.dto.ReportResDto;
 import com.example.travelshooting.report.repository.ReportRepository;
-import com.example.travelshooting.user.User;
+import com.example.travelshooting.user.entity.User;
 import com.example.travelshooting.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

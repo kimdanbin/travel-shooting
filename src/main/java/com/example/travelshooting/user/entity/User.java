@@ -1,4 +1,4 @@
-package com.example.travelshooting.user;
+package com.example.travelshooting.user.entity;
 
 import com.example.travelshooting.comment.Comment;
 import com.example.travelshooting.common.BaseEntity;
