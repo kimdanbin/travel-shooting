@@ -1,17 +1,19 @@
 package com.example.travelshooting.company.service;
 
 import com.example.travelshooting.company.Company;
-import com.example.travelshooting.company.repository.CompanyRepository;
 import com.example.travelshooting.company.dto.CompanyReqDto;
 import com.example.travelshooting.company.dto.CompanyResDto;
+import com.example.travelshooting.company.repository.CompanyRepository;
 import com.example.travelshooting.user.User;
 import com.example.travelshooting.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -99,6 +101,6 @@ public class CompanyService {
 
     public Company getCompanyById(Long companyId) {
         return companyRepository.findById(companyId)
-                .orElseThrow(() -> new IllegalArgumentException("아이디 " + companyId + "에 해당하는 업체를 찾을 수 없습니다."));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "아이디 " +companyId + "에 해당하는 업체를 찾을 수 없습니다."));
     }
 }
