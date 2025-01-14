@@ -4,6 +4,7 @@ import com.example.travelshooting.common.CommonResDto;
 import com.example.travelshooting.report.dto.ReportReqDto;
 import com.example.travelshooting.report.dto.ReportResDto;
 import com.example.travelshooting.report.service.ReportService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +29,7 @@ public class ReportController {
     @PostMapping("/posters/{posterId}/reports")
     public ResponseEntity<CommonResDto<ReportResDto>> reportPoster (
             @PathVariable Long posterId,
-            @RequestBody ReportReqDto reportReqDto
+            @Valid @RequestBody ReportReqDto reportReqDto
             ) {
         ReportResDto result = reportService.reportPoster(posterId, reportReqDto);
 
@@ -45,7 +46,7 @@ public class ReportController {
     @PostMapping("/posters/{posterId}/comments/{commentId}/reports")
     public ResponseEntity<CommonResDto<ReportResDto>> reportComment(
             @PathVariable Long commentId,
-            @RequestBody ReportReqDto reportReqDto
+            @Valid @RequestBody ReportReqDto reportReqDto
     ) {
         ReportResDto result = reportService.reportComment(commentId, reportReqDto);
 

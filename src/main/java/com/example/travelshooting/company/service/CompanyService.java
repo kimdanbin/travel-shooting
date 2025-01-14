@@ -29,6 +29,7 @@ public class CompanyService {
         User user = userService.getUserById(companyReqDto.getUserId());
         Company company = companyReqDto.toEntity(user);
         companyRepository.save(company);
+        user.updateRole();
 
         return new CompanyResDto(
                 company.getId(),
