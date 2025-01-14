@@ -7,7 +7,7 @@ import com.example.travelshooting.product.service.ProductService;
 import com.example.travelshooting.reservation.Reservation;
 import com.example.travelshooting.reservation.dto.ReservationResDto;
 import com.example.travelshooting.reservation.repository.ReservationRepository;
-import com.example.travelshooting.user.entity.User;
+import com.example.travelshooting.user.User;
 import com.example.travelshooting.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

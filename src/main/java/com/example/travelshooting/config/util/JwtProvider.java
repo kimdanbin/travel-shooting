@@ -1,6 +1,6 @@
 package com.example.travelshooting.config.util;
 
-import com.example.travelshooting.user.entity.User;
+import com.example.travelshooting.user.User;
 import com.example.travelshooting.user.repository.UserRepository;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;

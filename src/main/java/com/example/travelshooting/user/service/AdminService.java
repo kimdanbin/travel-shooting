@@ -1,7 +1,7 @@
 package com.example.travelshooting.user.service;
 
 import com.example.travelshooting.enums.UserRole;
-import com.example.travelshooting.user.entity.User;
+import com.example.travelshooting.user.User;
 import com.example.travelshooting.user.dto.UserResDto;
 import com.example.travelshooting.user.repository.UserRepository;
 import jakarta.transaction.Transactional;

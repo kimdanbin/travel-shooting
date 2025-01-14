@@ -5,7 +5,7 @@ import com.example.travelshooting.common.BaseEntity;
 import com.example.travelshooting.file.entity.PosterFile;
 import com.example.travelshooting.like.LikePoster;
 import com.example.travelshooting.restaurant.Restaurant;
-import com.example.travelshooting.user.entity.User;
+import com.example.travelshooting.user.User;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
