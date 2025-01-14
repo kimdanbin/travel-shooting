@@ -2,7 +2,7 @@ package com.example.travelshooting.report.entity;
 
 import com.example.travelshooting.common.BaseEntity;
 import com.example.travelshooting.enums.ReportType;
-import com.example.travelshooting.user.User;
+import com.example.travelshooting.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
