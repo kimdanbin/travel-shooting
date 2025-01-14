@@ -1,6 +1,6 @@
 package com.example.travelshooting.user;
 
-import com.example.travelshooting.comment.Comment;
+import com.example.travelshooting.comment.entity.Comment;
 import com.example.travelshooting.common.BaseEntity;
 import com.example.travelshooting.company.Company;
 import com.example.travelshooting.enums.UserRole;
@@ -67,5 +67,9 @@ public class User extends BaseEntity {
         this.password = password;
         this.name = name;
         this.role = role;
+    }
+
+    public void updateRole() {
+        this.role = UserRole.PARTNER;
     }
 }

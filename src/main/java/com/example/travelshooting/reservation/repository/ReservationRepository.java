@@ -37,4 +37,10 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             "JOIN p.company c " +
             "WHERE p.id = :productId AND c.user.id = :userId AND r.id = :reservationId")
     Reservation findByProductIdAndUserIdAndId(@Param("productId") Long productId, @Param("userId") Long userId, @Param("reservationId") Long reservationId);
+
+    @Query("SELECT r " +
+            "FROM Reservation r " +
+            "JOIN r.product p " +
+            "WHERE p.id = :productId AND r.id = :reservationId")
+    Reservation findByProductIdAndId(@Param("productId") Long productId, @Param("reservationId") Long reservationId);
 }

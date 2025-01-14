@@ -118,4 +118,8 @@ public class ReservationService {
                 reservation.getUpdatedAt()
         );
     }
+
+    public Reservation findByProductIdAndId(Long productId, Long reservationId) {
+        return reservationRepository.findByProductIdAndId(productId, reservationId);
+    }
 }

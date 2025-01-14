@@ -4,6 +4,7 @@ import com.example.travelshooting.common.CommonResDto;
 import com.example.travelshooting.poster.dto.PosterReqDto;
 import com.example.travelshooting.poster.dto.PosterResDto;
 import com.example.travelshooting.poster.service.PosterService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,12 +19,13 @@ public class PosterController {
     // 포스터 생성
     @PostMapping()
     public ResponseEntity<CommonResDto<PosterResDto>> createPoster(
-            @RequestBody PosterReqDto posterReqDto
+            @Valid @RequestBody PosterReqDto posterReqDto
     ) {
 
         PosterResDto posterResDto = posterService.createPoster(
                 posterReqDto.getRestaurantId(),
                 posterReqDto.getPaymentId(),
+                posterReqDto.getExpenses(),
                 posterReqDto.getTitle(),
                 posterReqDto.getContent(),
                 posterReqDto.getTravelStartAt(),
@@ -48,13 +50,14 @@ public class PosterController {
     @PatchMapping("/{posterId}")
     public ResponseEntity<CommonResDto<PosterResDto>> updatePoster(
             @PathVariable Long posterId,
-            @RequestBody PosterReqDto posterReqDto
+            @Valid @RequestBody PosterReqDto posterReqDto
     ) {
 
         PosterResDto posterResDto = posterService.updatePoster(
                 posterId,
                 posterReqDto.getRestaurantId(),
                 posterReqDto.getPaymentId(),
+                posterReqDto.getExpenses(),
                 posterReqDto.getTitle(),
                 posterReqDto.getContent(),
                 posterReqDto.getTravelStartAt(),

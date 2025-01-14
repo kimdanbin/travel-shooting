@@ -1,6 +1,6 @@
 package com.example.travelshooting.poster.entity;
 
-import com.example.travelshooting.comment.Comment;
+import com.example.travelshooting.comment.entity.Comment;
 import com.example.travelshooting.common.BaseEntity;
 import com.example.travelshooting.file.entity.PosterFile;
 import com.example.travelshooting.like.LikePoster;
@@ -11,6 +11,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @SQLDelete(sql = "UPDATE poster SET is_deleted = true WHERE id = ?")
+@Where(clause = "is_deleted = false")
 public class Poster extends BaseEntity {
 
     @Id
@@ -38,6 +40,8 @@ public class Poster extends BaseEntity {
 //    @ManyToOne
 //    @JoinColumn(name = "payment_id")
 //    private Payment payment;
+
+    private int expenses;
 
     private String title;
 
@@ -59,9 +63,10 @@ public class Poster extends BaseEntity {
     private List<PosterFile> files = new ArrayList<>();
 
     @Builder
-    public Poster(User user, Restaurant restaurant, String title, String content, LocalDateTime travelStartAt, LocalDateTime travelEndAt) {
+    public Poster(User user, Restaurant restaurant, int expenses, String title, String content, LocalDateTime travelStartAt, LocalDateTime travelEndAt) {
         this.user = user;
         this.restaurant = restaurant;
+        this.expenses = expenses;
         this.title = title;
         this.content = content;
         this.travelStartAt = travelStartAt;
@@ -70,6 +75,10 @@ public class Poster extends BaseEntity {
 
     public void updateRestaurant(Restaurant restaurant) {
         this.restaurant = restaurant;
+    }
+
+    public void updateExpenses(int expenses) {
+        this.expenses = expenses;
     }
 
     public void updateTitle(String title) {
