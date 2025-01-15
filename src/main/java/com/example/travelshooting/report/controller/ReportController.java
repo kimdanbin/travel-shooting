@@ -31,7 +31,7 @@ public class ReportController {
             @PathVariable Long posterId,
             @Valid @RequestBody ReportReqDto reportReqDto
             ) {
-        ReportResDto result = reportService.reportPoster(posterId, reportReqDto);
+        ReportResDto result = reportService.reportPoster(posterId, reportReqDto.getReason());
 
         return new ResponseEntity<>(new CommonResDto<>("포스터 신고 완료", result), HttpStatus.CREATED);
     }
@@ -48,7 +48,7 @@ public class ReportController {
             @PathVariable Long commentId,
             @Valid @RequestBody ReportReqDto reportReqDto
     ) {
-        ReportResDto result = reportService.reportComment(commentId, reportReqDto);
+        ReportResDto result = reportService.reportComment(commentId, reportReqDto.getReason());
 
         return new ResponseEntity<>(new CommonResDto<>("댓글 신고 완료", result), HttpStatus.CREATED);
     }

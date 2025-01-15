@@ -1,8 +1,7 @@
 package com.example.travelshooting.company.service;
 
-import com.example.travelshooting.company.entity.Company;
-import com.example.travelshooting.company.dto.CompanyReqDto;
 import com.example.travelshooting.company.dto.CompanyResDto;
+import com.example.travelshooting.company.entity.Company;
 import com.example.travelshooting.company.repository.CompanyRepository;
 import com.example.travelshooting.user.entity.User;
 import com.example.travelshooting.user.service.UserService;
@@ -26,10 +25,10 @@ public class CompanyService {
     private final UserService userService;
 
     @Transactional
-    public CompanyResDto createCompany(CompanyReqDto companyReqDto) {
+    public CompanyResDto createCompany(Long userId, String name, String description) {
 
-        User user = userService.findUserById(companyReqDto.getUserId());
-        Company company = companyReqDto.toEntity(user);
+        User user = userService.findUserById(userId);
+        Company company = new Company(user, name, description);
         companyRepository.save(company);
         user.updateRole();
 
@@ -99,7 +98,7 @@ public class CompanyService {
         companyRepository.delete(findCompany);
     }
 
-    public Company getCompanyById(Long companyId) {
+    public Company findCompanyById(Long companyId) {
         return companyRepository.findById(companyId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "아이디 " +companyId + "에 해당하는 업체를 찾을 수 없습니다."));
     }

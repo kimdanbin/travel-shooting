@@ -2,8 +2,8 @@ package com.example.travelshooting.product.service;
 
 import com.example.travelshooting.company.entity.Company;
 import com.example.travelshooting.company.service.CompanyService;
-import com.example.travelshooting.product.entity.Product;
 import com.example.travelshooting.product.dto.*;
+import com.example.travelshooting.product.entity.Product;
 import com.example.travelshooting.product.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -26,9 +26,9 @@ public class ProductService {
     private final CompanyService companyService;
 
     @Transactional
-    public CreateProductResDto createProduct(Long companyId, CreateProductReqDto createProductReqDto) {
-        Company company = companyService.getCompanyById(companyId);
-        Product product = createProductReqDto.toEntity(company);
+    public CreateProductResDto createProduct(Long companyId, String name, String description, int price, String address, int quantity) {
+        Company company = companyService.findCompanyById(companyId);
+        Product product = new Product(name, description, price, address, quantity, company);
         productRepository.save(product);
 
         return new CreateProductResDto(
@@ -79,14 +79,9 @@ public class ProductService {
 
 
     @Transactional
-    public UpdateProductResDto updateProduct(Long productId, UpdateProductReqDto updateProductReqDto) {
+    public UpdateProductResDto updateProduct(Long productId, String description, int price, String address, int quantity) {
         Product findProduct = productRepository.findByIdOrElseThrow(productId);
-        findProduct.updateProduct(
-                updateProductReqDto.getDescription(),
-                updateProductReqDto.getPrice(),
-                updateProductReqDto.getAddress(),
-                updateProductReqDto.getQuantity()
-        );
+        findProduct.updateProduct(description, price, address, quantity);
         productRepository.save(findProduct);
 
         return new UpdateProductResDto(

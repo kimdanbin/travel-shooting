@@ -30,7 +30,7 @@ public class CompanyController {
     public ResponseEntity<CommonResDto<CompanyResDto>> createCompany(
             @Valid @RequestBody CompanyReqDto companyReqDto
     ) {
-        CompanyResDto result = companyService.createCompany(companyReqDto);
+        CompanyResDto result = companyService.createCompany(companyReqDto.getUserId(),companyReqDto.getName(),companyReqDto.getDescription());
 
         return new ResponseEntity<>(new CommonResDto<>("업체 생성 완료", result), HttpStatus.CREATED);
     }
