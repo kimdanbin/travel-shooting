@@ -36,11 +36,7 @@ public class PosterResDto implements BaseDtoDataType {
     public PosterResDto(Poster poster) {
         this.id = poster.getId();
         this.userId = poster.getUser().getId();
-        if (poster.getRestaurant() != null) {
-            this.restaurantId = poster.getRestaurant().getId();
-        } else {
-            this.restaurantId = null;
-        }
+        this.restaurantId = poster.getRestaurant() != null ? poster.getRestaurant().getId() : null;
         this.paymentId = poster.getPayment().getId() != null ? poster.getPayment().getId() : null;
         this.title = poster.getTitle();
         this.content = poster.getContent();
