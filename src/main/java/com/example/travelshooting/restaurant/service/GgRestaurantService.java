@@ -1,19 +1,17 @@
 package com.example.travelshooting.restaurant.service;
 
 import com.example.travelshooting.common.Const;
-import com.example.travelshooting.restaurant.entity.Restaurant;
 import com.example.travelshooting.restaurant.dto.GgRestaurantApiDto;
 import com.example.travelshooting.restaurant.dto.GgRestaurantResDto;
+import com.example.travelshooting.restaurant.entity.Restaurant;
 import com.example.travelshooting.restaurant.repository.RestaurantRepository;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
@@ -28,15 +26,15 @@ public class GgRestaurantService {
     private final RestTemplate restTemplate;
 
     @Value("${gg.api.food.key}")
-    private String apiKey;
+    private String key;
 
     @Value("${gg.api.food.url}")
-    private String GG_API_FOOD_URL;
+    private String ggFoodUrl;
 
     @Transactional
     public List<GgRestaurantResDto> saveGgRestaurants(int pIndex, int pSize) {
-        String url = UriComponentsBuilder.fromHttpUrl(GG_API_FOOD_URL)
-                .queryParam("KEY", apiKey)
+        String url = UriComponentsBuilder.fromHttpUrl(ggFoodUrl)
+                .queryParam("KEY", key)
                 .queryParam("pIndex", pIndex)
                 .queryParam("pSize", pSize)
                 .build()
@@ -95,11 +93,5 @@ public class GgRestaurantService {
         return savedRestaurants.stream()
                 .map(GgRestaurantResDto::toDto)
                 .collect(Collectors.toList());
-    }
-
-    // 맛집 아이디로 맛집 찾기
-    public Restaurant getRestaurantById(Long restaurantId) {
-        return restaurantRepository.findById(restaurantId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "아이디 " + restaurantId + "에 해당하는 맛집을 찾을 수 없습니다."));
     }
 }
