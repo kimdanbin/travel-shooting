@@ -1,13 +1,14 @@
 package com.example.travelshooting.like.controller;
 
+import com.example.travelshooting.common.CommonListResDto;
 import com.example.travelshooting.like.service.LikePosterService;
+import com.example.travelshooting.poster.dto.PosterResDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -34,5 +35,14 @@ public class LikePosterController {
         likePosterService.unlikePoster(posterId);
 
         return new ResponseEntity<>("좋아요를 취소 했습니다.", HttpStatus.CREATED);
+    }
+
+    // 본인이 좋아요 한 포스터만 전체 조회
+    @GetMapping("/posters/likes")
+    public ResponseEntity<CommonListResDto<PosterResDto>> findAllByLikedPoster() {
+
+        List<PosterResDto> likedPosters = likePosterService.findAllByLikedPoster();
+
+        return new ResponseEntity<>(new CommonListResDto<>("좋아요한 포스터 전체 조회 완료", likedPosters), HttpStatus.OK);
     }
 }

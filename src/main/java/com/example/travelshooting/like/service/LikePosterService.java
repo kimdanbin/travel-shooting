@@ -2,6 +2,7 @@ package com.example.travelshooting.like.service;
 
 import com.example.travelshooting.like.entity.LikePoster;
 import com.example.travelshooting.like.repository.LikePosterRepository;
+import com.example.travelshooting.poster.dto.PosterResDto;
 import com.example.travelshooting.poster.entity.Poster;
 import com.example.travelshooting.poster.service.PosterService;
 import com.example.travelshooting.user.entity.User;
@@ -10,6 +11,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -57,5 +61,22 @@ public class LikePosterService {
         LikePoster liked = likePosterRepository.findByUserIdAndPosterId(user.getId(), poster.getId());
 
         likePosterRepository.deleteById(liked.getId());
+    }
+
+    // 본인이 좋아요 한 포스터만 전체 조회
+    public List<PosterResDto> findAllByLikedPoster() {
+
+        User user = userService.findAuthenticatedUser();
+
+        List<LikePoster> allLiked = likePosterRepository.findAllByUserId(user.getId());
+        List<PosterResDto> likedPosters = new ArrayList<>();
+
+        for (LikePoster likedPoster : allLiked) {
+            Poster poster = posterService.findPosterById(likedPoster.getPoster().getId());
+            PosterResDto posterResDto = new PosterResDto(poster);
+            likedPosters.add(posterResDto);
+        }
+
+        return likedPosters;
     }
 }

@@ -4,6 +4,8 @@ import com.example.travelshooting.like.entity.LikePoster;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface LikePosterRepository extends JpaRepository<LikePoster, Long> {
 
@@ -11,5 +13,6 @@ public interface LikePosterRepository extends JpaRepository<LikePoster, Long> {
 
     LikePoster findByUserIdAndPosterId(Long userId, Long posterId);
 
-    void deleteByUserIdAndPosterId(Long userId, Long posterId);
+    List<LikePoster> findAllByUserId(Long userId);
+
 }
