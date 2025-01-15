@@ -28,7 +28,16 @@ public class WebConfig {
   private final AuthenticationEntryPoint authEntryPoint;
   private final AccessDeniedHandler accessDeniedHandler;
 
-  private static final String[] WHITE_LIST = {"/users/signup", "/users/login", "/admins", "/products/{productId}/reservations/{reservationId}/payment/approve", "/attachments"};
+  private static final String[] WHITE_LIST = {"/users/signup",
+                                              "/users/login",
+                                              "/admins",
+                                              "/products/{productId}/reservations/{reservationId}/payment/approve",
+                                              "/attachments",
+                                              "/posters", // 포스터 전체조회
+                                              "/posters/{posterId", // 포스터 단건 조회
+                                              "/posters/{posterId}/comments", // 댓글 전체 조회
+                                              "/locals", // 장소 검색
+                                              "/restaurants/search"}; // 맛집 검색
 
   @Bean
   SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
