@@ -1,6 +1,6 @@
 package com.example.travelshooting.company.service;
 
-import com.example.travelshooting.company.Company;
+import com.example.travelshooting.company.entity.Company;
 import com.example.travelshooting.company.dto.CompanyReqDto;
 import com.example.travelshooting.company.dto.CompanyResDto;
 import com.example.travelshooting.company.repository.CompanyRepository;

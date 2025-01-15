@@ -2,7 +2,7 @@ package com.example.travelshooting.user.entity;
 
 import com.example.travelshooting.comment.entity.Comment;
 import com.example.travelshooting.common.BaseEntity;
-import com.example.travelshooting.company.Company;
+import com.example.travelshooting.company.entity.Company;
 import com.example.travelshooting.enums.UserRole;
 import com.example.travelshooting.like.LikePoster;
 import com.example.travelshooting.poster.entity.Poster;
