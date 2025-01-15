@@ -18,11 +18,14 @@ public class SecurityConfig {
 
   private final UserDetailsService userDetailsService;
 
+  private static final int CONNECT_TIMEOUT = 5000; // 연결 타임아웃 (밀리초)
+  private static final int READ_TIMEOUT = 5000;    // 읽기 타임아웃 (밀리초)
+
   @Bean
   RestTemplate restTemplate() {
     SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
-    factory.setConnectTimeout(5000);
-    factory.setReadTimeout(5000);
+    factory.setConnectTimeout(CONNECT_TIMEOUT);
+    factory.setReadTimeout(READ_TIMEOUT);
 
     return new RestTemplate(factory);
   }
