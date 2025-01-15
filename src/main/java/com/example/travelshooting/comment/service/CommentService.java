@@ -34,7 +34,7 @@ public class CommentService {
         Comment comment = new Comment(user, poster, commentReqDto.getComment());
         Comment savedComment = commentRepository.save(comment);
 
-        return CommentResDto.toDto(savedComment);
+        return new CommentResDto(savedComment);
     }
 
     // 댓글 전체 조회
@@ -42,7 +42,7 @@ public class CommentService {
 
         List<Comment> comments = commentRepository.findAllByPosterId(posterId);
 
-        return comments.stream().map(CommentResDto::toDto).toList();
+        return comments.stream().map(CommentResDto::new).toList();
     }
 
     //댓글 수정
@@ -58,7 +58,7 @@ public class CommentService {
 
         comment.updateComment(commentReqDto.getComment());
 
-        return CommentResDto.toDto(comment);
+        return new CommentResDto(comment);
     }
 
     //댓글 삭제

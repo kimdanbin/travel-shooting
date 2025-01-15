@@ -18,7 +18,4 @@ public class CommentResDto implements BaseDtoDataType {
         this.comment = comment.getContent();
     }
 
-    public static CommentResDto toDto(Comment comment) {
-        return new CommentResDto(comment);
-    }
 }
