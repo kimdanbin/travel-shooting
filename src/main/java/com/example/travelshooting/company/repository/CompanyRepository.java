@@ -16,4 +16,7 @@ public interface CompanyRepository extends JpaRepository<Company, Long> {
     }
 
     Page<Company> findAll(Pageable pageable);
+
+    boolean existsByName(String name);
+
 }

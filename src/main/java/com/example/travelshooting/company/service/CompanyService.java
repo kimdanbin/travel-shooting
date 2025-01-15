@@ -28,6 +28,14 @@ public class CompanyService {
     public CompanyResDto createCompany(Long userId, String name, String description) {
 
         User user = userService.findUserById(userId);
+        // TODO 유저가 존재하는지 확인
+        if (user == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "유저가 존재하지 않습니다.");
+        }
+        // TODO 이미 등록된 업체 이름인지 확인
+        if (companyRepository.existsByName(name)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "이미 등록된 업체 이름입니다.");
+        }
         Company company = new Company(user, name, description);
         companyRepository.save(company);
         user.updateRole();
@@ -102,4 +110,5 @@ public class CompanyService {
         return companyRepository.findById(companyId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "아이디 " +companyId + "에 해당하는 업체를 찾을 수 없습니다."));
     }
+
 }
