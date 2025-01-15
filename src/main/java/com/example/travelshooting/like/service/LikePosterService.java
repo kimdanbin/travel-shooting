@@ -2,6 +2,7 @@ package com.example.travelshooting.like.service;
 
 import com.example.travelshooting.like.entity.LikePoster;
 import com.example.travelshooting.like.repository.LikePosterRepository;
+import com.example.travelshooting.poster.dto.PosterResDto;
 import com.example.travelshooting.poster.entity.Poster;
 import com.example.travelshooting.poster.service.PosterService;
 import com.example.travelshooting.user.entity.User;
@@ -10,6 +11,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -39,5 +43,40 @@ public class LikePosterService {
         LikePoster likePoster = new LikePoster(user, poster);
 
         likePosterRepository.save(likePoster);
+    }
+
+    // 좋아요 누른 포스터에 좋아요 취소하기
+    public void unlikePoster(Long posterId) {
+
+        User user = userService.findAuthenticatedUser();
+        Poster poster = posterService.findPosterById(posterId);
+
+        boolean isLiked = likePosterRepository.existsByUserIdAndPosterId(user.getId(), poster.getId());
+
+        // 좋아요를 하지 않았다면 예외
+        if (!isLiked) {
+            throw new ResponseStatusException(HttpStatus.OK, "좋아요가 이미 취소되어 있습니다.");
+        }
+
+        LikePoster liked = likePosterRepository.findByUserIdAndPosterId(user.getId(), poster.getId());
+
+        likePosterRepository.deleteById(liked.getId());
+    }
+
+    // 본인이 좋아요 한 포스터만 전체 조회
+    public List<PosterResDto> findAllByLikedPoster() {
+
+        User user = userService.findAuthenticatedUser();
+
+        List<LikePoster> allLiked = likePosterRepository.findAllByUserId(user.getId());
+        List<PosterResDto> likedPosters = new ArrayList<>();
+
+        for (LikePoster likedPoster : allLiked) {
+            Poster poster = posterService.findPosterById(likedPoster.getPoster().getId());
+            PosterResDto posterResDto = new PosterResDto(poster);
+            likedPosters.add(posterResDto);
+        }
+
+        return likedPosters;
     }
 }
