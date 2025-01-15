@@ -1,5 +1,6 @@
 package com.example.travelshooting.config;
 
+import com.example.travelshooting.common.Const;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,8 +19,8 @@ public class SecurityConfig {
 
   private final UserDetailsService userDetailsService;
 
-  private static final int CONNECT_TIMEOUT = 5000; // 연결 타임아웃 (밀리초)
-  private static final int READ_TIMEOUT = 5000;    // 읽기 타임아웃 (밀리초)
+  private static final int CONNECT_TIMEOUT = Const.CONNECT_TIMEOUT; // 연결 타임아웃 (밀리초)
+  private static final int READ_TIMEOUT = Const.READ_TIMEOUT;    // 읽기 타임아웃 (밀리초)
 
   @Bean
   RestTemplate restTemplate() {
