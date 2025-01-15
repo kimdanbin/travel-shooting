@@ -1,4 +1,4 @@
-package com.example.travelshooting.like;
+package com.example.travelshooting.like.entity;
 
 import com.example.travelshooting.poster.entity.Poster;
 import com.example.travelshooting.user.entity.User;
@@ -23,5 +23,10 @@ public class LikePoster {
     @ManyToOne
     @JoinColumn(name = "poster_id")
     private Poster poster;
+
+    public LikePoster(User user, Poster poster) {
+        this.user = user;
+        this.poster = poster;
+    }
 
 }
