@@ -22,8 +22,11 @@ public class CommentController {
 
     //댓글 생성
     @PostMapping
-    public ResponseEntity<CommonResDto<CommentResDto>> createComment(@PathVariable Long posterId,
-                                                      @Valid @RequestBody CommentReqDto commentReqDto) {
+    public ResponseEntity<CommonResDto<CommentResDto>> createComment(
+            @PathVariable Long posterId,
+            @Valid @RequestBody CommentReqDto commentReqDto
+    ) {
+
         CommentResDto commentResDto  = commentService.createComment(posterId, commentReqDto);
 
         return new ResponseEntity<>(new CommonResDto<>("댓글 생성 완료", commentResDto), HttpStatus.CREATED);
@@ -31,15 +34,20 @@ public class CommentController {
 
     // 댓글 전체 조회
     @GetMapping
-    public ResponseEntity<CommonListResDto<CommentResDto>> getComments(@PathVariable Long posterId){
-        List<CommentResDto> comments = commentService.getComments(posterId);
+    public ResponseEntity<CommonListResDto<CommentResDto>> findComments(@PathVariable Long posterId) {
+
+        List<CommentResDto> comments = commentService.findComments(posterId);
 
         return new ResponseEntity<>(new CommonListResDto<>("댓글 전체 조회 완료", comments), HttpStatus.OK);
     }
+
     //댓글 수정
     @PatchMapping("/{commentId}")
-    public ResponseEntity<CommonResDto<CommentResDto>> updateComment(@PathVariable Long commentId,
-                                                       @Valid @RequestBody CommentReqDto commentReqDto) {
+    public ResponseEntity<CommonResDto<CommentResDto>> updateComment(
+            @PathVariable Long commentId,
+            @Valid @RequestBody CommentReqDto commentReqDto
+    ) {
+
         CommentResDto commentResDto = commentService.updateComment(commentId, commentReqDto);
 
         return new ResponseEntity<>(new CommonResDto<>("댓글 수정 완료", commentResDto), HttpStatus.CREATED);
@@ -47,12 +55,11 @@ public class CommentController {
 
     //댓글 삭제
     @DeleteMapping("/{commentId}")
-    public ResponseEntity<CommentResDto> deleteComment(@PathVariable Long commentId) {
+    public ResponseEntity<String> deleteComment(@PathVariable Long commentId) {
+
         commentService.deleteComment(commentId);
 
-        return ResponseEntity.noContent().build();
+        return new ResponseEntity<>("댓글 삭제 완료", HttpStatus.NO_CONTENT);
     }
-
-
 
 }
