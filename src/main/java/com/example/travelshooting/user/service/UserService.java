@@ -3,13 +3,12 @@ package com.example.travelshooting.user.service;
 import com.example.travelshooting.config.util.JwtProvider;
 import com.example.travelshooting.enums.AuthenticationScheme;
 import com.example.travelshooting.enums.UserRole;
-import com.example.travelshooting.user.entity.User;
 import com.example.travelshooting.user.dto.ChangePasswordReqDto;
 import com.example.travelshooting.user.dto.JwtAuthResDto;
 import com.example.travelshooting.user.dto.PasswordVrfReqDto;
 import com.example.travelshooting.user.dto.UserResDto;
+import com.example.travelshooting.user.entity.User;
 import com.example.travelshooting.user.repository.UserRepository;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -58,7 +57,7 @@ public class UserService {
     Optional<User> user = userRepository.findByEmail(email);
 
     if (user.isEmpty()) {
-      throw new EntityNotFoundException("유효하지 않는 이메일입니다.");
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "존재하지 않는 사용자입니다.");
     }
 
     validatePassword(password, user.get().getPassword());
@@ -96,8 +95,7 @@ public class UserService {
   // 회원 탈퇴
   public void deleteUser(Long userId, PasswordVrfReqDto requestDto) {
     // 사용자 조회
-    User user = userRepository.findById(userId)
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 사용자를 찾을 수 없습니다."));
+    User user = userRepository.findUserById(userId);
 
     // 비밀번호 확인
     if (!passwordEncoder.matches(requestDto.getPassword(), user.getPassword())) {
