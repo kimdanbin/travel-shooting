@@ -31,21 +31,21 @@ public class LocalService {
     private final RestTemplate restTemplate;
 
     @Value("${kakao.api.map.key}")
-    private String apiKey;
+    private String kakaoAk;
 
     @Value("${kakao.api.map.url}")
-    private String KAKAO_API_URL;
+    private String kakaoMapUrl;
 
     @Transactional(readOnly = true)
     public Page<LocalResDto> searchPlaces(String keyword, Pageable pageable) {
-        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(KAKAO_API_URL)
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(kakaoMapUrl)
                 .queryParam("query", keyword);
 
         URI uri = uriBuilder.build().encode().toUri();
 
         // 인증 요청에 필요한 REST API 키를 헤더에 설정
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "KakaoAK " + apiKey);
+        headers.set("Authorization", "KakaoAK " + kakaoAk);
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
         long totalElements = 0;
@@ -68,16 +68,16 @@ public class LocalService {
 
             // JSON 데이터를 LocalResDto로 변환
             localResDto = StreamSupport.stream(documents.spliterator(), false)
-                    .map(document -> LocalResDto.builder()
-                            .id(document.path("id").asLong())
-                            .categoryName(document.path("category_name").asText())
-                            .placeName(document.path("place_name").asText())
-                            .addressName(document.path("address_name").asText())
-                            .roadAddressName(document.path("road_address_name").asText())
-                            .phone(document.path("phone").asText())
-                            .longitude(document.path("x").asText())
-                            .latitude(document.path("y").asText())
-                            .build())
+                    .map(document -> new LocalResDto(
+                            document.path("id").asLong(),
+                            document.path("category_name").asText(),
+                            document.path("place_name").asText(),
+                            document.path("address_name").asText(),
+                            document.path("road_address_name").asText(),
+                            document.path("phone").asText(),
+                            document.path("x").asText(),
+                            document.path("y").asText()
+                    ))
                     .collect(Collectors.toList());
         } catch (ResourceAccessException e) {
             e.printStackTrace();

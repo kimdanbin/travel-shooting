@@ -1,18 +1,19 @@
 package com.example.travelshooting.local.dto;
 
-import lombok.Builder;
+import com.example.travelshooting.common.BaseDtoDataType;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 @Getter
-@Builder
-public class LocalResDto {
+@RequiredArgsConstructor
+public class LocalResDto implements BaseDtoDataType {
 
-    private Long id;
-    private String categoryName;
-    private String placeName;
-    private String addressName;
-    private String roadAddressName;
-    private String phone;
-    private String longitude; // 경도
-    private String latitude; // 위도
+    private final Long id;
+    private final String categoryName;
+    private final String placeName;
+    private final String addressName;
+    private final String roadAddressName;
+    private final String phone;
+    private final String longitude; // 경도
+    private final String latitude; // 위도
 }
