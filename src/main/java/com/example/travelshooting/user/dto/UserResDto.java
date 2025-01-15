@@ -10,10 +10,8 @@ import lombok.RequiredArgsConstructor;
 public class UserResDto implements BaseDtoDataType {
 
   private final Long id;
-
   private final String email;
-
   private final String name;
-
   private final UserRole role;
+  private final String imageUrl;
 }
