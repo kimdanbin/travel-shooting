@@ -111,11 +111,10 @@
 # 👨‍💻 기능별 담당자
 |담당자|역할|기능|블로그 주소|깃허브 주소|
 |:----|:----|:----|:----|:----|
-|김지연|리더|1. 장소 검색 <br> 2. Open API 기반 음식점 정보 저장 <br> 3. 레저/티켓 예약 CRD <br> 4. 레저/티켓 결제|https://velog.io/@yeoni9094/posts </br> https://blog.naver.com/yeondata|https://github.com/jiyeon0926|
-|김단빈|부리더|1. 포스터 CUD <br> 2. 첨부파일 <br> 3. 배포|https://dreamcompass.tistory.com/|https://github.com/kimdanbin|
+|김지연|리더|1. 장소 검색 <br> 2. Open API 기반 음식점 정보 저장 <br> 3. 레저/티켓 예약 CRUD <br> 4. 레저/티켓 결제 <br> 5. 맛집 검색|https://velog.io/@yeoni9094/posts </br> https://blog.naver.com/yeondata|https://github.com/jiyeon0926|
+|김단빈|부리더|1. 포스터 CUD <br> 2. 첨부파일 <br> 3. 배포 <br> 4. 댓글 CRUD <br> 5. 좋아요|https://dreamcompass.tistory.com/|https://github.com/kimdanbin|
 |안정민|팀원|1. JWT <br> 2. 인증/인가 <br> 3. 사용자 CRUD <br> 4. 여행 코스 검색|https://velog.io/@devtony/posts|https://github.com/JeongMinAhnn|
-|이아름|팀원|1. 레저/티켓 업체 CRUD <br> 2. 레저/티켓 상품 CRUD <br> 3. 신고 <br> 4. 검색 기능 최적화|https://muerha.tistory.com/|https://github.com/aaahreum|
-|박시환|팀원|1. 댓글 CRUD <br> 2. 좋아요 <br> 3. 맛집 검색 <br> 4. 대댓글 CRUD|https://nangman99.tistory.com/|https://github.com/baksihwan|
+|이아름|팀원|1. 레저/티켓 업체 CRUD <br> 2. 레저/티켓 상품 CRUD <br> 3. 포스터 및 댓글 신고 <br> 4. 검색 기능 최적화|https://muerha.tistory.com/|https://github.com/aaahreum|
 
 ---------
 

@@ -32,7 +32,7 @@ public class ReportService {
     @Transactional
     public ReportResDto reportPoster(Long posterId, ReportReqDto reportReqDto) {
 
-        User user = userService.getAuthenticatedUser();
+        User user = userService.findAuthenticatedUser();
         Report report = new Report(user, ReportType.POSTER, posterId, reportReqDto.getReason());
         reportRepository.save(report);
 
@@ -60,7 +60,7 @@ public class ReportService {
     @Transactional
     public ReportResDto reportComment(Long commentId, ReportReqDto reportReqDto) {
 
-        User user = userService.getAuthenticatedUser();
+        User user = userService.findAuthenticatedUser();
         Report report = new Report(user, ReportType.COMMENT, commentId, reportReqDto.getReason());
         reportRepository.save(report);
 

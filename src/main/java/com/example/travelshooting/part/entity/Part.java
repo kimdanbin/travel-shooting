@@ -1,8 +1,8 @@
-package com.example.travelshooting.part.entity;
+package com.example.travelshooting.part;
 
 import com.example.travelshooting.common.BaseEntity;
 import com.example.travelshooting.product.entity.Product;
-import com.example.travelshooting.reservation.Reservation;
+import com.example.travelshooting.reservation.entity.Reservation;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

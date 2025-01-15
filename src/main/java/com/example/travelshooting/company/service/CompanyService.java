@@ -28,7 +28,7 @@ public class CompanyService {
     @Transactional
     public CompanyResDto createCompany(CompanyReqDto companyReqDto) {
 
-        User user = userService.getUserById(companyReqDto.getUserId());
+        User user = userService.findUserById(companyReqDto.getUserId());
         Company company = companyReqDto.toEntity(user);
         companyRepository.save(company);
         user.updateRole();

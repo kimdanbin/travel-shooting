@@ -1,7 +1,7 @@
 package com.example.travelshooting.restaurant.service;
 
 import com.example.travelshooting.common.Const;
-import com.example.travelshooting.restaurant.Restaurant;
+import com.example.travelshooting.restaurant.entity.Restaurant;
 import com.example.travelshooting.restaurant.dto.GgRestaurantApiDto;
 import com.example.travelshooting.restaurant.dto.GgRestaurantResDto;
 import com.example.travelshooting.restaurant.repository.RestaurantRepository;

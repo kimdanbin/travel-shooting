@@ -1,7 +1,7 @@
 package com.example.travelshooting.restaurant.dto;
 
 import com.example.travelshooting.common.BaseDtoDataType;
-import com.example.travelshooting.restaurant.Restaurant;
+import com.example.travelshooting.restaurant.entity.Restaurant;
 import lombok.Getter;
 
 @Getter

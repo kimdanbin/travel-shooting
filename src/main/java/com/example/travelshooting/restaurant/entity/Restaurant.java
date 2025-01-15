@@ -1,4 +1,4 @@
-package com.example.travelshooting.restaurant;
+package com.example.travelshooting.restaurant.entity;
 
 import com.example.travelshooting.poster.entity.Poster;
 import jakarta.persistence.*;

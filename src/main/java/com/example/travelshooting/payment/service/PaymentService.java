@@ -2,13 +2,13 @@ package com.example.travelshooting.payment.service;
 
 import com.example.travelshooting.enums.PaymentStatus;
 import com.example.travelshooting.enums.ReservationStatus;
-import com.example.travelshooting.payment.Payment;
+import com.example.travelshooting.payment.entity.Payment;
 import com.example.travelshooting.payment.dto.PaymentAproveResDto;
 import com.example.travelshooting.payment.dto.PaymentReadyResDto;
 import com.example.travelshooting.payment.repository.PaymentRepository;
 import com.example.travelshooting.product.entity.Product;
 import com.example.travelshooting.product.service.ProductService;
-import com.example.travelshooting.reservation.Reservation;
+import com.example.travelshooting.reservation.entity.Reservation;
 import com.example.travelshooting.reservation.service.ReservationService;
 import com.example.travelshooting.user.entity.User;
 import com.example.travelshooting.user.service.UserService;
@@ -47,7 +47,7 @@ public class PaymentService {
     // 카카오페이 결제창 연결
     public PaymentReadyResDto payReady(Long productId, Long reservationId) {
         Reservation reservation = reservationService.findByProductIdAndId(productId, reservationId);
-        User user = userService.getAuthenticatedUser();
+        User user = userService.findAuthenticatedUser();
         Product product = productService.findProductById(productId);
         Payment payment = paymentRepository.findByReservationId(reservation.getId());
 

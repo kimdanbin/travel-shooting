@@ -1,7 +1,7 @@
 package com.example.travelshooting.reservation.service;
 
 import com.example.travelshooting.enums.ReservationStatus;
-import com.example.travelshooting.reservation.Reservation;
+import com.example.travelshooting.reservation.entity.Reservation;
 import com.example.travelshooting.reservation.dto.ReservationResDto;
 import com.example.travelshooting.reservation.repository.ReservationRepository;
 import com.example.travelshooting.user.entity.User;
@@ -24,7 +24,7 @@ public class ReservationPartnerService {
 
     @Transactional(readOnly = true)
     public List<ReservationResDto> findByProductIdAndUserId(Long productId) {
-        User user = userService.getAuthenticatedUser();
+        User user = userService.findAuthenticatedUser();
         List<Reservation> reservations = reservationRepository.findByProductIdAndUserId(productId, user.getId());
 
         if (reservations.isEmpty()) {
@@ -47,7 +47,7 @@ public class ReservationPartnerService {
 
     @Transactional(readOnly = true)
     public ReservationResDto findByProductIdAndUserIdAndId(Long productId, Long reservationId) {
-        User user = userService.getAuthenticatedUser();
+        User user = userService.findAuthenticatedUser();
         Reservation reservation = reservationRepository.findByProductIdAndUserIdAndId(productId, user.getId(), reservationId);
 
         if (reservation == null) {
@@ -70,7 +70,7 @@ public class ReservationPartnerService {
 
     @Transactional
     public ReservationResDto updateReservationStatus(Long productId, Long reservationId, String status) {
-        User user = userService.getAuthenticatedUser();
+        User user = userService.findAuthenticatedUser();
         Reservation reservation = reservationRepository.findByProductIdAndUserIdAndId(productId, user.getId(), reservationId);
 
         if (reservation == null) {
