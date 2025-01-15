@@ -27,6 +27,8 @@ public class PosterResDto implements BaseDtoDataType {
 
     private final LocalDateTime travelEndAt;
 
+    private final long likes;
+
     private final LocalDateTime createdAt;
 
     private final LocalDateTime updatedAt;
@@ -42,6 +44,7 @@ public class PosterResDto implements BaseDtoDataType {
 //        this.paymentId = poster.getPayment().getId(); 나중에 추가
         this.title = poster.getTitle();
         this.content = poster.getContent();
+        this.likes = poster.getLikePosters().size();
         this.travelStartAt = poster.getTravelStartAt();
         this.travelEndAt = poster.getTravelEndAt();
         this.createdAt = poster.getCreatedAt();
