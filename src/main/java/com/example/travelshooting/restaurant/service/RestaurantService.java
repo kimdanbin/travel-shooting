@@ -99,7 +99,18 @@ public class RestaurantService {
                 .collect(Collectors.toList());
 
         return savedRestaurants.stream()
-                .map(GgRestaurantResDto::toDto)
+                .map(restaurant -> new GgRestaurantResDto(
+                        restaurant.getId(),
+                        restaurant.getRegion(),
+                        restaurant.getCity(),
+                        restaurant.getPlaceName(),
+                        restaurant.getAddressName(),
+                        restaurant.getRoadAddressName(),
+                        restaurant.getPhone(),
+                        restaurant.getLongitude(),
+                        restaurant.getLatitude()
+
+                ))
                 .collect(Collectors.toList());
     }
 

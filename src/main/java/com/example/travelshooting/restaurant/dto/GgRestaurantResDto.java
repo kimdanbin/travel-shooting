@@ -1,7 +1,6 @@
 package com.example.travelshooting.restaurant.dto;
 
 import com.example.travelshooting.common.BaseDtoDataType;
-import com.example.travelshooting.restaurant.entity.Restaurant;
 import lombok.Getter;
 
 @Getter
@@ -27,19 +26,5 @@ public class GgRestaurantResDto implements BaseDtoDataType {
         this.phone = phone;
         this.longitude = longitude;
         this.latitude = latitude;
-    }
-
-    public static GgRestaurantResDto toDto(Restaurant restaurant) {
-        return new GgRestaurantResDto(
-                restaurant.getId(),
-                restaurant.getRegion(),
-                restaurant.getCity(),
-                restaurant.getPlaceName(),
-                restaurant.getAddressName(),
-                restaurant.getRoadAddressName(),
-                restaurant.getPhone(),
-                restaurant.getLongitude(),
-                restaurant.getLatitude()
-        );
     }
 }
