@@ -15,14 +15,16 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/admins/restaurants")
+@RequestMapping("/admins/restaurants/regions")
 public class RestaurantController {
 
     private final GgRestaurantService ggRestaurantService;
 
-    @PostMapping("/regions/gyeonggi")
+    // 경기도 맛집 정보 저장
+    @PostMapping("/gyeonggi")
     public ResponseEntity<CommonListResDto<GgRestaurantResDto>> saveRestaurants(@RequestParam int pIndex, @RequestParam int pSize) {
         List<GgRestaurantResDto> result = ggRestaurantService.saveGgRestaurants(pIndex, pSize);
+
         return new ResponseEntity<>(new CommonListResDto<>("경기도 맛집 정보 저장 완료", result), HttpStatus.CREATED);
     }
 }
