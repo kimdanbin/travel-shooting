@@ -39,7 +39,7 @@ public class ReportService {
         int reportCount = reportRepository.countByFkIdAndType(posterId, ReportType.POSTER);
 
         if (reportCount >= 5 && report.getType().equals(ReportType.POSTER)){
-            List<CommentResDto> comments = commentService.getComments(posterId);
+            List<CommentResDto> comments = commentService.findComments(posterId);
             for (CommentResDto comment : comments) {
                 commentService.deleteComment(comment.getId()); // 관련 댓글 먼저 soft delete 처리
             }

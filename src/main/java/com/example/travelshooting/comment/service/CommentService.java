@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +24,7 @@ public class CommentService {
     private final UserService userService;
     private final PosterService posterService;
 
+    //댓글 생성
     @Transactional
     public CommentResDto createComment(Long posterId, CommentReqDto commentReqDto) {
 
@@ -37,13 +37,15 @@ public class CommentService {
         return CommentResDto.toDto(savedComment);
     }
 
-    public List<CommentResDto> getComments(Long posterId){
+    // 댓글 전체 조회
+    public List<CommentResDto> findComments(Long posterId){
 
         List<Comment> comments = commentRepository.findAllByPosterId(posterId);
 
-        return comments.stream().map(CommentResDto::toDto).collect(Collectors.toList());
+        return comments.stream().map(CommentResDto::toDto).toList();
     }
 
+    //댓글 수정
     @Transactional
     public CommentResDto updateComment(Long commentId, CommentReqDto commentReqDto) {
 
@@ -59,6 +61,7 @@ public class CommentService {
         return CommentResDto.toDto(comment);
     }
 
+    //댓글 삭제
     @Transactional
     public void deleteComment(Long commentId) {
 
