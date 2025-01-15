@@ -8,4 +8,8 @@ import org.springframework.stereotype.Repository;
 public interface LikePosterRepository extends JpaRepository<LikePoster, Long> {
 
     boolean existsByUserIdAndPosterId(Long userId, Long likePosterId);
+
+    LikePoster findByUserIdAndPosterId(Long userId, Long posterId);
+
+    void deleteByUserIdAndPosterId(Long userId, Long posterId);
 }
