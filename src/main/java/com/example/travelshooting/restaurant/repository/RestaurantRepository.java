@@ -19,11 +19,11 @@ public interface RestaurantRepository extends JpaRepository<Restaurant, Long> {
 
     @Query("SELECT r FROM Restaurant r " +
             "INNER JOIN Poster p ON r.id = p.restaurant.id " +
-            "WHERE (:placeName IS NULL OR r.placeName LIKE %:placeName%) " +
-            "AND (:region IS NULL OR r.region LIKE %:region%) " +
-            "AND (:city IS NULL OR r.city LIKE %:city%)")
+            "WHERE (r.placeName LIKE %:placeName%) " +
+            "OR (r.region LIKE %:region%) " +
+            "OR (r.city LIKE %:city%)")
     Page<Restaurant> findAllById(@Param("placeName") String placeName,
-                                       @Param("region") String region,
-                                       @Param("city") String city,
-                                       Pageable pageable);
+                                 @Param("region") String region,
+                                 @Param("city") String city,
+                                 Pageable pageable);
 }
