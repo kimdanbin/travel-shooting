@@ -29,7 +29,14 @@ public class ProductController {
             @PathVariable Long companyId,
             @Valid @RequestBody CreateProductReqDto createProductReqDto
     ) {
-        CreateProductResDto result = productService.createProduct(companyId, createProductReqDto);
+        CreateProductResDto result = productService.createProduct(
+                companyId,
+                createProductReqDto.getName(),
+                createProductReqDto.getDescription(),
+                createProductReqDto.getPrice(),
+                createProductReqDto.getAddress(),
+                createProductReqDto.getQuantity()
+        );
 
         return new ResponseEntity<>(new CommonResDto<>("레저/티켓 생성 완료", result), HttpStatus.CREATED);
     }
@@ -80,7 +87,13 @@ public class ProductController {
             @PathVariable Long productId,
             @Valid @RequestBody UpdateProductReqDto updateProductReqDto
     ) {
-        UpdateProductResDto result = productService.updateProduct(productId, updateProductReqDto);
+        UpdateProductResDto result = productService.updateProduct(
+                productId,
+                updateProductReqDto.getDescription(),
+                updateProductReqDto.getPrice(),
+                updateProductReqDto.getAddress(),
+                updateProductReqDto.getQuantity()
+                );
 
         return new ResponseEntity<>(new CommonResDto<>("레저/티켓 수정 완료", result), HttpStatus.OK);
     }

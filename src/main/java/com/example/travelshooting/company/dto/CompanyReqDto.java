@@ -1,7 +1,5 @@
 package com.example.travelshooting.company.dto;
 
-import com.example.travelshooting.company.entity.Company;
-import com.example.travelshooting.user.entity.User;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -20,7 +18,4 @@ public class CompanyReqDto {
     @NotBlank(message = "업체 설명은 필수 입력 항목입니다.")
     private final String description;
 
-    public Company toEntity(User user) {
-        return new Company(user, this.name, this.description);
-    }
 }

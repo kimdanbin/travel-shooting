@@ -1,7 +1,5 @@
 package com.example.travelshooting.product.dto;
 
-import com.example.travelshooting.company.entity.Company;
-import com.example.travelshooting.product.entity.Product;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -25,16 +23,5 @@ public class CreateProductReqDto {
 
     @NotNull(message = "판매 개수는 필수 입력 항목입니다.")
     private final int quantity;
-
-    public Product toEntity(Company company) {
-        return new Product(
-                this.name,
-                this.description,
-                this.price,
-                this.address,
-                this.quantity,
-                company
-        );
-    }
 
 }

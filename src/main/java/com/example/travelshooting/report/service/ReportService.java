@@ -4,9 +4,8 @@ import com.example.travelshooting.comment.dto.CommentResDto;
 import com.example.travelshooting.comment.service.CommentService;
 import com.example.travelshooting.enums.ReportType;
 import com.example.travelshooting.poster.service.PosterService;
-import com.example.travelshooting.report.entity.Report;
-import com.example.travelshooting.report.dto.ReportReqDto;
 import com.example.travelshooting.report.dto.ReportResDto;
+import com.example.travelshooting.report.entity.Report;
 import com.example.travelshooting.report.repository.ReportRepository;
 import com.example.travelshooting.user.entity.User;
 import com.example.travelshooting.user.service.UserService;
@@ -30,10 +29,10 @@ public class ReportService {
     private final CommentService commentService;
 
     @Transactional
-    public ReportResDto reportPoster(Long posterId, ReportReqDto reportReqDto) {
+    public ReportResDto reportPoster(Long posterId, String reason) {
 
         User user = userService.findAuthenticatedUser();
-        Report report = new Report(user, ReportType.POSTER, posterId, reportReqDto.getReason());
+        Report report = new Report(user, ReportType.POSTER, posterId, reason);
         reportRepository.save(report);
 
         // 특정 포스터의 누적 신고가 5번일 경우, 포스터 삭제 처리
@@ -58,10 +57,10 @@ public class ReportService {
     }
 
     @Transactional
-    public ReportResDto reportComment(Long commentId, ReportReqDto reportReqDto) {
+    public ReportResDto reportComment(Long commentId, String reason) {
 
         User user = userService.findAuthenticatedUser();
-        Report report = new Report(user, ReportType.COMMENT, commentId, reportReqDto.getReason());
+        Report report = new Report(user, ReportType.COMMENT, commentId, reason);
         reportRepository.save(report);
 
         // 특정 댓글의 누적 신고가 5번일 경우, 댓글 삭제 처리

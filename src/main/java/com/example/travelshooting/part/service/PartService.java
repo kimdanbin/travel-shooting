@@ -1,9 +1,7 @@
 package com.example.travelshooting.part.service;
 
-import com.example.travelshooting.part.entity.Part;
-import com.example.travelshooting.part.dto.CreatePartReqDto;
 import com.example.travelshooting.part.dto.PartResDto;
-import com.example.travelshooting.part.dto.UpdatePartReqDto;
+import com.example.travelshooting.part.entity.Part;
 import com.example.travelshooting.part.repository.PartRepository;
 import com.example.travelshooting.product.entity.Product;
 import com.example.travelshooting.product.service.ProductService;
@@ -13,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalTime;
 import java.util.List;
 
 @Service
@@ -22,9 +21,9 @@ public class PartService {
     private final ProductService productService;
     private final PartRepository partRepository;
 
-    public PartResDto createPart(Long productId, CreatePartReqDto createPartReqDto) {
+    public PartResDto createPart(Long productId, LocalTime openAt, LocalTime closeAt, int number) {
         Product product = productService.findProductById(productId);
-        Part part = createPartReqDto.toEntity(product);
+        Part part = new Part(openAt, closeAt, number, product);
         Part savedPart = partRepository.save(part);
 
         return  new PartResDto(
@@ -36,13 +35,9 @@ public class PartService {
     }
 
     @Transactional
-    public PartResDto updatePart(Long partId, UpdatePartReqDto updatePartReqDto) {
+    public PartResDto updatePart(Long partId, LocalTime openAt, LocalTime closeAt, int number) {
         Part findPart = partRepository.findByIdOrElseThrow(partId);
-        findPart.updatePart(
-                updatePartReqDto.getOpenAt(),
-                updatePartReqDto.getCloseAt(),
-                updatePartReqDto.getNumber()
-        );
+        findPart.updatePart(openAt, closeAt, number);
         partRepository.save(findPart);
 
         return new PartResDto(
@@ -75,7 +70,6 @@ public class PartService {
     }
 
     public List<Part> findPartsByProductId(Long productId) {
-
         List<Part> parts = partRepository.findPartsByProductId(productId);
 
         if (parts.isEmpty()) {
