@@ -46,10 +46,10 @@ public class RestaurantController {
     }
 
     // 맛집 대표 이미지 추가
-    @PostMapping("/{restauranId}/attachments")
-    public ResponseEntity<CommonResDto<RestaurantResDto>> uploadFile(@PathVariable Long restauranId,
+    @PostMapping("/{restaurantId}/attachments")
+    public ResponseEntity<CommonResDto<RestaurantResDto>> uploadFile(@PathVariable Long restaurantId,
                                                                      @RequestParam MultipartFile file) {
-        RestaurantResDto restaurant = restaurantService.uploadFile(restauranId, file);
+        RestaurantResDto restaurant = restaurantService.uploadFile(restaurantId, file);
 
         return new ResponseEntity<>(new CommonResDto<>("파일 업로드 완료", restaurant), HttpStatus.OK);
     }
