@@ -1,5 +1,7 @@
 package com.example.travelshooting.poster.service;
 
+import com.example.travelshooting.payment.entity.Payment;
+import com.example.travelshooting.payment.service.PaymentService;
 import com.example.travelshooting.poster.dto.PosterResDto;
 import com.example.travelshooting.poster.entity.Poster;
 import com.example.travelshooting.poster.repository.PosterRepository;
@@ -21,25 +23,24 @@ public class PosterService {
     private final PosterRepository posterRepository;
     private final UserService userService;
     private final RestaurantService restaurantService;
+    private final PaymentService paymentService;
 
     // 포스터 생성
     public PosterResDto createPoster(Long restaurantId, Long paymentId, int expenses, String title, String content, LocalDateTime travelStartAt, LocalDateTime travelEndAt) {
 
         User user = userService.findAuthenticatedUser();
+        Restaurant restaurant = restaurantId != null ? restaurantService.findRestaurantById(restaurantId) : null;
+        Payment payment = paymentService.findPaymentById(paymentId);
 
-        Restaurant restaurant;
-
-        if (restaurantId == null) {
-            restaurant = null;
-        } else {
-            restaurant = restaurantService.findRestaurantById(restaurantId);
+        // 로그인 유저가 결제한 내역이 아닐 경우
+        if (user.getId().equals(payment.getReservation().getUser().getId())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "본인이 결제한 항목이 아닙니다.");
         }
-
-        // payment 도 나중에 구현되면 추가
 
         Poster poster = Poster.builder()
                 .user(user)
                 .restaurant(restaurant)
+                .payment(payment)
                 .expenses(expenses)
                 .title(title)
                 .content(content)
@@ -63,21 +64,21 @@ public class PosterService {
         User user = userService.findAuthenticatedUser();
         Poster poster = findPosterById(posterId);
 
+        // 본인이 작성한 포스터가 아닐 경우
         if (!user.getId().equals(poster.getUser().getId())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "본인이 작성한 포스터만 수정 가능합니다.");
         }
 
-        Restaurant restaurant;
+        Restaurant restaurant = restaurantId != null ? restaurantService.findRestaurantById(restaurantId) : null;
+        Payment payment = paymentService.findPaymentById(paymentId);
 
-        if (restaurantId == null) {
-            restaurant = null;
-        } else {
-            restaurant = restaurantService.findRestaurantById(restaurantId);
+        // 로그인 유저가 결제한 내역이 아닐 경우
+        if (user.getId().equals(payment.getReservation().getUser().getId())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "본인이 결제한 항목이 아닙니다.");
         }
 
-        // payment 도 나중에 구현되면 추가
-
         poster.updateRestaurant(restaurant);
+        poster.updatePayment(payment);
         poster.updateExpenses(expenses);
         poster.updateTitle(title);
         poster.updateContent(content);
@@ -93,6 +94,7 @@ public class PosterService {
         User user = userService.findAuthenticatedUser();
         Poster poster = findPosterById(posterId);
 
+        // 본인이 작성한 포스터가 아닐 경우
         if (!user.getId().equals(poster.getUser().getId())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "본인이 작성한 포스터만 삭제 가능합니다.");
         }

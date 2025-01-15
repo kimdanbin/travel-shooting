@@ -17,7 +17,7 @@ public class PosterResDto implements BaseDtoDataType {
 
     private final Long restaurantId;
 
-//    private final Long paymentId;
+    private final Long paymentId;
 
     private final String title;
 
@@ -36,12 +36,8 @@ public class PosterResDto implements BaseDtoDataType {
     public PosterResDto(Poster poster) {
         this.id = poster.getId();
         this.userId = poster.getUser().getId();
-        if (poster.getRestaurant() != null) {
-            this.restaurantId = poster.getRestaurant().getId();
-        } else {
-            this.restaurantId = null;
-        }
-//        this.paymentId = poster.getPayment().getId(); 나중에 추가
+        this.restaurantId = poster.getRestaurant() != null ? poster.getRestaurant().getId() : null;
+        this.paymentId = poster.getPayment().getId() != null ? poster.getPayment().getId() : null;
         this.title = poster.getTitle();
         this.content = poster.getContent();
         this.likes = poster.getLikePosters().size();
