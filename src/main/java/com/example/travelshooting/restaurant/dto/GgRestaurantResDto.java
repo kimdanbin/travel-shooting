@@ -2,29 +2,19 @@ package com.example.travelshooting.restaurant.dto;
 
 import com.example.travelshooting.common.BaseDtoDataType;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 @Getter
+@RequiredArgsConstructor
 public class GgRestaurantResDto implements BaseDtoDataType {
 
-    private Long id;
-    private String region;
-    private String city;
-    private String placeName;
-    private String addressName;
-    private String roadAddressName;
-    private String phone;
-    private String longitude;
-    private String latitude;
-
-    public GgRestaurantResDto(Long id, String region, String city, String placeName, String addressName, String roadAddressName, String phone, String longitude, String latitude) {
-        this.id = id;
-        this.region = region;
-        this.city = city;
-        this.placeName = placeName;
-        this.addressName = addressName;
-        this.roadAddressName = roadAddressName;
-        this.phone = phone;
-        this.longitude = longitude;
-        this.latitude = latitude;
-    }
+    private final Long id;
+    private final String region;
+    private final String city;
+    private final String placeName;
+    private final String addressName;
+    private final String roadAddressName;
+    private final String phone;
+    private final String longitude;
+    private final String latitude;
 }

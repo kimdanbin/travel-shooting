@@ -43,6 +43,8 @@ public class User extends BaseEntity {
 
     private boolean isDeleted = false;
 
+    private String imageUrl;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Company> companies = new ArrayList<>();
 
@@ -71,5 +73,9 @@ public class User extends BaseEntity {
 
     public void updateRole() {
         this.role = UserRole.PARTNER;
+    }
+
+    public void updateImage(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 }
