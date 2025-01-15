@@ -29,16 +29,13 @@ public class PosterService {
     public PosterResDto createPoster(Long restaurantId, Long paymentId, int expenses, String title, String content, LocalDateTime travelStartAt, LocalDateTime travelEndAt) {
 
         User user = userService.findAuthenticatedUser();
-
-        Restaurant restaurant;
-
-        if (restaurantId == null) {
-            restaurant = null;
-        } else {
-            restaurant = restaurantService.findRestaurantById(restaurantId);
-        }
-
+        Restaurant restaurant = restaurantId != null ? restaurantService.findRestaurantById(restaurantId) : null;
         Payment payment = paymentService.findPaymentById(paymentId);
+
+        // 로그인 유저가 결제한 내역이 아닐 경우
+        if (user.getId().equals(payment.getReservation().getUser().getId())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "본인이 결제한 항목이 아닙니다.");
+        }
 
         Poster poster = Poster.builder()
                 .user(user)
@@ -67,19 +64,18 @@ public class PosterService {
         User user = userService.findAuthenticatedUser();
         Poster poster = findPosterById(posterId);
 
+        // 본인이 작성한 포스터가 아닐 경우
         if (!user.getId().equals(poster.getUser().getId())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "본인이 작성한 포스터만 수정 가능합니다.");
         }
 
-        Restaurant restaurant;
-
-        if (restaurantId == null) {
-            restaurant = null;
-        } else {
-            restaurant = restaurantService.findRestaurantById(restaurantId);
-        }
-
+        Restaurant restaurant = restaurantId != null ? restaurantService.findRestaurantById(restaurantId) : null;
         Payment payment = paymentService.findPaymentById(paymentId);
+
+        // 로그인 유저가 결제한 내역이 아닐 경우
+        if (user.getId().equals(payment.getReservation().getUser().getId())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "본인이 결제한 항목이 아닙니다.");
+        }
 
         poster.updateRestaurant(restaurant);
         poster.updatePayment(payment);
@@ -98,6 +94,7 @@ public class PosterService {
         User user = userService.findAuthenticatedUser();
         Poster poster = findPosterById(posterId);
 
+        // 본인이 작성한 포스터가 아닐 경우
         if (!user.getId().equals(poster.getUser().getId())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "본인이 작성한 포스터만 삭제 가능합니다.");
         }
