@@ -4,6 +4,7 @@ import com.example.travelshooting.comment.entity.Comment;
 import com.example.travelshooting.common.BaseEntity;
 import com.example.travelshooting.file.entity.PosterFile;
 import com.example.travelshooting.like.entity.LikePoster;
+import com.example.travelshooting.payment.entity.Payment;
 import com.example.travelshooting.restaurant.entity.Restaurant;
 import com.example.travelshooting.user.entity.User;
 import jakarta.persistence.*;
@@ -37,9 +38,9 @@ public class Poster extends BaseEntity {
     @JoinColumn(name = "restaurant_id")
     private Restaurant restaurant;
 
-//    @ManyToOne
-//    @JoinColumn(name = "payment_id")
-//    private Payment payment;
+    @ManyToOne
+    @JoinColumn(name = "payment_id")
+    private Payment payment;
 
     private int expenses;
 
@@ -63,9 +64,10 @@ public class Poster extends BaseEntity {
     private List<PosterFile> files = new ArrayList<>();
 
     @Builder
-    public Poster(User user, Restaurant restaurant, int expenses, String title, String content, LocalDateTime travelStartAt, LocalDateTime travelEndAt) {
+    public Poster(User user, Restaurant restaurant, Payment payment, int expenses, String title, String content, LocalDateTime travelStartAt, LocalDateTime travelEndAt) {
         this.user = user;
         this.restaurant = restaurant;
+        this.payment = payment;
         this.expenses = expenses;
         this.title = title;
         this.content = content;
@@ -75,6 +77,10 @@ public class Poster extends BaseEntity {
 
     public void updateRestaurant(Restaurant restaurant) {
         this.restaurant = restaurant;
+    }
+
+    public void updatePayment(Payment payment) {
+        this.payment = payment;
     }
 
     public void updateExpenses(int expenses) {

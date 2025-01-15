@@ -2,9 +2,9 @@ package com.example.travelshooting.payment.service;
 
 import com.example.travelshooting.enums.PaymentStatus;
 import com.example.travelshooting.enums.ReservationStatus;
-import com.example.travelshooting.payment.entity.Payment;
 import com.example.travelshooting.payment.dto.PaymentAproveResDto;
 import com.example.travelshooting.payment.dto.PaymentReadyResDto;
+import com.example.travelshooting.payment.entity.Payment;
 import com.example.travelshooting.payment.repository.PaymentRepository;
 import com.example.travelshooting.product.entity.Product;
 import com.example.travelshooting.product.service.ProductService;
@@ -173,5 +173,11 @@ public class PaymentService {
         headers.set("Content-type", "application/json");
 
         return headers;
+    }
+
+    // 결제 아이디로 결제 찾기
+    public Payment findPaymentById(Long paymentId) {
+        return paymentRepository.findById(paymentId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "아이디 " + paymentId + "에 해당하는 결제를 찾을 수 없습니다."));
     }
 }

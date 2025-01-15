@@ -1,5 +1,7 @@
 package com.example.travelshooting.poster.service;
 
+import com.example.travelshooting.payment.entity.Payment;
+import com.example.travelshooting.payment.service.PaymentService;
 import com.example.travelshooting.poster.dto.PosterResDto;
 import com.example.travelshooting.poster.entity.Poster;
 import com.example.travelshooting.poster.repository.PosterRepository;
@@ -21,6 +23,7 @@ public class PosterService {
     private final PosterRepository posterRepository;
     private final UserService userService;
     private final RestaurantService restaurantService;
+    private final PaymentService paymentService;
 
     // 포스터 생성
     public PosterResDto createPoster(Long restaurantId, Long paymentId, int expenses, String title, String content, LocalDateTime travelStartAt, LocalDateTime travelEndAt) {
@@ -35,11 +38,12 @@ public class PosterService {
             restaurant = restaurantService.findRestaurantById(restaurantId);
         }
 
-        // payment 도 나중에 구현되면 추가
+        Payment payment = paymentService.findPaymentById(paymentId);
 
         Poster poster = Poster.builder()
                 .user(user)
                 .restaurant(restaurant)
+                .payment(payment)
                 .expenses(expenses)
                 .title(title)
                 .content(content)
@@ -75,9 +79,10 @@ public class PosterService {
             restaurant = restaurantService.findRestaurantById(restaurantId);
         }
 
-        // payment 도 나중에 구현되면 추가
+        Payment payment = paymentService.findPaymentById(paymentId);
 
         poster.updateRestaurant(restaurant);
+        poster.updatePayment(payment);
         poster.updateExpenses(expenses);
         poster.updateTitle(title);
         poster.updateContent(content);
