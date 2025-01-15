@@ -1,4 +1,4 @@
-package com.example.travelshooting.reservation;
+package com.example.travelshooting.reservation.entity;
 
 import com.example.travelshooting.common.BaseEntity;
 import com.example.travelshooting.enums.ReservationStatus;

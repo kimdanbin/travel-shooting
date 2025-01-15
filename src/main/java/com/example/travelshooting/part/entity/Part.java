@@ -1,4 +1,4 @@
-package com.example.travelshooting.part;
+package com.example.travelshooting.part.entity;
 
 import com.example.travelshooting.common.BaseEntity;
 import com.example.travelshooting.product.entity.Product;
