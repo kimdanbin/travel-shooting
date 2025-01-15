@@ -4,7 +4,7 @@ import com.example.travelshooting.comment.entity.Comment;
 import com.example.travelshooting.common.BaseEntity;
 import com.example.travelshooting.company.entity.Company;
 import com.example.travelshooting.enums.UserRole;
-import com.example.travelshooting.like.LikePoster;
+import com.example.travelshooting.like.entity.LikePoster;
 import com.example.travelshooting.poster.entity.Poster;
 import com.example.travelshooting.reservation.entity.Reservation;
 import jakarta.persistence.*;

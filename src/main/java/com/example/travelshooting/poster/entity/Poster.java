@@ -3,7 +3,7 @@ package com.example.travelshooting.poster.entity;
 import com.example.travelshooting.comment.entity.Comment;
 import com.example.travelshooting.common.BaseEntity;
 import com.example.travelshooting.file.entity.PosterFile;
-import com.example.travelshooting.like.LikePoster;
+import com.example.travelshooting.like.entity.LikePoster;
 import com.example.travelshooting.restaurant.entity.Restaurant;
 import com.example.travelshooting.user.entity.User;
 import jakarta.persistence.*;
