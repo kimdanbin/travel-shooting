@@ -67,6 +67,13 @@ public class UserController {
 
         return ResponseEntity.ok("비밀번호 변경 완료");
     }
+//    @PostMapping("/refresh")
+//    public ResponseEntity<CommonResDto<TokenDto>> refreshAccessToken(@Valid @RequestBody TokenDto dto) {
+//
+//        TokenDto result = userService.refresh(dto.getAccessToken(), dto.getRefreshToken());
+//
+//        return new ResponseEntity<>(new CommonResDto<>("토큰 재발급 완료", result), HttpStatus.CREATED);
+//    }
 
     // 사용자 이미지 추가
     @PostMapping("/{userId}/attachments")

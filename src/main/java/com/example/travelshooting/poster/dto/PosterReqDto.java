@@ -14,7 +14,7 @@ public class PosterReqDto {
     private Long paymentId;
 
     @NotNull(message = "여행경비를 입력해주세요")
-    private int expenses;
+    private Integer expenses;
 
     @NotBlank(message = "제목을 입력해주세요.")
     private String title;

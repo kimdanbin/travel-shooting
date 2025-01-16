@@ -1,21 +1,33 @@
 package com.example.travelshooting.poster.service;
 
+import com.example.travelshooting.like.entity.QLikePoster;
 import com.example.travelshooting.payment.entity.Payment;
 import com.example.travelshooting.payment.service.PaymentService;
 import com.example.travelshooting.poster.dto.PosterResDto;
+import com.example.travelshooting.poster.dto.QSearchPosterResDto;
+import com.example.travelshooting.poster.dto.SearchPosterResDto;
 import com.example.travelshooting.poster.entity.Poster;
+import com.example.travelshooting.poster.entity.QPoster;
 import com.example.travelshooting.poster.repository.PosterRepository;
 import com.example.travelshooting.restaurant.entity.Restaurant;
 import com.example.travelshooting.restaurant.service.RestaurantService;
 import com.example.travelshooting.user.entity.User;
 import com.example.travelshooting.user.service.UserService;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.QueryResults;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -25,6 +37,7 @@ public class PosterService {
     private final UserService userService;
     private final RestaurantService restaurantService;
     private final PaymentService paymentService;
+    private final JPAQueryFactory jpaQueryFactory;
 
     // 포스터 생성
     public PosterResDto createPoster(Long restaurantId, Long paymentId, int expenses, String title, String content, LocalDateTime travelStartAt, LocalDateTime travelEndAt) {
@@ -56,6 +69,48 @@ public class PosterService {
     public PosterResDto findPoster(Long posterId) {
 
         return new PosterResDto(findPosterById(posterId));
+    }
+    // 포스터 전체 조회
+    public Page<SearchPosterResDto> findAll(Integer minExpenses, Integer maxExpenses, LocalDate travelStartAt, LocalDate travelEndAt, Pageable pageable) {
+        QPoster poster = QPoster.poster;
+        QLikePoster likePoster = QLikePoster.likePoster;
+
+        BooleanBuilder conditions = new BooleanBuilder();
+
+        if (minExpenses != null) {
+            conditions.and(poster.expenses.goe(minExpenses)); // goe >= 최소값
+        }
+
+        if (maxExpenses != null) {
+            conditions.and(poster.expenses.loe(maxExpenses)); // loe <= 최대값
+        }
+
+        if (travelStartAt != null) {
+            conditions.and(poster.travelStartAt.goe(travelStartAt.atStartOfDay()));
+        }
+
+        if (travelEndAt != null) {
+            conditions.and(poster.travelEndAt.loe(travelEndAt.atTime(LocalTime.MAX)));
+        }
+
+        QueryResults<SearchPosterResDto> queryResults = jpaQueryFactory
+            .select(new QSearchPosterResDto(
+                poster.id,
+                poster.title,
+                poster.expenses,
+                poster.travelStartAt,
+                poster.travelEndAt,
+                poster.likePosters.size()))
+            .from(poster)
+            .leftJoin(likePoster).on(poster.id.eq(likePoster.poster.id))
+            .where(conditions)
+            .groupBy(poster.id, poster.title, poster.expenses, poster.travelStartAt, poster.travelEndAt)
+            .orderBy(likePoster.count().desc())
+            .offset(pageable.getOffset())
+            .limit(pageable.getPageSize())
+            .fetchResults();
+
+        return new PageImpl<>(queryResults.getResults(), pageable, queryResults.getTotal());
     }
 
     // 포스터 수정

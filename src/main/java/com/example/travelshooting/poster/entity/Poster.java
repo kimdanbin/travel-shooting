@@ -42,7 +42,7 @@ public class Poster extends BaseEntity {
     @JoinColumn(name = "payment_id")
     private Payment payment;
 
-    private int expenses;
+    private Integer expenses;
 
     private String title;
 
@@ -65,7 +65,7 @@ public class Poster extends BaseEntity {
     private List<PosterFile> files = new ArrayList<>();
 
     @Builder
-    public Poster(User user, Restaurant restaurant, Payment payment, int expenses, String title, String content, LocalDateTime travelStartAt, LocalDateTime travelEndAt) {
+    public Poster(User user, Restaurant restaurant, Payment payment, Integer expenses, String title, String content, LocalDateTime travelStartAt, LocalDateTime travelEndAt) {
         this.user = user;
         this.restaurant = restaurant;
         this.payment = payment;
