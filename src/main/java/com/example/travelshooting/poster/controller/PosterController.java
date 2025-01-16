@@ -97,5 +97,4 @@ public class PosterController {
 
         return new ResponseEntity<>("포스터 삭제 완료", HttpStatus.NO_CONTENT);
     }
-
 }
