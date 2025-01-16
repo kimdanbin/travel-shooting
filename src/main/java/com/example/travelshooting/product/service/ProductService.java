@@ -35,8 +35,8 @@ public class ProductService {
     public CreateProductResDto createProduct(Long companyId, String name, String description, int price, String address, int quantity) {
         Company company = companyService.findCompanyById(companyId);
         User user = userService.findAuthenticatedUser();
-        // TODO 상품을 등록하려는 사람이 해당 업체의 소유자인지 확인
-        if(!company.getUser().getId().equals(user.getId())) {
+        // 상품을 등록하려는 사람이 해당 업체의 소유자인지 확인
+        if (!company.getUser().getId().equals(user.getId())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "업체의 소유자만 상품을 등록할 수 있습니다.");
         }
         // TODO 이미 등록된 업체 이름인지 확인
@@ -63,7 +63,6 @@ public class ProductService {
     @Transactional(readOnly = true)
     public List<ProductResDto> findAllProducts(int page, int size, String productName) {
         Pageable pageable = PageRequest.of(page, size);
-//        Page<Product> productPage = productRepository.findAll(pageable);
         Page<Product> productPage;
 
         // 상품명 검색을 통한 검색 결과 조회
@@ -116,8 +115,8 @@ public class ProductService {
     public UpdateProductResDto updateProduct(Long productId, String description, int price, String address, int quantity) {
         Product findProduct = productRepository.findByIdOrElseThrow(productId);
         User user = userService.findAuthenticatedUser();
-        // TODO 상품을 수정하려는 사람이 해당 업체의 소유자인지 확인
-        if(!findProduct.getCompany().getUser().getId().equals(user.getId())) {
+        // 상품을 수정하려는 사람이 해당 업체의 소유자인지 확인
+        if (!findProduct.getCompany().getUser().getId().equals(user.getId())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "업체의 소유자만 상품을 수정할 수 있습니다.");
         }
         findProduct.updateProduct(description, price, address, quantity);
@@ -140,8 +139,8 @@ public class ProductService {
     public void deleteCompany(Long productId) {
         Product findProduct = productRepository.findByIdOrElseThrow(productId);
         User user = userService.findAuthenticatedUser();
-        // TODO 상품을 삭제하려는 사람이 해당 업체의 소유자인지 확인
-        if(!findProduct.getCompany().getUser().getId().equals(user.getId())) {
+        // 상품을 삭제하려는 사람이 해당 업체의 소유자인지 확인
+        if (!findProduct.getCompany().getUser().getId().equals(user.getId())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "업체의 소유자만 상품을 삭제할 수 있습니다.");
         }
         productRepository.delete(findProduct);
