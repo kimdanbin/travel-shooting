@@ -5,6 +5,8 @@ import com.example.travelshooting.part.entity.Part;
 import com.example.travelshooting.part.repository.PartRepository;
 import com.example.travelshooting.product.entity.Product;
 import com.example.travelshooting.product.service.ProductService;
+import com.example.travelshooting.user.entity.User;
+import com.example.travelshooting.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -20,13 +22,23 @@ public class PartService {
 
     private final ProductService productService;
     private final PartRepository partRepository;
+    private final UserService userService;
 
     public PartResDto createPart(Long productId, LocalTime openAt, LocalTime closeAt, int number) {
         Product product = productService.findProductById(productId);
+        User user = userService.findAuthenticatedUser();
+        // 일정을 등록하려는 사람이 해당 업체의 소유자인지 확인
+        if (!product.getCompany().getUser().getId().equals(user.getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "업체의 소유자만 일정을 등록할 수 있습니다.");
+        }
+        // 이미 등록되어 있는 일정인지 확인
+        if (partRepository.existsByOpenAtAndCloseAt(openAt, closeAt)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "해당 일정이 이미 존재합니다.");
+        }
         Part part = new Part(openAt, closeAt, number, product);
         Part savedPart = partRepository.save(part);
 
-        return  new PartResDto(
+        return new PartResDto(
                 savedPart.getId(),
                 savedPart.getOpenAt(),
                 savedPart.getCloseAt(),
@@ -37,6 +49,11 @@ public class PartService {
     @Transactional
     public PartResDto updatePart(Long partId, LocalTime openAt, LocalTime closeAt, int number) {
         Part findPart = partRepository.findByIdOrElseThrow(partId);
+        User user = userService.findAuthenticatedUser();
+        // 일정을 수정하려는 사람이 해당 업체의 소유자인지 확인
+        if (!findPart.getProduct().getCompany().getUser().getId().equals(user.getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "업체의 소유자만 일정을 수정할 수 있습니다.");
+        }
         findPart.updatePart(openAt, closeAt, number);
         partRepository.save(findPart);
 
@@ -51,19 +68,24 @@ public class PartService {
     @Transactional
     public void deleteCompany(Long partId) {
         Part findPart = partRepository.findByIdOrElseThrow(partId);
+        User user = userService.findAuthenticatedUser();
+        // 일정을 삭제하려는 사람이 해당 업체의 소유자인지 확인
+        if (!findPart.getProduct().getCompany().getUser().getId().equals(user.getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "업체의 소유자만 일정을 삭제할 수 있습니다.");
+        }
         partRepository.delete(findPart);
     }
 
     public Part findPartById(Long partId) {
         return partRepository.findById(partId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "아이디 " +partId + "에 해당하는 레저/티켓 일정을 찾을 수 없습니다."));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "아이디 " + partId + "에 해당하는 레저/티켓 일정을 찾을 수 없습니다."));
     }
 
     public Part findPartByProductId(Long productId) {
         Part part = partRepository.findPartByProductId(productId);
 
         if (part == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "아이디 " + part.getId()  + "에 해당하는 레저/티켓 일정을 찾을 수 없습니다.");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "아이디 " + part.getId() + "에 해당하는 레저/티켓 일정을 찾을 수 없습니다.");
         }
 
         return part;

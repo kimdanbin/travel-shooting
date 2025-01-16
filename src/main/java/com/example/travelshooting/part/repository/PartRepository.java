@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalTime;
 import java.util.List;
 
 @Repository
@@ -18,5 +19,7 @@ public interface PartRepository extends JpaRepository<Part, Long> {
     Part findPartByProductId(Long productId);
 
     List<Part> findPartsByProductId(Long productId);
+
+    boolean existsByOpenAtAndCloseAt(LocalTime openAt, LocalTime closeAt);
 
 }
