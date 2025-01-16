@@ -63,7 +63,7 @@ public class ReservationService {
     @Transactional
     public void deleteReservation(Long productId, Long reservationId) {
         User user = userService.findAuthenticatedUser();
-        Reservation reservation = reservationRepository.findByUserIdAndProductIdAndId(user.getId(), productId, reservationId);
+        Reservation reservation = reservationRepository.findReservationByUserIdAndProductIdAndId(user.getId(), productId, reservationId);
 
         if (reservation == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "예약 내역이 없습니다.");
@@ -97,9 +97,9 @@ public class ReservationService {
     }
 
     @Transactional(readOnly = true)
-    public ReservationResDto findByUserIdAndProductIdAndId(Long productId, Long reservationId) {
+    public ReservationResDto findReservationByUserIdAndProductIdAndId(Long productId, Long reservationId) {
         User user = userService.findAuthenticatedUser();
-        Reservation reservation = reservationRepository.findByUserIdAndProductIdAndId(user.getId(), productId, reservationId);
+        Reservation reservation = reservationRepository.findReservationByUserIdAndProductIdAndId(user.getId(), productId, reservationId);
 
         if (reservation == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "예약 내역이 없습니다.");
@@ -119,7 +119,7 @@ public class ReservationService {
         );
     }
 
-    public Reservation findByProductIdAndId(Long productId, Long reservationId) {
-        return reservationRepository.findByProductIdAndId(productId, reservationId);
+    public Reservation findReservationByProductIdAndId(Long productId, Long reservationId) {
+        return reservationRepository.findReservationByProductIdAndId(productId, reservationId);
     }
 }

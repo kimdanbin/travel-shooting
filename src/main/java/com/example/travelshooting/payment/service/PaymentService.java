@@ -46,7 +46,7 @@ public class PaymentService {
 
     // 카카오페이 결제창 연결
     public PaymentReadyResDto payReady(Long productId, Long reservationId) {
-        Reservation reservation = reservationService.findByProductIdAndId(productId, reservationId);
+        Reservation reservation = reservationService.findReservationByProductIdAndId(productId, reservationId);
         User user = userService.findAuthenticatedUser();
         Product product = productService.findProductById(productId);
         Payment payment = paymentRepository.findByReservationId(reservation.getId());
@@ -111,7 +111,7 @@ public class PaymentService {
 
     // 최종적으로 결제 완료 처리를 하는 단계
     public PaymentAproveResDto payApprove(Long productId, Long reservationId, String pgToken) {
-        Reservation reservation = reservationService.findByProductIdAndId(productId, reservationId);
+        Reservation reservation = reservationService.findReservationByProductIdAndId(productId, reservationId);
         Payment payment = paymentRepository.findByReservationId(reservationId);
 
         Map<String, String> body = new HashMap<>();
