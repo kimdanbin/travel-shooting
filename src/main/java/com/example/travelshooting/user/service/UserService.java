@@ -4,10 +4,7 @@ import com.example.travelshooting.config.util.JwtProvider;
 import com.example.travelshooting.enums.AuthenticationScheme;
 import com.example.travelshooting.enums.UserRole;
 import com.example.travelshooting.s3.S3Service;
-import com.example.travelshooting.user.dto.ChangePasswordReqDto;
-import com.example.travelshooting.user.dto.JwtAuthResDto;
-import com.example.travelshooting.user.dto.PasswordVrfReqDto;
-import com.example.travelshooting.user.dto.UserResDto;
+import com.example.travelshooting.user.dto.*;
 import com.example.travelshooting.user.entity.User;
 import com.example.travelshooting.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -77,6 +74,22 @@ public class UserService {
 
         return new JwtAuthResDto(AuthenticationScheme.BEARER.getName(), accessToken);
     }
+    // Refresh token 요청
+//    public TokenDto refresh(String accessToken, String refreshToken) {
+//
+//        if (!jwtProvider.validRefreshToken(refreshToken)) {
+//            throw new CustomException(ErrorCode.EXPIRED_TOKEN);
+//        }
+//
+//        String email = jwtProvider.getUsername(refreshToken);
+//        String savedRequestToken = refreshTokenRepository.getRefreshToken(email);
+//
+//        if (!refreshToken.equals(savedRequestToken)) {
+//            throw new CustomException(ErrorCode.EXPIRED_TOKEN);
+//        }
+//
+//        return jwtProvider.generateToken(email);
+//    }
 
     //비밀번호 변경
     @Transactional
