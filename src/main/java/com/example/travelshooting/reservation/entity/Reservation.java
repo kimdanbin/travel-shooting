@@ -44,10 +44,10 @@ public class Reservation extends BaseEntity {
     private LocalDate reservationDate;
 
     @Column(nullable = false)
-    private int number;
+    private Integer number;
 
     @Column(nullable = false)
-    private int totalPrice;
+    private Integer totalPrice;
 
     @Column(nullable = false, length = 10)
     @Enumerated(value = EnumType.STRING)

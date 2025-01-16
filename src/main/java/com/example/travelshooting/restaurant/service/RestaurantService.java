@@ -1,16 +1,23 @@
 package com.example.travelshooting.restaurant.service;
 
 import com.example.travelshooting.common.Const;
+import com.example.travelshooting.poster.entity.QPoster;
 import com.example.travelshooting.restaurant.dto.GgRestaurantApiDto;
 import com.example.travelshooting.restaurant.dto.GgRestaurantResDto;
+import com.example.travelshooting.restaurant.dto.QRestaurantResDto;
 import com.example.travelshooting.restaurant.dto.RestaurantResDto;
+import com.example.travelshooting.restaurant.entity.QRestaurant;
 import com.example.travelshooting.restaurant.entity.Restaurant;
 import com.example.travelshooting.restaurant.repository.RestaurantRepository;
 import com.example.travelshooting.s3.S3Service;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.QueryResults;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -32,6 +39,7 @@ public class RestaurantService {
     private final RestaurantRepository restaurantRepository;
     private final S3Service s3Service;
     private final RestTemplate restTemplate;
+    private final JPAQueryFactory jpaQueryFactory;
 
     @Value("${gg.api.food.key}")
     private String ggFoodKey;
@@ -116,19 +124,44 @@ public class RestaurantService {
 
     @Transactional(readOnly = true)
     public Page<RestaurantResDto> findAllById(String placeName, String region, String city, Pageable pageable) {
-        return restaurantRepository.findAllById(placeName, region, city, pageable)
-                .map(restaurant -> new RestaurantResDto (
-                        restaurant.getId(),
-                        restaurant.getRegion(),
-                        restaurant.getCity(),
-                        restaurant.getPlaceName(),
-                        restaurant.getAddressName(),
-                        restaurant.getRoadAddressName(),
-                        restaurant.getPhone(),
-                        restaurant.getLongitude(),
-                        restaurant.getLatitude(),
-                        restaurant.getImageUrl()
-                ));
+        QRestaurant restaurant = QRestaurant.restaurant;
+        QPoster poster = QPoster.poster;
+
+        BooleanBuilder conditions = new BooleanBuilder();
+
+        if (placeName != null) {
+            conditions.and(restaurant.placeName.containsIgnoreCase(placeName));
+        }
+
+        if (region != null) {
+            conditions.and(restaurant.region.containsIgnoreCase(region));
+        }
+
+        if (city != null) {
+            conditions.and(restaurant.city.containsIgnoreCase(city));
+        }
+
+        QueryResults<RestaurantResDto> queryResults = jpaQueryFactory
+                .select(new QRestaurantResDto(
+                        restaurant.id,
+                        restaurant.region,
+                        restaurant.city,
+                        restaurant.placeName,
+                        restaurant.addressName,
+                        restaurant.roadAddressName,
+                        restaurant.phone,
+                        restaurant.longitude,
+                        restaurant.latitude,
+                        restaurant.imageUrl))
+                .from(restaurant)
+                .innerJoin(poster).on(restaurant.id.eq(poster.restaurant.id)).fetchJoin()
+                .where(conditions)
+                .orderBy(restaurant.placeName.asc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetchResults();
+
+        return new PageImpl<>(queryResults.getResults(), pageable, queryResults.getTotal());
     }
 
     @Transactional
@@ -140,7 +173,7 @@ public class RestaurantService {
 
             restaurant.updateImage(fileUrl);
             restaurantRepository.save(restaurant);
-        } catch(Exception e) {
+        } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
 
