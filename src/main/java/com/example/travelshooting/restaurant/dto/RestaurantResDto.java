@@ -1,11 +1,10 @@
 package com.example.travelshooting.restaurant.dto;
 
 import com.example.travelshooting.common.BaseDtoDataType;
+import com.querydsl.core.annotations.QueryProjection;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 @Getter
-@RequiredArgsConstructor
 public class RestaurantResDto implements BaseDtoDataType {
 
     private final Long id;
@@ -18,4 +17,20 @@ public class RestaurantResDto implements BaseDtoDataType {
     private final String longitude;
     private final String latitude;
     private final String imageUrl;
+
+    @QueryProjection
+    public RestaurantResDto(Long id, String region, String city, String placeName,
+                            String addressName, String roadAddressName, String phone,
+                            String longitude, String latitude, String imageUrl) {
+        this.id = id;
+        this.region = region;
+        this.city = city;
+        this.placeName = placeName;
+        this.addressName = addressName;
+        this.roadAddressName = roadAddressName;
+        this.phone = phone;
+        this.longitude = longitude;
+        this.latitude = latitude;
+        this.imageUrl = imageUrl;
+    }
 }

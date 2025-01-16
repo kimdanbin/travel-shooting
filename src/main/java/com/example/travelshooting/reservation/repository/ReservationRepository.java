@@ -13,7 +13,7 @@ import java.util.List;
 @Repository
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
 
-    default Reservation findByIdOrElseThrow(Long reservationId) {
+    default Reservation findReservationById(Long reservationId) {
         return findById(reservationId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "아이디 " + reservationId + "에 해당하는 레저/티켓 예약을 찾을 수 없습니다."));
     }
 
