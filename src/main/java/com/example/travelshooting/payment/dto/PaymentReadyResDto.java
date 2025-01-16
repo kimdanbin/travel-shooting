@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public class PaymentReadyResDto implements BaseDtoDataType {
-    // 카카오톡으로 결제 요청 메시지(TMS)를 보내기 위한 사용자 정보 입력화면 Redirect URL
-    @JsonProperty("next_redirect_pc_url")
+
+    @JsonProperty("next_redirect_pc_url") // 결제 요청 URL (QR 결제 및 카톡 결제)
     private final String nextRedirectPcUrl;
 }
