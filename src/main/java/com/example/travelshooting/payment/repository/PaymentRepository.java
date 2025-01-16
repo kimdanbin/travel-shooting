@@ -9,7 +9,7 @@ import org.springframework.web.server.ResponseStatusException;
 @Repository
 public interface PaymentRepository extends JpaRepository<Payment, Long> {
 
-    default Payment findByIdOrElseThrow(Long paymentId) {
+    default Payment findPaymentById(Long paymentId) {
         return findById(paymentId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "아이디 " + paymentId + "에 해당하는 레저/티켓 결제 내역을 찾을 수 없습니다."));
     }
 
