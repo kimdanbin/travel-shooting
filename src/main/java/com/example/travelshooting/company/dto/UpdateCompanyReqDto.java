@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UpdateCompanyReqDto {
 
-    @NotBlank(message = "업체 설명은 필수 입력 항목입니다.")
+    @NotBlank(message = "업체 설명을 입력해주세요.")
     private final String description;
 
 }

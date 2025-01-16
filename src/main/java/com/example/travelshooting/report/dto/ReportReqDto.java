@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ReportReqDto {
 
-    @NotBlank(message = "신고 사유는 필수 입력 항목입니다.")
+    @NotBlank(message = "신고 사유를 입력해주세요.")
     private final String reason;
 
 }

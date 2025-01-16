@@ -12,14 +12,14 @@ import java.time.LocalTime;
 public class CreatePartReqDto {
 
     @JsonFormat(pattern = "HH:mm")
-    @NotNull(message = "활동 시작 시간은 필수 입력 항목입니다.")
+    @NotNull(message = "활동 시작 시간을 입력해주세요.")
     private final LocalTime openAt;
 
     @JsonFormat(pattern = "HH:mm")
-    @NotNull(message = "활동 종료 시간은 필수 입력 항목입니다.")
+    @NotNull(message = "활동 종료 시간을 입력해주세요.")
     private final LocalTime closeAt;
 
-    @NotNull(message = "인원은 필수 입력 항목입니다.")
+    @NotNull(message = "인원을 입력해주세요.")
     private final int number;
 
 }

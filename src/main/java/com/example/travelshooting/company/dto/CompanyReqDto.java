@@ -9,13 +9,13 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CompanyReqDto {
 
-    @NotNull(message = "유저 아이디는 필수 입력 항목입니다.")
+    @NotNull(message = "유저 아이디를 입력해주세요.")
     private final Long userId;
 
-    @NotBlank(message = "업체명은 필수 입력 항목입니다.")
+    @NotBlank(message = "업체명을 입력해주세요.")
     private final String name;
 
-    @NotBlank(message = "업체 설명은 필수 입력 항목입니다.")
+    @NotBlank(message = "업체 설명을 입력해주세요.")
     private final String description;
 
 }

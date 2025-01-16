@@ -26,15 +26,16 @@ public class Product extends BaseEntity {
     @JoinColumn(name = "leisure_company_id", nullable = false)
     private Company company;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 200)
     private String name;
 
+    @Column(nullable = false)
     private String description;
 
     @Column(nullable = false)
     private int price;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 200)
     private String address;
 
     @Column(nullable = false)

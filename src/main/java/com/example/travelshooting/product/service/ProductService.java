@@ -2,6 +2,7 @@ package com.example.travelshooting.product.service;
 
 import com.example.travelshooting.company.entity.Company;
 import com.example.travelshooting.company.service.CompanyService;
+import com.example.travelshooting.part.dto.PartResDto;
 import com.example.travelshooting.product.dto.CreateProductResDto;
 import com.example.travelshooting.product.dto.ProductDetailResDto;
 import com.example.travelshooting.product.dto.ProductResDto;
@@ -92,7 +93,22 @@ public class ProductService {
     public ProductDetailResDto findProduct(Long productId) {
         Product findProduct = productRepository.findByIdOrElseThrow(productId);
 
-        return ProductDetailResDto.toDto(findProduct);
+        List<PartResDto> parts = findProduct.getParts().stream()
+                .map(part -> new PartResDto(part.getId(), part.getOpenAt(), part.getCloseAt(), part.getNumber()))
+                .collect(Collectors.toList());
+
+        return new ProductDetailResDto(
+                findProduct.getId(),
+                findProduct.getCompany().getId(),
+                findProduct.getCompany().getName(),
+                findProduct.getCompany().getDescription(),
+                findProduct.getPrice(),
+                findProduct.getAddress(),
+                findProduct.getQuantity(),
+                findProduct.getCreatedAt(),
+                findProduct.getUpdatedAt(),
+                parts
+        );
     }
 
 
