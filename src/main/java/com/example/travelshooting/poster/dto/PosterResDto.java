@@ -19,7 +19,7 @@ public class PosterResDto implements BaseDtoDataType {
 
     private final Long paymentId;
 
-    private final int expenses;
+    private final Integer expenses;
 
     private final String title;
 
