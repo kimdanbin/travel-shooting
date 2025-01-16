@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -79,5 +80,10 @@ public class CommentService {
     public Comment findCommentById(Long commentId) {
         return commentRepository.findById(commentId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "아이디 " + commentId + "에 해당하는 댓글을 찾을 수 없습니다."));
+    }
+
+    // isDeleted 가 true 인 댓글도 포함해서 찾기
+    public Optional<Comment> findByIdIncludeDeleted(Long commentId) {
+        return commentRepository.findByIdIncludeDeleted(commentId);
     }
 }
