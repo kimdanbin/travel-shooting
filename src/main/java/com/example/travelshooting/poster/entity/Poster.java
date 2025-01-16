@@ -46,6 +46,7 @@ public class Poster extends BaseEntity {
 
     private String title;
 
+    @Column(columnDefinition = "TEXT")
     private String content;
 
     private LocalDateTime travelStartAt;
