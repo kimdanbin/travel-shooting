@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -106,5 +107,10 @@ public class PosterService {
     public Poster findPosterById(Long posterId) {
         return posterRepository.findById(posterId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "아이디 " + posterId + "에 해당하는 포스터를 찾을 수 없습니다."));
+    }
+
+    // isDeleted 가 true 인 포스터도 포함해서 찾기
+    public Optional<Poster> findByIdIncludeDeleted(Long posterId) {
+        return posterRepository.findByIdIncludeDeleted(posterId);
     }
 }
