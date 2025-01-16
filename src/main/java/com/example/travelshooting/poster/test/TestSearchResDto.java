@@ -11,13 +11,13 @@ public class TestSearchResDto implements BaseDtoDataType {
 
     private final Long id;
     private final String title;
-    private final int expenses;
+    private final Integer expenses;
     private final LocalDateTime travelStartAt;
     private final LocalDateTime travelEndAt;
     private final Integer likeCount;
 
     @QueryProjection
-    public TestSearchResDto(Long id, String title, int expenses, LocalDateTime travelStartAt, LocalDateTime travelEndAt, Integer likeCount) {
+    public TestSearchResDto(Long id, String title, Integer expenses, LocalDateTime travelStartAt, LocalDateTime travelEndAt, Integer likeCount) {
         this.id = id;
         this.title = title;
         this.expenses = expenses;
