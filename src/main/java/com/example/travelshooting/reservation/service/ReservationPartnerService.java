@@ -23,9 +23,9 @@ public class ReservationPartnerService {
     private final UserService userService;
 
     @Transactional(readOnly = true)
-    public List<ReservationResDto> findByProductIdAndUserId(Long productId) {
+    public List<ReservationResDto> findAllByProductIdAndUserId(Long productId) {
         User user = userService.findAuthenticatedUser();
-        List<Reservation> reservations = reservationRepository.findByProductIdAndUserId(productId, user.getId());
+        List<Reservation> reservations = reservationRepository.findAllByProductIdAndUserId(productId, user.getId());
 
         if (reservations.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "예약 내역이 없습니다.");
@@ -46,9 +46,9 @@ public class ReservationPartnerService {
     }
 
     @Transactional(readOnly = true)
-    public ReservationResDto findByProductIdAndUserIdAndId(Long productId, Long reservationId) {
+    public ReservationResDto findReservationByProductIdAndUserIdAndId(Long productId, Long reservationId) {
         User user = userService.findAuthenticatedUser();
-        Reservation reservation = reservationRepository.findByProductIdAndUserIdAndId(productId, user.getId(), reservationId);
+        Reservation reservation = reservationRepository.findReservationByProductIdAndUserIdAndId(productId, user.getId(), reservationId);
 
         if (reservation == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "예약 내역이 없습니다.");
@@ -71,7 +71,7 @@ public class ReservationPartnerService {
     @Transactional
     public ReservationResDto updateReservationStatus(Long productId, Long reservationId, String status) {
         User user = userService.findAuthenticatedUser();
-        Reservation reservation = reservationRepository.findByProductIdAndUserIdAndId(productId, user.getId(), reservationId);
+        Reservation reservation = reservationRepository.findReservationByProductIdAndUserIdAndId(productId, user.getId(), reservationId);
 
         if (reservation == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "예약 내역이 없습니다.");

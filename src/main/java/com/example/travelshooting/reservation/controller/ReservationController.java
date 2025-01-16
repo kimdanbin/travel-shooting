@@ -48,9 +48,9 @@ public class ReservationController {
 
     // 예약 단 건 조회
     @GetMapping ("/{reservationId}")
-    ResponseEntity<CommonResDto<ReservationResDto>> findByUserIdAndProductIdAndId(@PathVariable Long productId,
+    ResponseEntity<CommonResDto<ReservationResDto>> findReservationByUserIdAndProductIdAndId(@PathVariable Long productId,
                                                                              @PathVariable Long reservationId) {
-        ReservationResDto reservation = reservationService.findByUserIdAndProductIdAndId(productId, reservationId);
+        ReservationResDto reservation = reservationService.findReservationByUserIdAndProductIdAndId(productId, reservationId);
 
         return new ResponseEntity<>(new CommonResDto<>("레저/티켓 예약 단 건 조회 완료", reservation), HttpStatus.OK);
     }

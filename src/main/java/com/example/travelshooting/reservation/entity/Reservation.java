@@ -58,7 +58,7 @@ public class Reservation extends BaseEntity {
     @OneToMany(mappedBy = "reservation")
     private List<Payment> payments = new ArrayList<>();
 
-    public Reservation(User user, Product product, Part part, LocalDate reservationDate, int number, int totalPrice) {
+    public Reservation(User user, Product product, Part part, LocalDate reservationDate, Integer number, Integer totalPrice) {
         this.user = user;
         this.product = product;
         this.part = part;

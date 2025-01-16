@@ -22,17 +22,17 @@ public class ReservationPartnerController {
 
     // 레저/티켓 예약 전체 조회
     @GetMapping
-    public ResponseEntity<CommonListResDto<ReservationResDto>> findByProductIdAndUserId(@PathVariable Long productId) {
-        List<ReservationResDto> reservations = reservationPartnerService.findByProductIdAndUserId(productId);
+    public ResponseEntity<CommonListResDto<ReservationResDto>> findAllByProductIdAndUserId(@PathVariable Long productId) {
+        List<ReservationResDto> reservations = reservationPartnerService.findAllByProductIdAndUserId(productId);
 
         return new ResponseEntity<>(new CommonListResDto<>("레저/티켓 예약 전체 조회 완료", reservations), HttpStatus.OK);
     }
 
     // 레저/티켓 예약 단 건 조회
     @GetMapping("/{reservationId}")
-    public ResponseEntity<CommonResDto<ReservationResDto>> findByProductIdAndUserIdAndId(@PathVariable Long productId,
+    public ResponseEntity<CommonResDto<ReservationResDto>> findReservationByProductIdAndUserIdAndId(@PathVariable Long productId,
                                                                                 @PathVariable Long reservationId) {
-        ReservationResDto reservation = reservationPartnerService.findByProductIdAndUserIdAndId(productId, reservationId);
+        ReservationResDto reservation = reservationPartnerService.findReservationByProductIdAndUserIdAndId(productId, reservationId);
 
         return new ResponseEntity<>(new CommonResDto<>("레저/티켓 예약 단 건 조회 완료", reservation), HttpStatus.OK);
     }

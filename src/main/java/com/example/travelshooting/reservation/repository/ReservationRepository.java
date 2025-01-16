@@ -22,25 +22,21 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
     List<Reservation> findAllByUserIdAndProductId(Long userId, Long productId);
 
-    Reservation findByUserIdAndProductIdAndId(Long userId, Long productId, Long reservationId);
+    Reservation findReservationByUserIdAndProductIdAndId(Long userId, Long productId, Long reservationId);
 
     @Query("SELECT r " +
             "FROM Reservation r " +
-            "JOIN r.product p " +
-            "JOIN p.company c " +
+            "INNER JOIN r.product p " +
+            "INNER JOIN p.company c " +
             "WHERE p.id = :productId AND c.user.id = :userId")
-    List<Reservation> findByProductIdAndUserId(@Param("productId") Long productId, @Param("userId") Long userId);
+    List<Reservation> findAllByProductIdAndUserId(@Param("productId") Long productId, @Param("userId") Long userId);
 
     @Query("SELECT r " +
             "FROM Reservation r " +
-            "JOIN r.product p " +
-            "JOIN p.company c " +
+            "INNER JOIN r.product p " +
+            "INNER JOIN p.company c " +
             "WHERE p.id = :productId AND c.user.id = :userId AND r.id = :reservationId")
-    Reservation findByProductIdAndUserIdAndId(@Param("productId") Long productId, @Param("userId") Long userId, @Param("reservationId") Long reservationId);
+    Reservation findReservationByProductIdAndUserIdAndId(@Param("productId") Long productId, @Param("userId") Long userId, @Param("reservationId") Long reservationId);
 
-    @Query("SELECT r " +
-            "FROM Reservation r " +
-            "JOIN r.product p " +
-            "WHERE p.id = :productId AND r.id = :reservationId")
-    Reservation findByProductIdAndId(@Param("productId") Long productId, @Param("reservationId") Long reservationId);
+    Reservation findReservationByProductIdAndId(Long productId, Long reservationId);
 }
