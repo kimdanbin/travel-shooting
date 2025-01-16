@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -17,6 +18,7 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.server.ResponseStatusException;
 
 @Configuration
 @EnableWebSecurity // SecurityFilterChain 빈 설정을 위해 필요.
@@ -53,8 +55,12 @@ public class WebConfig {
         )
         // Spring Security 예외에 대한 처리를 핸들러에 위임.
         .exceptionHandling(handler -> handler
-            .authenticationEntryPoint(authEntryPoint)
-            .accessDeniedHandler(accessDeniedHandler))
+            .authenticationEntryPoint((request, response, authException) -> {
+              throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "인증되지 않은 사용자입니다. 유효한 자격 증명을 제공하세요.");
+            })
+            .accessDeniedHandler((request, response, accessDeniedException) -> {
+              throw new ResponseStatusException(HttpStatus.FORBIDDEN, "접근이 거부되었습니다. 필요한 권한이 부족합니다.");
+            }))
         // JWT 기반 테스트를 위해 SecurityContext를 가져올 때 HttpSession을 사용하지 않도록 설정.
         .sessionManagement(
             session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -76,11 +82,15 @@ public class WebConfig {
 
   @Bean
   public RoleHierarchy roleHierarchy() {
-    return RoleHierarchyImpl.fromHierarchy(
-        // "ROLE_ADMIN > ROLE_PARTNER > ROLE_USER"
-        """
-            ROLE_ADMIN > ROLE_PARTNER
-            ROLE_PARTNER > ROLE_USER
-            """);
+    try {
+      return RoleHierarchyImpl.fromHierarchy(
+          // "ROLE_ADMIN > ROLE_PARTNER > ROLE_USER"
+          """
+              ROLE_ADMIN > ROLE_PARTNER
+              ROLE_PARTNER > ROLE_USER
+              """);
+    } catch (Exception ex) {
+      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "RoleHierarchy 초기화에 실패하였습니다.", ex);
+    }
   }
 }

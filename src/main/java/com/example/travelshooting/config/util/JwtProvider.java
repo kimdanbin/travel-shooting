@@ -37,12 +37,37 @@ public class JwtProvider {
   @Value("${jwt.expiry-millis}")
   private long expiryMillis;
 
+  /**
+   * 리프레시 토큰 만료시간(밀리초).
+   */
+//  @Getter
+//  @Value("${jwt.refresh-expiry-millis}")
+//  private long refreshExpiryMillis;
+
   private final UserRepository userRepository;
 
   public String generateToken(Authentication authentication) {
     String username = authentication.getName();
     return this.generateTokenBy(username);
   }
+  // Refresh token
+//  public TokenDto generateToken(Authentication authentication) throws EntityNotFoundException {
+//
+//    String email = authentication.getName();
+//
+//    String accessToken = this.generateTokenBy(email);
+//    String refreshToken = this.generateRefreshToken(email);
+//
+//    return new TokenDto(accessToken, refreshToken);
+//  }
+
+//  public TokenDto generateToken(String email) throws EntityNotFoundException {
+//
+//    String accessToken = this.generateTokenBy(email);
+//    String refreshToken = this.generateRefreshToken(email);
+//
+//    return new TokenDto(accessToken, refreshToken);
+//  }
 
   public String getUsername(String token) {
     Claims claims = this.getClaims(token);
@@ -53,14 +78,14 @@ public class JwtProvider {
     try {
       return !this.tokenExpired(token);
     } catch (MalformedJwtException e) {
-      log.error("잘못된 JWT 토큰입니다.: {}", e.getMessage());
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "잘못된 JWT 토큰입니다.", e);
     } catch (ExpiredJwtException e) {
-      log.error("JWT 토큰이 만료되었습니다.: {}", e.getMessage());
+      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "JWT 토큰이 만료되었습니다.", e);
     } catch (UnsupportedJwtException e) {
-      log.error("지원되지 않는 JWT 토큰입니다.: {}", e.getMessage());
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "지원되지 않는 JWT 토큰입니다.", e);
+    } catch (JwtException e) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "JWT 토큰 처리 중 오류가 발생했습니다.", e);
     }
-
-    return false;
   }
 
   private String generateTokenBy(String email) {
@@ -85,7 +110,7 @@ public class JwtProvider {
 
   private Claims getClaims(String token) {
     if (!StringUtils.hasText(token)) { //Spring의 StringUtils 클래스의 메서드로, 입력받은 문자열이 비어있거나 공백으로만 구성되어 있는지 확인
-      throw new MalformedJwtException("토큰이 비어 있습니다.");
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "토큰이 비어 있습니다.");
     }
 
     return Jwts.parser()  // 토큰을 파싱(분석)하고 검증
@@ -100,6 +125,29 @@ public class JwtProvider {
 
     return expiration.before(new Date());
   }
+    // 리프레시 토큰 생성
+//  public String generateRefreshToken(String email) {
+//    Date currentDate = new Date();
+//    Date expireDate = new Date(currentDate.getTime() + this.refreshExpiryMillis);
+//
+//    return Jwts.builder()
+//        .subject(email)
+//        .issuedAt(currentDate)
+//        .expiration(expireDate)
+//        .signWith(Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8)), Jwts.SIG.HS256)
+//        .compact();
+//  }
+
+//  // 리프레시 토큰 검증
+//  public boolean validRefreshToken(String token) {
+//    try {
+//      Claims claims = this.getClaims(token);
+//      return claims.getExpiration().after(new Date());
+//    } catch (JwtException e) {
+//      log.error("Invalid refresh token: {}", e.getMessage());
+//      return false;
+//    }
+//  }
 
   private Date getExpirationDateFromToken(String token) {
     return this.resolveClaims(token, Claims::getExpiration);
