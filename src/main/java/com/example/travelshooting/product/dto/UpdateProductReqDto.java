@@ -9,16 +9,16 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UpdateProductReqDto {
 
-    @NotBlank(message = "업체 설명은 필수 입력 항목입니다.")
+    @NotBlank(message = "업체 설명을 입력해주세요")
     private final String description;
 
-    @NotNull(message = "유저 아이디는 필수 입력 항목입니다.")
+    @NotNull(message = "가격을 입력해주세요.")
     private final int price;
 
-    @NotBlank(message = "업체 설명은 필수 입력 항목입니다.")
+    @NotBlank(message = "활동 지역 주소를 입력해주세요.")
     private final String address;
 
-    @NotNull(message = "유저 아이디는 필수 입력 항목입니다.")
+    @NotNull(message = "판매 개수를 입력해주세요.")
     private final int quantity;
 
 }

@@ -24,8 +24,10 @@ public class Company extends BaseEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @Column(nullable = false, unique = true, length = 100)
     private String name;
 
+    @Column(nullable = false)
     private String description;
 
     @OneToMany(mappedBy = "company", cascade = CascadeType.ALL, orphanRemoval = true)
