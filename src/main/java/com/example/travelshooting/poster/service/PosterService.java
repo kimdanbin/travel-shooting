@@ -1,5 +1,6 @@
 package com.example.travelshooting.poster.service;
 
+import com.example.travelshooting.enums.UserRole;
 import com.example.travelshooting.like.entity.QLikePoster;
 import com.example.travelshooting.payment.entity.Payment;
 import com.example.travelshooting.payment.service.PaymentService;
@@ -150,8 +151,8 @@ public class PosterService {
         User user = userService.findAuthenticatedUser();
         Poster poster = findPosterById(posterId);
 
-        // 본인이 작성한 포스터가 아닐 경우
-        if (!user.getId().equals(poster.getUser().getId())) {
+        // 관리자가 아니거나 본인이 작성한 포스터가 아닐 경우
+        if (!user.getRole().equals(UserRole.ADMIN) && !user.getId().equals(poster.getUser().getId())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "본인이 작성한 포스터만 삭제 가능합니다.");
         }
 

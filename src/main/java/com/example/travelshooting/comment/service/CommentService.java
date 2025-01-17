@@ -5,6 +5,7 @@ import com.example.travelshooting.comment.dto.CommentReqDto;
 import com.example.travelshooting.comment.dto.CommentResDto;
 import com.example.travelshooting.comment.entity.Comment;
 import com.example.travelshooting.comment.repository.CommentRepository;
+import com.example.travelshooting.enums.UserRole;
 import com.example.travelshooting.poster.entity.Poster;
 import com.example.travelshooting.poster.service.PosterService;
 import com.example.travelshooting.user.entity.User;
@@ -69,7 +70,8 @@ public class CommentService {
         User user = userService.findAuthenticatedUser();
         Comment comment = findCommentById(commentId);
 
-        if (!user.getId().equals(comment.getUser().getId())) {
+        // 관리자가 아니거나 본인이 작성한 포스터가 아닐 경우
+        if (!user.getRole().equals(UserRole.ADMIN) && !user.getId().equals(comment.getUser().getId())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "본인이 작성한 댓글만 삭제 가능합니다.");
         }
 
