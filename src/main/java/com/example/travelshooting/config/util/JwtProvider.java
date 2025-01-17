@@ -48,6 +48,7 @@ public class JwtProvider {
 
   public String generateToken(Authentication authentication) {
     String username = authentication.getName();
+
     return this.generateTokenBy(username);
   }
   // Refresh token
@@ -71,10 +72,12 @@ public class JwtProvider {
 
   public String getUsername(String token) {
     Claims claims = this.getClaims(token);
+
     return claims.getSubject();
   }
 
   public boolean validToken(String token) throws JwtException {
+
     try {
       return !this.tokenExpired(token);
     } catch (MalformedJwtException e) {
