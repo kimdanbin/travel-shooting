@@ -1,5 +1,6 @@
 package com.example.travelshooting.local.service;
 
+import com.example.travelshooting.common.Const;
 import com.example.travelshooting.local.dto.LocalResDto;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -45,7 +46,7 @@ public class LocalService {
 
         // 인증 요청에 필요한 REST API 키를 헤더에 설정
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "KakaoAK " + kakaoAk);
+        headers.set(HttpHeaders.AUTHORIZATION, Const.KAKAO_MAP_HEADER + " " + kakaoAk);
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
         long totalElements = 0;

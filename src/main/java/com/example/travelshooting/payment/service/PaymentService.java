@@ -1,5 +1,6 @@
 package com.example.travelshooting.payment.service;
 
+import com.example.travelshooting.common.Const;
 import com.example.travelshooting.enums.PaymentStatus;
 import com.example.travelshooting.enums.ReservationStatus;
 import com.example.travelshooting.payment.dto.PaymentAproveResDto;
@@ -20,7 +21,6 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,13 +36,22 @@ public class PaymentService {
     private final ProductService productService;
 
     @Value("${kakao.api.pay.key}")
-    private String SecretKey;
+    private String secretKey;
 
     @Value("${kakao.api.pay.ready.url}")
-    private String KAKAO_PAY_READY_URL;
+    private String kakaoPayReadyUrl;
 
-    @Value("${kakao.api.pay.approve.url}")
-    private String KAKAO_PAY_APPROVE_URL;
+    @Value("${kakao.api.pay.completed.url}")
+    private String kakaoPayCompletedUrl;
+
+    @Value("${kakao.api.pay.next.url}")
+    private String kakaoPayNextUrl;
+
+    @Value("${kakao.api.pay.cancel.url}")
+    private String kakaoPayCancelUrl;
+
+    @Value("${kakao.api.pay.fail.url}")
+    private String kakaoPayFailUrl;
 
     // 카카오페이 결제창 연결
     public PaymentReadyResDto payReady(Long productId, Long reservationId) {
@@ -59,52 +68,52 @@ public class PaymentService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 결제된 예약입니다.");
         }
 
-        String approvalUrl = UriComponentsBuilder.fromHttpUrl("http://localhost:8080")
-                .path("/products/{productId}/reservations/{reservationId}/payment/approve")
-                .buildAndExpand(productId, reservationId)
-                .toUriString();
+//        String approvalUrl = UriComponentsBuilder.fromHttpUrl("http://localhost:8080")
+//                .path("/products/{productId}/reservations/{reservationId}/payment/completed")
+//                .buildAndExpand(productId, reservationId)
+//                .toUriString();
 
         Map<String, String> body = new HashMap<>();
-        body.put("cid", "TC0ONETIME");
+        body.put("cid", Const.KAKAO_PAY_TEST_CID);
         body.put("partner_order_id", reservation.getId().toString());
         body.put("partner_user_id", user.getId().toString());
         body.put("item_name", product.getName());
         body.put("quantity", String.valueOf(reservation.getNumber()));
         body.put("total_amount", String.valueOf(reservation.getTotalPrice()));
         body.put("tax_free_amount", "0");
-        body.put("approval_url", approvalUrl);
-        body.put("cancel_url", "http://localhost:8080/payment/cancel");
-        body.put("fail_url", "http://localhost:8080/payment/fail");
+        body.put("approval_url", "http://localhost:8080/products/{productId}/reservations/{reservationId}/payment/completed");
+        body.put("cancel_url", kakaoPayCancelUrl);
+        body.put("fail_url", kakaoPayFailUrl);
 
         HttpHeaders headers = getHttpHeaders();
         HttpEntity<Map<String, String>> request = new HttpEntity<>(body, headers);
 
         ResponseEntity<String> response = restTemplate.exchange(
-                KAKAO_PAY_READY_URL, HttpMethod.POST, request, String.class
+                kakaoPayReadyUrl, HttpMethod.POST, request, String.class
         );
 
         if (response.getStatusCode() == HttpStatus.OK) {
             ObjectMapper objectMapper = new ObjectMapper();
             try {
                 JsonNode root = objectMapper.readTree(response.getBody());
-                String tid = root.path("tid").asText(); // 결제 고유 번호
-                String redirectUrl = root.path("next_redirect_pc_url").asText();  // 결제 페이지 URL
+                String tid = root.path("tid").asText();
+                String redirectUrl = root.path(kakaoPayNextUrl).asText();
 
                 // 결제 정보 저장
-                savePayment(reservation, tid, user.getId(), reservation.getTotalPrice());
+                savePayment(reservation, tid, reservation.getTotalPrice());
 
                 return new PaymentReadyResDto(redirectUrl);
             } catch (Exception e) {
                 e.printStackTrace();
-                throw new RuntimeException("카카오페이 결제 준비 응답 처리 중 오류가 발생했습니다.");
+                throw new RuntimeException("카카오페이 결제 준비 응답 처리 중 오류 발생");
             }
         } else {
-            throw new RuntimeException("카카오페이 결제 준비 요청 실패.");
+            throw new RuntimeException("카카오페이 결제 준비 요청 실패");
         }
     }
 
-    public Payment savePayment(Reservation reservation, String tid, Long userId, int totalPrice) {
-        Payment payment = new Payment(reservation, tid, userId, totalPrice);
+    public Payment savePayment(Reservation reservation, String tid, int totalPrice) {
+        Payment payment = new Payment(reservation, tid, totalPrice);
 
         return paymentRepository.save(payment);
     }
@@ -115,17 +124,17 @@ public class PaymentService {
         Payment payment = paymentRepository.findByReservationId(reservationId);
 
         Map<String, String> body = new HashMap<>();
-        body.put("cid", "TC0ONETIME");
+        body.put("cid", Const.KAKAO_PAY_TEST_CID);
         body.put("tid", payment.getTid());
         body.put("partner_order_id", reservation.getId().toString());
-        body.put("partner_user_id", payment.getUserId().toString());
+        body.put("partner_user_id", "1");
         body.put("pg_token", pgToken);
 
         HttpHeaders headers = getHttpHeaders();
         HttpEntity<Map<String, String>> request = new HttpEntity<>(body, headers);
 
         ResponseEntity<String> response = restTemplate.exchange(
-                KAKAO_PAY_APPROVE_URL,
+                kakaoPayCompletedUrl,
                 HttpMethod.POST,
                 request,
                 String.class
@@ -169,15 +178,13 @@ public class PaymentService {
 
     private HttpHeaders getHttpHeaders() {
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "SECRET_KEY " + SecretKey);
+        headers.set(HttpHeaders.AUTHORIZATION, Const.KAKAO_PAY_HEADER + " " + secretKey);
         headers.set("Content-type", "application/json");
 
         return headers;
     }
 
-    // 결제 아이디로 결제 찾기
     public Payment findPaymentById(Long paymentId) {
-        return paymentRepository.findById(paymentId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "아이디 " + paymentId + "에 해당하는 결제를 찾을 수 없습니다."));
+        return paymentRepository.findPaymentById(paymentId);
     }
 }

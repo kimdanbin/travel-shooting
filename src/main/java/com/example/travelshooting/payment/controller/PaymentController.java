@@ -25,7 +25,7 @@ public class PaymentController {
     }
 
     // 결제 승인
-    @GetMapping("/products/{productId}/reservations/{reservationId}/payment/approve")
+    @GetMapping("/products/{productId}/reservations/{reservationId}/payment/completed")
     public ResponseEntity<CommonResDto<PaymentAproveResDto>> payApprove(@PathVariable Long productId,
                                                                           @PathVariable Long reservationId,
                                                                           @RequestParam("pg_token") String pgToken) {

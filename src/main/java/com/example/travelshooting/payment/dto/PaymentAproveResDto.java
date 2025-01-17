@@ -8,11 +8,9 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public class PaymentAproveResDto implements BaseDtoDataType {
-    // 요청 고유 번호
-    private final String aid;
 
-    // 결제 고유 번호
-    private final String tid;
+    private final String aid; // 요청 고유 번호
+    private final String tid; // 결제 고유 번호
 
     @JsonProperty("partner_order_id")
     private final String reservationId;
@@ -24,7 +22,7 @@ public class PaymentAproveResDto implements BaseDtoDataType {
     private final String productName;
 
     @JsonProperty("quantity")
-    private final int number;
+    private final Integer number;
 
     @JsonProperty("total")
     private final Integer totalPrice;
