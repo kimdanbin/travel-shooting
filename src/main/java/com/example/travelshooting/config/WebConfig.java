@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
@@ -21,7 +20,6 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.server.ResponseStatusException;
 
 @Configuration
 @EnableWebSecurity // SecurityFilterChain 빈 설정을 위해 필요.
@@ -36,7 +34,7 @@ public class WebConfig {
     private static final String[] WHITE_LIST = {"/users/signup",
             "/users/login",
             "/admins",
-            "/products/{productId}/reservations/{reservationId}/payment/approve",
+            "/products/{productId}/reservations/{reservationId}/payment/completed",
             "/attachments",
             "/posters", // 포스터 전체조회
             "/posters/{posterId}", // 포스터 단건 조회
@@ -58,12 +56,8 @@ public class WebConfig {
                 )
                 // Spring Security 예외에 대한 처리를 핸들러에 위임.
                 .exceptionHandling(handler -> handler
-                        .authenticationEntryPoint((request, response, authException) -> {
-                            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "인증되지 않은 사용자입니다. 유효한 자격 증명을 제공하세요.");
-                        })
-                        .accessDeniedHandler((request, response, accessDeniedException) -> {
-                            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "접근이 거부되었습니다. 필요한 권한이 부족합니다.");
-                        }))
+                        .authenticationEntryPoint(authEntryPoint)
+                        .accessDeniedHandler(accessDeniedHandler))
                 // JWT 기반 테스트를 위해 SecurityContext를 가져올 때 HttpSession을 사용하지 않도록 설정.
                 .sessionManagement(
                         session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -76,8 +70,6 @@ public class WebConfig {
                  * ExceptionTranslationFilter의 doFilter()는 이후의 필터 체인에서 예외가 발생하면 그 예외를 처리하도록 작성되어 있다.
                  * request를 넘겨 JwtAuthFilter에서 발생한 예외를 처리시키기 위해 ExceptionTranslationFilter 다음에 수행하도록 순서를 설정.
                  */
-                // ExceptionTranslationFilter --> jwtAuthFilter
-//        .addFilterAfter(jwtAuthFilter, BasicAuthenticationFilter.class);
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
@@ -94,15 +86,11 @@ public class WebConfig {
 
     @Bean
     public RoleHierarchy roleHierarchy() {
-        try {
-            return RoleHierarchyImpl.fromHierarchy(
-                    // "ROLE_ADMIN > ROLE_PARTNER > ROLE_USER"
-                    """
-                            ROLE_ADMIN > ROLE_PARTNER
-                            ROLE_PARTNER > ROLE_USER
-                            """);
-        } catch (Exception ex) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "RoleHierarchy 초기화에 실패하였습니다.", ex);
-        }
+        return RoleHierarchyImpl.fromHierarchy(
+                // "ROLE_ADMIN > ROLE_PARTNER > ROLE_USER"
+                """
+                        ROLE_ADMIN > ROLE_PARTNER
+                        ROLE_PARTNER > ROLE_USER
+                        """);
     }
 }
