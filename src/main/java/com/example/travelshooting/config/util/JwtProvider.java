@@ -77,7 +77,6 @@ public class JwtProvider {
   }
 
   public boolean validToken(String token) throws JwtException {
-
     try {
       return !this.tokenExpired(token);
     } catch (MalformedJwtException e) {

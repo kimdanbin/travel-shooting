@@ -8,7 +8,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,7 +16,6 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 
@@ -35,14 +33,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
                                   FilterChain filterChain) throws ServletException, IOException {
 
-    try {
-      authenticate(request);
-    } catch (ResponseStatusException ex) {
-      // 예외가 발생하면 HTTP 응답 상태와 메시지를 클라이언트로 반환.
-      response.setStatus(ex.getStatusCode().value());
-      response.getWriter().write(ex.getReason());
-      return;
-    }
+    authenticate(request);
     filterChain.doFilter(request, response);
   }
 
@@ -55,20 +46,14 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     // 토큰 검증.
     String token = getTokenFromRequest(request);
 
-    if (token != null) {
-      if (!jwtProvider.validToken(token)) {
-        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "token 이 유효하지 않거나 만료되었습니다.");
-      }
-
-      // 토큰으로부텨 username을 추출.
-      String username = jwtProvider.getUsername(token);
-
-      // username에 해당되는 사용자를 찾는다.
-      UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-
-      // SecurityContext에 인증 객체 저장.
-      setAuthentication(request, userDetails);
+    if (!jwtProvider.validToken(token)) {
+      return;
     }
+
+    String username = jwtProvider.getUsername(token);
+    UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+
+    setAuthentication(request, userDetails);
   }
 
   /**
@@ -83,11 +68,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     boolean tokenFound = StringUtils.hasText(bearerToken) && bearerToken.startsWith(headerPrefix);
 
-    if (!tokenFound) {
-      return null; // Authorization 헤더가 없거나 형식이 잘못된 경우
+    if (tokenFound) {
+      return bearerToken.substring(headerPrefix.length());
     }
 
-    return bearerToken.substring(headerPrefix.length());
+    return null;
   }
 
   /**
