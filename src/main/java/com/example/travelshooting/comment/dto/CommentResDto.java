@@ -11,11 +11,11 @@ public class CommentResDto implements BaseDtoDataType {
     private Long id;
 
     @NotBlank(message = "댓글을 입력해주세요.")
-    private String comment;
+    private String content;
 
     public CommentResDto(Comment comment) {
         this.id = comment.getId();
-        this.comment = comment.getContent();
+        this.content = comment.getContent();
     }
 
 }
