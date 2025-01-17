@@ -129,7 +129,7 @@ public class PosterService {
         Payment payment = paymentService.findPaymentById(paymentId);
 
         // 로그인 유저가 결제한 내역이 아닐 경우
-        if (user.getId().equals(payment.getReservation().getUser().getId())) {
+        if (!user.getId().equals(payment.getReservation().getUser().getId())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "본인이 결제한 항목이 아닙니다.");
         }
 
