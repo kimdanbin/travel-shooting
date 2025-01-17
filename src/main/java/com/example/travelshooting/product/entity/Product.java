@@ -33,13 +33,13 @@ public class Product extends BaseEntity {
     private String description;
 
     @Column(nullable = false)
-    private int price;
+    private Integer price;
 
     @Column(nullable = false, length = 200)
     private String address;
 
     @Column(nullable = false)
-    private int quantity;
+    private Integer quantity;
 
     @OneToMany(mappedBy = "product")
     private List<Reservation> reservations = new ArrayList<>();
@@ -50,7 +50,7 @@ public class Product extends BaseEntity {
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Part> parts = new ArrayList<>();
 
-    public Product(String name, String description, int price, String address, int quantity, Company company) {
+    public Product(String name, String description, Integer price, String address, Integer quantity, Company company) {
         this.name = name;
         this.description = description;
         this.price = price;
@@ -59,7 +59,7 @@ public class Product extends BaseEntity {
         this.company = company;
     }
 
-    public void updateProduct(String description, int price, String address, int quantity) {
+    public void updateProduct(String description, Integer price, String address, Integer quantity) {
         this.description = description;
         this.price = price;
         this.address = address;

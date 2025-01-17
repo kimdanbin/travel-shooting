@@ -14,9 +14,9 @@ public class UpdateProductResDto implements BaseDtoDataType {
     private final Long companyId;
     private final String name;
     private final String description;
-    private final int price;
+    private final Integer price;
     private final String address;
-    private final int quantity;
+    private final Integer quantity;
     private final LocalDateTime createdAt;
     private final LocalDateTime updatedAt;
 
