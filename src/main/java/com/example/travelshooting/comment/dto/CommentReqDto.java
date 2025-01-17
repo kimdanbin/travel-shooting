@@ -6,9 +6,6 @@ import lombok.*;
 public class CommentReqDto {
 
     @NotBlank(message = "댓글을 입력해주세요.")
-    private String comment;
+    private String content;
 
-    public CommentReqDto(String comment) {
-        this.comment = comment;
-    }
 }

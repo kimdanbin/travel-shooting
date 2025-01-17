@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -27,7 +28,7 @@ public class CommentController {
             @Valid @RequestBody CommentReqDto commentReqDto
     ) {
 
-        CommentResDto commentResDto  = commentService.createComment(posterId, commentReqDto);
+        CommentResDto commentResDto  = commentService.createComment(posterId, commentReqDto.getContent());
 
         return new ResponseEntity<>(new CommonResDto<>("댓글 생성 완료", commentResDto), HttpStatus.CREATED);
     }
@@ -44,18 +45,30 @@ public class CommentController {
     //댓글 수정
     @PatchMapping("/{commentId}")
     public ResponseEntity<CommonResDto<CommentResDto>> updateComment(
+            @PathVariable Long posterId,
             @PathVariable Long commentId,
             @Valid @RequestBody CommentReqDto commentReqDto
     ) {
 
-        CommentResDto commentResDto = commentService.updateComment(commentId, commentReqDto);
+        if (!commentService.isPosterIdValid(posterId, commentId)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 포스터에 없는 댓글입니다.");
+        }
+
+        CommentResDto commentResDto = commentService.updateComment(commentId, commentReqDto.getContent());
 
         return new ResponseEntity<>(new CommonResDto<>("댓글 수정 완료", commentResDto), HttpStatus.CREATED);
     }
 
     //댓글 삭제
     @DeleteMapping("/{commentId}")
-    public ResponseEntity<String> deleteComment(@PathVariable Long commentId) {
+    public ResponseEntity<String> deleteComment(
+            @PathVariable Long posterId,
+            @PathVariable Long commentId
+    ) {
+
+        if (!commentService.isPosterIdValid(posterId, commentId)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 포스터에 없는 댓글입니다.");
+        }
 
         commentService.deleteComment(commentId);
 

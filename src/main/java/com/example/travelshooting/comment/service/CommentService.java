@@ -1,10 +1,10 @@
 package com.example.travelshooting.comment.service;
 
 
-import com.example.travelshooting.comment.dto.CommentReqDto;
 import com.example.travelshooting.comment.dto.CommentResDto;
 import com.example.travelshooting.comment.entity.Comment;
 import com.example.travelshooting.comment.repository.CommentRepository;
+import com.example.travelshooting.enums.UserRole;
 import com.example.travelshooting.poster.entity.Poster;
 import com.example.travelshooting.poster.service.PosterService;
 import com.example.travelshooting.user.entity.User;
@@ -27,12 +27,12 @@ public class CommentService {
 
     //댓글 생성
     @Transactional
-    public CommentResDto createComment(Long posterId, CommentReqDto commentReqDto) {
+    public CommentResDto createComment(Long posterId, String content) {
 
         User user = userService.findAuthenticatedUser();
         Poster poster = posterService.findPosterById(posterId);
 
-        Comment comment = new Comment(user, poster, commentReqDto.getComment());
+        Comment comment = new Comment(user, poster, content);
         Comment savedComment = commentRepository.save(comment);
 
         return new CommentResDto(savedComment);
@@ -48,7 +48,7 @@ public class CommentService {
 
     //댓글 수정
     @Transactional
-    public CommentResDto updateComment(Long commentId, CommentReqDto commentReqDto) {
+    public CommentResDto updateComment(Long commentId, String content) {
 
         User user = userService.findAuthenticatedUser();
         Comment comment = findCommentById(commentId);
@@ -57,7 +57,7 @@ public class CommentService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "본인이 작성한 댓글만 수정 가능합니다.");
         }
 
-        comment.updateComment(commentReqDto.getComment());
+        comment.updateComment(content);
 
         return new CommentResDto(comment);
     }
@@ -69,11 +69,16 @@ public class CommentService {
         User user = userService.findAuthenticatedUser();
         Comment comment = findCommentById(commentId);
 
-        if (!user.getId().equals(comment.getUser().getId())) {
+        // 관리자가 아니거나 본인이 작성한 포스터가 아닐 경우
+        if (!user.getRole().equals(UserRole.ADMIN) && !user.getId().equals(comment.getUser().getId())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "본인이 작성한 댓글만 삭제 가능합니다.");
         }
 
         commentRepository.delete(comment);
+    }
+
+    public boolean isPosterIdValid(Long posterId, Long commentId) {
+        return findCommentById(commentId).getPoster().getId().equals(posterId);
     }
 
     // 댓글 id로 댓글 찾기

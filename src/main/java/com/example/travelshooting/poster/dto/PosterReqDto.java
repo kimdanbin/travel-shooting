@@ -28,12 +28,4 @@ public class PosterReqDto {
     @NotNull(message = "여행 종료 날짜를 입력해주세요.")
     private LocalDateTime travelEndAt;
 
-    public PosterReqDto(Long restaurantId, Long paymentId, String title, String content, LocalDateTime travelStartAt, LocalDateTime travelEndAt) {
-        this.restaurantId = restaurantId;
-        this.paymentId = paymentId;
-        this.title = title;
-        this.content = content;
-        this.travelStartAt = travelStartAt;
-        this.travelEndAt = travelEndAt;
-    }
 }
