@@ -78,14 +78,14 @@ public class JwtProvider {
     try {
       return !this.tokenExpired(token);
     } catch (MalformedJwtException e) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "잘못된 JWT 토큰입니다.", e);
+      log.error("잘못된 JWT 토큰입니다.: {}", e.getMessage());
     } catch (ExpiredJwtException e) {
-      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "JWT 토큰이 만료되었습니다.", e);
+      log.error("JWT 토큰이 만료되었습니다.: {}", e.getMessage());
     } catch (UnsupportedJwtException e) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "지원되지 않는 JWT 토큰입니다.", e);
-    } catch (JwtException e) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "JWT 토큰 처리 중 오류가 발생했습니다.", e);
+      log.error("지원되지 않는 JWT 토큰입니다.: {}", e.getMessage());
     }
+
+    return false;
   }
 
   private String generateTokenBy(String email) {
