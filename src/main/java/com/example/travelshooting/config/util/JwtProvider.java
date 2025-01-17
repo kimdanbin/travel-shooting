@@ -111,8 +111,8 @@ public class JwtProvider {
   }
 
   private Claims getClaims(String token) {
-    if (!StringUtils.hasText(token)) { //Spring의 StringUtils 클래스의 메서드로, 입력받은 문자열이 비어있거나 공백으로만 구성되어 있는지 확인
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "토큰이 비어 있습니다.");
+    if (!StringUtils.hasText(token)) {
+      throw new MalformedJwtException("토큰이 비어 있습니다.");
     }
 
     return Jwts.parser()  // 토큰을 파싱(분석)하고 검증
@@ -123,7 +123,7 @@ public class JwtProvider {
   }
 
   private boolean tokenExpired(String token) {
-    final Date expiration = this.getExpirationDateFromToken(token);
+    final Date expiration = getExpirationDateFromToken(token);
 
     return expiration.before(new Date());
   }
@@ -152,11 +152,11 @@ public class JwtProvider {
 //  }
 
   private Date getExpirationDateFromToken(String token) {
-    return this.resolveClaims(token, Claims::getExpiration);
+    return resolveClaims(token, Claims::getExpiration);
   }
 
   private <T> T resolveClaims(String token, Function<Claims, T> claimsResolver) {
-    final Claims claims = this.getClaims(token);
+    final Claims claims = getClaims(token);
 
     return claimsResolver.apply(claims);
   }
