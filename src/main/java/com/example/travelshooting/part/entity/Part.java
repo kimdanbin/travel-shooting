@@ -6,6 +6,8 @@ import com.example.travelshooting.reservation.entity.Reservation;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -15,6 +17,8 @@ import java.util.List;
 @Table(name = "product_part")
 @Getter
 @NoArgsConstructor
+@SQLDelete(sql = "UPDATE part SET is_deleted = true WHERE id = ?")
+@Where(clause = "is_deleted = false")
 public class Part extends BaseEntity {
 
     @Id
@@ -33,6 +37,8 @@ public class Part extends BaseEntity {
 
     @Column(nullable = false)
     private Integer number;
+
+    private boolean isDeleted = false;
 
     @OneToMany(mappedBy = "part")
     private List<Reservation> reservations = new ArrayList<>();

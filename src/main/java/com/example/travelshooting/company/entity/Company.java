@@ -6,6 +6,8 @@ import com.example.travelshooting.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +16,8 @@ import java.util.List;
 @Table(name = "leisure_company")
 @Getter
 @NoArgsConstructor
+@SQLDelete(sql = "UPDATE reservation SET is_deleted = true WHERE id = ?")
+@Where(clause = "is_deleted = false")
 public class Company extends BaseEntity {
 
     @Id
@@ -29,6 +33,8 @@ public class Company extends BaseEntity {
 
     @Column(nullable = false)
     private String description;
+
+    private boolean isDeleted = false;
 
     @OneToMany(mappedBy = "company", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Product> products = new ArrayList<>();
