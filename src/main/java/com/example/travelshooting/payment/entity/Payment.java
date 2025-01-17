@@ -18,7 +18,7 @@ public class Payment extends BaseEntity {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "reservation_id", nullable = false)
+    @JoinColumn(name = "partner_order_id", nullable = false)
     private Reservation reservation;
 
     @Column(nullable = false)
@@ -29,15 +29,22 @@ public class Payment extends BaseEntity {
     private PaymentStatus status = PaymentStatus.READY;
 
     @Column(nullable = false)
+    private Long partnerUserId;
+
+    @Column(nullable = false)
     private Integer totalPrice;
 
-    public Payment(Reservation reservation, String tid, Integer totalPrice) {
+    private String paymentType;
+
+    public Payment(Reservation reservation, String tid, Long partnerUserId, Integer totalPrice) {
         this.reservation = reservation;
         this.tid = tid;
+        this.partnerUserId = partnerUserId;
         this.totalPrice = totalPrice;
     }
 
-    public void updatePayStatus(PaymentStatus status) {
+    public void updatePayment(PaymentStatus status, String paymentType) {
         this.status = status;
+        this.paymentType = paymentType;
     }
 }

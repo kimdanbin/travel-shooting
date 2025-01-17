@@ -41,8 +41,8 @@ public class PaymentService {
     @Value("${kakao.api.pay.ready.url}")
     private String kakaoPayReadyUrl;
 
-    @Value("${kakao.api.pay.completed.url}")
-    private String kakaoPayCompletedUrl;
+    @Value("${kakao.api.pay.approve.url}")
+    private String kakaoPayApproveUrl;
 
     @Value("${kakao.api.pay.next.url}")
     private String kakaoPayNextUrl;
@@ -52,6 +52,9 @@ public class PaymentService {
 
     @Value("${kakao.api.pay.fail.url}")
     private String kakaoPayFailUrl;
+
+    @Value("${kakao.api.pay.completed.url}")
+    private String kakaoPayCompletedUrl;
 
     // 카카오페이 결제창 연결
     public PaymentReadyResDto payReady(Long productId, Long reservationId) {
@@ -68,10 +71,11 @@ public class PaymentService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 결제된 예약입니다.");
         }
 
-//        String approvalUrl = UriComponentsBuilder.fromHttpUrl("http://localhost:8080")
-//                .path("/products/{productId}/reservations/{reservationId}/payment/completed")
-//                .buildAndExpand(productId, reservationId)
-//                .toUriString();
+        String approvalUrl = String.format(
+                kakaoPayCompletedUrl,
+                product.getId(),
+                reservation.getId()
+        );
 
         Map<String, String> body = new HashMap<>();
         body.put("cid", Const.KAKAO_PAY_TEST_CID);
@@ -81,7 +85,7 @@ public class PaymentService {
         body.put("quantity", String.valueOf(reservation.getNumber()));
         body.put("total_amount", String.valueOf(reservation.getTotalPrice()));
         body.put("tax_free_amount", "0");
-        body.put("approval_url", "http://localhost:8080/products/{productId}/reservations/{reservationId}/payment/completed");
+        body.put("approval_url", approvalUrl);
         body.put("cancel_url", kakaoPayCancelUrl);
         body.put("fail_url", kakaoPayFailUrl);
 
@@ -100,7 +104,7 @@ public class PaymentService {
                 String redirectUrl = root.path(kakaoPayNextUrl).asText();
 
                 // 결제 정보 저장
-                savePayment(reservation, tid, reservation.getTotalPrice());
+                savePayment(reservation, tid, user.getId(), reservation.getTotalPrice());
 
                 return new PaymentReadyResDto(redirectUrl);
             } catch (Exception e) {
@@ -112,8 +116,8 @@ public class PaymentService {
         }
     }
 
-    public Payment savePayment(Reservation reservation, String tid, int totalPrice) {
-        Payment payment = new Payment(reservation, tid, totalPrice);
+    public Payment savePayment(Reservation reservation, String tid, Long partnerUserId, Integer totalPrice) {
+        Payment payment = new Payment(reservation, tid, partnerUserId, totalPrice);
 
         return paymentRepository.save(payment);
     }
@@ -127,14 +131,14 @@ public class PaymentService {
         body.put("cid", Const.KAKAO_PAY_TEST_CID);
         body.put("tid", payment.getTid());
         body.put("partner_order_id", reservation.getId().toString());
-        body.put("partner_user_id", "1");
+        body.put("partner_user_id", payment.getPartnerUserId().toString());
         body.put("pg_token", pgToken);
 
         HttpHeaders headers = getHttpHeaders();
         HttpEntity<Map<String, String>> request = new HttpEntity<>(body, headers);
 
         ResponseEntity<String> response = restTemplate.exchange(
-                kakaoPayCompletedUrl,
+                kakaoPayApproveUrl,
                 HttpMethod.POST,
                 request,
                 String.class
@@ -150,6 +154,7 @@ public class PaymentService {
                 String partnerOrderId = root.path("partner_order_id").asText();
                 String partnerUserId = root.path("partner_user_id").asText();
                 String itemName = root.path("item_name").asText();
+                String paymentType = root.path("payment_method_type").asText();
                 int quantity = root.path("quantity").asInt();
                 int total = root.path("total").asInt();
 
@@ -163,7 +168,7 @@ public class PaymentService {
                         total
                 );
 
-                payment.updatePayStatus(PaymentStatus.APPROVED);
+                payment.updatePayment(PaymentStatus.APPROVED, paymentType);
                 paymentRepository.save(payment);
 
                 return paymentAproveResDto;
