@@ -89,9 +89,11 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
-    public ProductDetailResDto findProduct(Long productId) {
-        Product findProduct = productRepository.findByIdOrElseThrow(productId);
-
+    public ProductDetailResDto findProduct(Long companyId, Long productId) {
+        Product findProduct = productRepository.findByCompanyIdAndId(companyId,productId);
+        if (findProduct == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 업체가 가진 해당 ID의 상품이 없습니다.");
+        }
         List<PartResDto> parts = findProduct.getParts().stream()
                 .map(part -> new PartResDto(part.getId(), part.getOpenAt(), part.getCloseAt(), part.getNumber()))
                 .collect(Collectors.toList());
@@ -112,8 +114,11 @@ public class ProductService {
 
 
     @Transactional
-    public UpdateProductResDto updateProduct(Long productId, String description, Integer price, String address, Integer quantity) {
-        Product findProduct = productRepository.findByIdOrElseThrow(productId);
+    public UpdateProductResDto updateProduct(Long companyId, Long productId, String description, Integer price, String address, Integer quantity) {
+        Product findProduct = productRepository.findByCompanyIdAndId(companyId, productId);
+        if (findProduct == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 업체가 가진 해당 ID의 상품이 없습니다.");
+        }
         User user = userService.findAuthenticatedUser();
         // 상품을 수정하려는 사람이 해당 업체의 소유자인지 확인
         if (!findProduct.getCompany().getUser().getId().equals(user.getId())) {
@@ -136,8 +141,11 @@ public class ProductService {
     }
 
     @Transactional
-    public void deleteCompany(Long productId) {
-        Product findProduct = productRepository.findByIdOrElseThrow(productId);
+    public void deleteProduct(Long companyId, Long productId) {
+        Product findProduct = productRepository.findByCompanyIdAndId(companyId, productId);
+        if (findProduct == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 업체가 가진 해당 ID의 상품이 없습니다.");
+        }
         User user = userService.findAuthenticatedUser();
         // 상품을 삭제하려는 사람이 해당 업체의 소유자인지 확인
         if (!findProduct.getCompany().getUser().getId().equals(user.getId())) {
@@ -147,8 +155,7 @@ public class ProductService {
     }
 
     public Product findProductById(Long productId) {
-        return productRepository.findById(productId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "아이디 " + productId + "에 해당하는 레저/티켓 상품을 찾을 수 없습니다."));
+        return productRepository.finProductByIdOrElseThrow(productId);
     }
 
 }
