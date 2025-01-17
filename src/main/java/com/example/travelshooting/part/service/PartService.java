@@ -48,7 +48,7 @@ public class PartService {
 
     @Transactional
     public PartResDto updatePart(Long partId, LocalTime openAt, LocalTime closeAt, Integer number) {
-        Part findPart = partRepository.findByIdOrElseThrow(partId);
+        Part findPart = partRepository.findPartByIdOrElseThrow(partId);
         User user = userService.findAuthenticatedUser();
         // 일정을 수정하려는 사람이 해당 업체의 소유자인지 확인
         if (!findPart.getProduct().getCompany().getUser().getId().equals(user.getId())) {
@@ -67,7 +67,7 @@ public class PartService {
 
     @Transactional
     public void deleteCompany(Long partId) {
-        Part findPart = partRepository.findByIdOrElseThrow(partId);
+        Part findPart = partRepository.findPartByIdOrElseThrow(partId);
         User user = userService.findAuthenticatedUser();
         // 일정을 삭제하려는 사람이 해당 업체의 소유자인지 확인
         if (!findPart.getProduct().getCompany().getUser().getId().equals(user.getId())) {
@@ -77,8 +77,7 @@ public class PartService {
     }
 
     public Part findPartById(Long partId) {
-        return partRepository.findById(partId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "아이디 " + partId + "에 해당하는 레저/티켓 일정을 찾을 수 없습니다."));
+        return partRepository.findPartByIdOrElseThrow(partId);
     }
 
     public Part findPartByProductId(Long productId) {

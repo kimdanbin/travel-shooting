@@ -12,7 +12,7 @@ import java.util.List;
 @Repository
 public interface PartRepository extends JpaRepository<Part, Long> {
 
-    default Part findByIdOrElseThrow(Long partId) {
+    default Part findPartByIdOrElseThrow(Long partId) {
         return findById(partId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "아이디 " + partId + "에 해당하는 레저/티켓 일정을 찾을 수 없습니다."));
     }
 

@@ -69,8 +69,8 @@ public class ProductController {
      * @return 조회된 레저/티켓 상품의 정보를 담고 있는 dto. 성공시 상태코드 201 반환
      */
     @GetMapping("companies/{companyId}/products/{productId}")
-    public ResponseEntity<CommonResDto<ProductDetailResDto>> findProduct(@PathVariable Long productId) {
-        ProductDetailResDto result = productService.findProduct(productId);
+    public ResponseEntity<CommonResDto<ProductDetailResDto>> findProduct(@PathVariable Long companyId, @PathVariable Long productId) {
+        ProductDetailResDto result = productService.findProduct(companyId, productId);
 
         return new ResponseEntity<>(new CommonResDto<>("레저/티켓 단건 조회 완료", result), HttpStatus.OK);
     }
@@ -84,10 +84,12 @@ public class ProductController {
      */
     @PatchMapping("/partners/companies/{companyId}/products/{productId}")
     public ResponseEntity<CommonResDto<UpdateProductResDto>> updateProduct(
+            @PathVariable Long companyId,
             @PathVariable Long productId,
             @Valid @RequestBody UpdateProductReqDto updateProductReqDto
     ) {
         UpdateProductResDto result = productService.updateProduct(
+                companyId,
                 productId,
                 updateProductReqDto.getDescription(),
                 updateProductReqDto.getPrice(),
@@ -105,8 +107,8 @@ public class ProductController {
      * @return 삭제 성공 시, 메시지와 함께 상태코드 200 반환
      */
     @DeleteMapping("/partners/companies/{companyId}/products/{productId}")
-    public ResponseEntity<String> deleteProduct(@PathVariable Long productId) {
-        productService.deleteCompany(productId);
+    public ResponseEntity<String> deleteProduct(@PathVariable Long companyId, @PathVariable Long productId) {
+        productService.deleteProduct(companyId, productId);
 
         return new ResponseEntity<>("레저/티켓 삭제 완료", HttpStatus.OK);
     }

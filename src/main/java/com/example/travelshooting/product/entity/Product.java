@@ -4,10 +4,11 @@ import com.example.travelshooting.common.BaseEntity;
 import com.example.travelshooting.company.entity.Company;
 import com.example.travelshooting.file.entity.LeisureFile;
 import com.example.travelshooting.part.entity.Part;
-import com.example.travelshooting.reservation.entity.Reservation;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +17,8 @@ import java.util.List;
 @Table(name = "leisure_product")
 @Getter
 @NoArgsConstructor
+@SQLDelete(sql = "UPDATE product SET is_deleted = true WHERE id = ?")
+@Where(clause = "is_deleted = false")
 public class Product extends BaseEntity {
 
     @Id
@@ -41,8 +44,7 @@ public class Product extends BaseEntity {
     @Column(nullable = false)
     private Integer quantity;
 
-    @OneToMany(mappedBy = "product")
-    private List<Reservation> reservations = new ArrayList<>();
+    private boolean isDeleted = false;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<LeisureFile> files = new ArrayList<>();
