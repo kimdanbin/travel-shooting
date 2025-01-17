@@ -13,12 +13,12 @@ public class UpdateProductReqDto {
     private final String description;
 
     @NotNull(message = "가격을 입력해주세요.")
-    private final int price;
+    private final Integer price;
 
     @NotBlank(message = "활동 지역 주소를 입력해주세요.")
     private final String address;
 
     @NotNull(message = "판매 개수를 입력해주세요.")
-    private final int quantity;
+    private final Integer quantity;
 
 }

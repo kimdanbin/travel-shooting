@@ -24,7 +24,7 @@ public class PartService {
     private final PartRepository partRepository;
     private final UserService userService;
 
-    public PartResDto createPart(Long productId, LocalTime openAt, LocalTime closeAt, int number) {
+    public PartResDto createPart(Long productId, LocalTime openAt, LocalTime closeAt, Integer number) {
         Product product = productService.findProductById(productId);
         User user = userService.findAuthenticatedUser();
         // 일정을 등록하려는 사람이 해당 업체의 소유자인지 확인
@@ -47,7 +47,7 @@ public class PartService {
     }
 
     @Transactional
-    public PartResDto updatePart(Long partId, LocalTime openAt, LocalTime closeAt, int number) {
+    public PartResDto updatePart(Long partId, LocalTime openAt, LocalTime closeAt, Integer number) {
         Part findPart = partRepository.findByIdOrElseThrow(partId);
         User user = userService.findAuthenticatedUser();
         // 일정을 수정하려는 사람이 해당 업체의 소유자인지 확인

@@ -32,12 +32,12 @@ public class Part extends BaseEntity {
     private LocalTime closeAt;
 
     @Column(nullable = false)
-    private int number;
+    private Integer number;
 
     @OneToMany(mappedBy = "part")
     private List<Reservation> reservations = new ArrayList<>();
 
-    public Part(LocalTime openAt, LocalTime closeAt,  int number, Product product) {
+    public Part(LocalTime openAt, LocalTime closeAt,  Integer number, Product product) {
         this.openAt = openAt;
         this.closeAt = closeAt;
         this.number = number;

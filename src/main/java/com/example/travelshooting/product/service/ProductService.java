@@ -32,7 +32,7 @@ public class ProductService {
     private final UserService userService;
 
     @Transactional
-    public CreateProductResDto createProduct(Long companyId, String name, String description, int price, String address, int quantity) {
+    public CreateProductResDto createProduct(Long companyId, String name, String description, Integer price, String address, Integer quantity) {
         Company company = companyService.findCompanyById(companyId);
         User user = userService.findAuthenticatedUser();
         // 상품을 등록하려는 사람이 해당 업체의 소유자인지 확인
@@ -112,7 +112,7 @@ public class ProductService {
 
 
     @Transactional
-    public UpdateProductResDto updateProduct(Long productId, String description, int price, String address, int quantity) {
+    public UpdateProductResDto updateProduct(Long productId, String description, Integer price, String address, Integer quantity) {
         Product findProduct = productRepository.findByIdOrElseThrow(productId);
         User user = userService.findAuthenticatedUser();
         // 상품을 수정하려는 사람이 해당 업체의 소유자인지 확인
