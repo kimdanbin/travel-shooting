@@ -37,7 +37,7 @@ public class LikePosterService {
 
         // 이미 좋아요를 했다면 예외
         if (isLiked) {
-            throw new ResponseStatusException(HttpStatus.OK, "이미 좋아요를 하였습니다.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 좋아요를 하였습니다.");
         }
 
         LikePoster likePoster = new LikePoster(user, poster);
@@ -55,7 +55,7 @@ public class LikePosterService {
 
         // 좋아요를 하지 않았다면 예외
         if (!isLiked) {
-            throw new ResponseStatusException(HttpStatus.OK, "좋아요가 이미 취소되어 있습니다.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "좋아요가 이미 취소되어 있습니다.");
         }
 
         LikePoster liked = likePosterRepository.findByUserIdAndPosterId(user.getId(), poster.getId());
