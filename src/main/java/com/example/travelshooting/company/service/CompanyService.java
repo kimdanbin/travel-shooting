@@ -72,7 +72,7 @@ public class CompanyService {
     @Transactional(readOnly = true)
     public CompanyResDto findCompany(Long companyId) {
 
-        Company findCompany = companyRepository.findByIdOrElseThrow(companyId);
+        Company findCompany = companyRepository.findCompanyById(companyId);
 
         return new CompanyResDto(
                 findCompany.getId(),
@@ -86,7 +86,7 @@ public class CompanyService {
 
     @Transactional
     public CompanyResDto updateCompany(Long companyId, String description) {
-        Company findCompany = companyRepository.findByIdOrElseThrow(companyId);
+        Company findCompany = companyRepository.findCompanyById(companyId);
         findCompany.updateCompany(description);
         companyRepository.save(findCompany);
 
@@ -102,13 +102,12 @@ public class CompanyService {
 
     @Transactional
     public void deleteCompany(Long companyId) {
-        Company findCompany = companyRepository.findByIdOrElseThrow(companyId);
+        Company findCompany = companyRepository.findCompanyById(companyId);
         companyRepository.delete(findCompany);
     }
 
     public Company findCompanyById(Long companyId) {
-        return companyRepository.findById(companyId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "아이디 " + companyId + "에 해당하는 업체를 찾을 수 없습니다."));
+        return companyRepository.findCompanyById(companyId);
     }
 
 }

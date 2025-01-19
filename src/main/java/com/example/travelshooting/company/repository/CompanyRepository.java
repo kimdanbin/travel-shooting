@@ -11,7 +11,7 @@ import org.springframework.web.server.ResponseStatusException;
 @Repository
 public interface CompanyRepository extends JpaRepository<Company, Long> {
 
-    default Company findByIdOrElseThrow(Long companyId) {
+    default Company findCompanyById(Long companyId) {
         return findById(companyId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "아이디 " +companyId + "에 해당하는 업체를 찾을 수 없습니다."));
     }
 

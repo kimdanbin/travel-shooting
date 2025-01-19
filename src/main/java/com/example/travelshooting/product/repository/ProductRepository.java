@@ -12,7 +12,7 @@ import org.springframework.web.server.ResponseStatusException;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
-    default Product finProductByIdOrElseThrow(Long productId) {
+    default Product findProductById(Long productId) {
         return findById(productId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "아이디 " + productId + "에 해당하는 레저/티켓 상품을 찾을 수 없습니다."));
     }
 
