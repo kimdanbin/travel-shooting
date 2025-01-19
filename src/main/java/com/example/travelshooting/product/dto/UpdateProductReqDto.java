@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UpdateProductReqDto {
 
-    @NotBlank(message = "업체 설명을 입력해주세요")
+    @NotBlank(message = "상품 설명을 입력해주세요")
     private final String description;
 
     @NotNull(message = "가격을 입력해주세요.")
