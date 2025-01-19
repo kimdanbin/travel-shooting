@@ -95,7 +95,7 @@ public class ProductService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 업체가 가진 해당 ID의 상품이 없습니다.");
         }
         List<PartResDto> parts = findProduct.getParts().stream()
-                .map(part -> new PartResDto(part.getId(), part.getOpenAt(), part.getCloseAt(), part.getNumber()))
+                .map(part -> new PartResDto(part.getId(), part.getOpenAt(), part.getCloseAt(), part.getHeadCount()))
                 .collect(Collectors.toList());
 
         return new ProductDetailResDto(
@@ -155,7 +155,7 @@ public class ProductService {
     }
 
     public Product findProductById(Long productId) {
-        return productRepository.finProductByIdOrElseThrow(productId);
+        return productRepository.findProductById(productId);
     }
 
 }
