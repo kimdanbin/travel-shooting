@@ -101,8 +101,8 @@ public class ProductService {
         return new ProductDetailResDto(
                 findProduct.getId(),
                 findProduct.getCompany().getId(),
-                findProduct.getCompany().getName(),
-                findProduct.getCompany().getDescription(),
+                findProduct.getName(),
+                findProduct.getDescription(),
                 findProduct.getPrice(),
                 findProduct.getAddress(),
                 findProduct.getQuantity(),
