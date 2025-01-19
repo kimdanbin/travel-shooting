@@ -8,4 +8,6 @@ public class Const {
     public static final String KAKAO_PAY_TEST_CID = "TC0ONETIME";
     public static final String KAKAO_PAY_HEADER = "SECRET_KEY";
     public static final String KAKAO_MAP_HEADER = "KakaoAK";
+    public static final Integer REPORT_COUNT = 5;
+    public static final Integer LOCAL_PAGE_DEFAULT = 1;
 }

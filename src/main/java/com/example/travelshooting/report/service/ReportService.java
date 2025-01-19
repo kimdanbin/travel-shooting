@@ -3,6 +3,7 @@ package com.example.travelshooting.report.service;
 import com.example.travelshooting.comment.dto.CommentResDto;
 import com.example.travelshooting.comment.entity.Comment;
 import com.example.travelshooting.comment.service.CommentService;
+import com.example.travelshooting.common.Const;
 import com.example.travelshooting.enums.ReportType;
 import com.example.travelshooting.poster.entity.Poster;
 import com.example.travelshooting.poster.service.PosterService;
@@ -51,7 +52,7 @@ public class ReportService {
         // 특정 포스터의 누적 신고가 5번일 경우, 포스터 삭제 처리
         int reportCount = reportRepository.countByFkIdAndType(posterId, ReportType.POSTER);
 
-        if (reportCount >= 5 && report.getType().equals(ReportType.POSTER)){
+        if (reportCount >= Const.REPORT_COUNT && report.getType().equals(ReportType.POSTER)){
             List<CommentResDto> comments = commentService.findComments(posterId);
             for (CommentResDto comment : comments) {
                 commentService.deleteComment(comment.getId()); // 관련 댓글 먼저 soft delete 처리
