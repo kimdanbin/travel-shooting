@@ -58,14 +58,19 @@ public class PaymentService {
 
     // 카카오페이 결제창 연결
     public PaymentReadyResDto payReady(Long productId, Long reservationId) {
-        Reservation reservation = reservationService.findReservationByProductIdAndId(productId, reservationId);
-        User user = userService.findAuthenticatedUser();
         Product product = productService.findProductById(productId);
-        Payment payment = paymentRepository.findByReservationId(reservation.getId());
+        Reservation reservation = reservationService.findReservationByProductIdAndId(product.getId(), reservationId);
+        User user = userService.findAuthenticatedUser();
+
+        if (reservation == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "예약 내역을 찾을 수 없습니다.");
+        }
 
         if (!reservation.getStatus().equals(ReservationStatus.APPROVED)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "예약 승인이 먼저 되어야 합니다.");
         }
+
+        Payment payment = paymentRepository.findByReservationId(reservation.getId());
 
         if (payment != null && payment.getStatus().equals(PaymentStatus.APPROVED)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 결제된 예약입니다.");
