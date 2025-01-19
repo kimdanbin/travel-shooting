@@ -6,17 +6,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
@@ -38,9 +33,15 @@ public class LocalService {
     private String kakaoMapUrl;
 
     @Transactional(readOnly = true)
-    public Page<LocalResDto> searchPlaces(String keyword, Pageable pageable) {
+    public List<LocalResDto> searchPlaces(String keyword, int page, int size) {
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(kakaoMapUrl)
-                .queryParam("query", keyword);
+                .queryParam("query", keyword)
+                .queryParam("page", page)
+                .queryParam("size", size);
+
+        if (page < Const.LOCAL_PAGE_DEFAULT) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "페이지는 1부터 시작합니다.");
+        }
 
         URI uri = uriBuilder.build().encode().toUri();
 
@@ -49,8 +50,7 @@ public class LocalService {
         headers.set(HttpHeaders.AUTHORIZATION, Const.KAKAO_MAP_HEADER + " " + kakaoAk);
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
-        long totalElements = 0;
-        List<LocalResDto> localResDto = new ArrayList<>();
+        List<LocalResDto> locals = new ArrayList<>();
 
         // API 호출
         try {
@@ -65,10 +65,9 @@ public class LocalService {
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode root = objectMapper.readTree(response.getBody());
             JsonNode documents = root.path("documents");
-            totalElements = root.path("meta").path("total_count").asLong();
 
             // JSON 데이터를 LocalResDto로 변환
-            localResDto = StreamSupport.stream(documents.spliterator(), false)
+            locals = StreamSupport.stream(documents.spliterator(), false)
                     .map(document -> new LocalResDto(
                             document.path("id").asLong(),
                             document.path("category_name").asText(),
@@ -88,6 +87,6 @@ public class LocalService {
             throw new RuntimeException("JSON 파싱 오류가 발생했습니다.");
         }
 
-        return new PageImpl<>(localResDto, pageable, totalElements);
+        return locals;
     }
 }
