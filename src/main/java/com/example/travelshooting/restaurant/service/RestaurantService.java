@@ -2,10 +2,7 @@ package com.example.travelshooting.restaurant.service;
 
 import com.example.travelshooting.common.Const;
 import com.example.travelshooting.poster.entity.QPoster;
-import com.example.travelshooting.restaurant.dto.GgRestaurantApiDto;
-import com.example.travelshooting.restaurant.dto.GgRestaurantResDto;
-import com.example.travelshooting.restaurant.dto.QRestaurantResDto;
-import com.example.travelshooting.restaurant.dto.RestaurantResDto;
+import com.example.travelshooting.restaurant.dto.*;
 import com.example.travelshooting.restaurant.entity.QRestaurant;
 import com.example.travelshooting.restaurant.entity.Restaurant;
 import com.example.travelshooting.restaurant.repository.RestaurantRepository;
@@ -123,7 +120,7 @@ public class RestaurantService {
     }
 
     @Transactional(readOnly = true)
-    public Page<RestaurantResDto> findAllById(String placeName, String region, String city, Pageable pageable) {
+    public Page<RestaurantSearchResDto> findAllById(String placeName, String region, String city, Pageable pageable) {
         QRestaurant restaurant = QRestaurant.restaurant;
         QPoster poster = QPoster.poster;
 
@@ -141,8 +138,8 @@ public class RestaurantService {
             conditions.and(restaurant.city.containsIgnoreCase(city));
         }
 
-        QueryResults<RestaurantResDto> queryResults = jpaQueryFactory
-                .select(new QRestaurantResDto(
+        QueryResults<RestaurantSearchResDto> queryResults = jpaQueryFactory
+                .select(new QRestaurantSearchResDto(
                         restaurant.id,
                         restaurant.region,
                         restaurant.city,
@@ -152,11 +149,13 @@ public class RestaurantService {
                         restaurant.phone,
                         restaurant.longitude,
                         restaurant.latitude,
-                        restaurant.imageUrl))
+                        restaurant.imageUrl,
+                        restaurant.count().intValue()))
                 .from(restaurant)
                 .innerJoin(poster).on(restaurant.id.eq(poster.restaurant.id)).fetchJoin()
                 .where(conditions)
-                .orderBy(restaurant.placeName.asc())
+                .groupBy(restaurant.id)
+                .orderBy(poster.count().desc(), restaurant.placeName.asc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetchResults();
