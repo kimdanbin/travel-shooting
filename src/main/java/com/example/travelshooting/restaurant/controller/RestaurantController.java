@@ -2,8 +2,9 @@ package com.example.travelshooting.restaurant.controller;
 
 import com.example.travelshooting.common.CommonListResDto;
 import com.example.travelshooting.common.CommonResDto;
-import com.example.travelshooting.restaurant.dto.RestaurantResDto;
 import com.example.travelshooting.restaurant.dto.GgRestaurantResDto;
+import com.example.travelshooting.restaurant.dto.RestaurantResDto;
+import com.example.travelshooting.restaurant.dto.RestaurantSearchResDto;
 import com.example.travelshooting.restaurant.service.RestaurantService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -35,12 +36,12 @@ public class RestaurantController {
 
     // 맛집 검색
     @GetMapping("/search")
-    public ResponseEntity<CommonListResDto<RestaurantResDto>> findAllById(@RequestParam(required = false) String placeName,
-                                                                          @RequestParam(required = false) String region,
-                                                                          @RequestParam(required = false) String city,
-                                                                          @PageableDefault(size = 10, page = 0, sort = "placeName", direction = Sort.Direction.ASC) Pageable pageable) {
-        Page<RestaurantResDto> restaurants = restaurantService.findAllById(placeName, region, city, pageable);
-        List<RestaurantResDto> content = restaurants.getContent();
+    public ResponseEntity<CommonListResDto<RestaurantSearchResDto>> findAllById(@RequestParam(required = false) String placeName,
+                                                                                @RequestParam(required = false) String region,
+                                                                                @RequestParam(required = false) String city,
+                                                                                @PageableDefault(size = 10, page = 0, sort = "placeName", direction = Sort.Direction.ASC) Pageable pageable) {
+        Page<RestaurantSearchResDto> restaurants = restaurantService.findAllById(placeName, region, city, pageable);
+        List<RestaurantSearchResDto> content = restaurants.getContent();
 
         return new ResponseEntity<>(new CommonListResDto<>("맛집 검색 완료", content), HttpStatus.OK);
     }
