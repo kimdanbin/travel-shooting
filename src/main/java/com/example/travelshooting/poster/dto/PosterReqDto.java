@@ -11,6 +11,7 @@ public class PosterReqDto {
 
     private Long restaurantId;
 
+    @NotNull(message = "여행경비를 입력해주세요")
     private Long paymentId;
 
     @NotNull(message = "여행경비를 입력해주세요")
