@@ -22,7 +22,7 @@ public class PaymentAproveResDto implements BaseDtoDataType {
     private final String productName;
 
     @JsonProperty("quantity")
-    private final Integer number;
+    private final Integer headCount;
 
     @JsonProperty("total")
     private final Integer totalPrice;

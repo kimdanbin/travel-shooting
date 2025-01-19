@@ -44,7 +44,7 @@ public class Reservation extends BaseEntity {
     private LocalDate reservationDate;
 
     @Column(nullable = false)
-    private Integer number;
+    private Integer headCount;
 
     @Column(nullable = false)
     private Integer totalPrice;
@@ -58,12 +58,12 @@ public class Reservation extends BaseEntity {
     @OneToMany(mappedBy = "reservation")
     private List<Payment> payments = new ArrayList<>();
 
-    public Reservation(User user, Product product, Part part, LocalDate reservationDate, Integer number, Integer totalPrice) {
+    public Reservation(User user, Product product, Part part, LocalDate reservationDate, Integer headCount, Integer totalPrice) {
         this.user = user;
         this.product = product;
         this.part = part;
         this.reservationDate = reservationDate;
-        this.number = number;
+        this.headCount = headCount;
         this.totalPrice = totalPrice;
     }
 

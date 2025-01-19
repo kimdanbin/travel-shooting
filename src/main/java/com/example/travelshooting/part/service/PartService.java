@@ -24,7 +24,7 @@ public class PartService {
     private final PartRepository partRepository;
     private final UserService userService;
 
-    public PartResDto createPart(Long productId, LocalTime openAt, LocalTime closeAt, Integer number) {
+    public PartResDto createPart(Long productId, LocalTime openAt, LocalTime closeAt, Integer headCount) {
         Product product = productService.findProductById(productId);
         User user = userService.findAuthenticatedUser();
         // 일정을 등록하려는 사람이 해당 업체의 소유자인지 확인
@@ -35,39 +35,39 @@ public class PartService {
         if (partRepository.existsByOpenAtAndCloseAt(openAt, closeAt)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "해당 일정이 이미 존재합니다.");
         }
-        Part part = new Part(openAt, closeAt, number, product);
+        Part part = new Part(openAt, closeAt, headCount, product);
         Part savedPart = partRepository.save(part);
 
         return new PartResDto(
                 savedPart.getId(),
                 savedPart.getOpenAt(),
                 savedPart.getCloseAt(),
-                savedPart.getNumber()
+                savedPart.getHeadCount()
         );
     }
 
     @Transactional
-    public PartResDto updatePart(Long partId, LocalTime openAt, LocalTime closeAt, Integer number) {
-        Part findPart = partRepository.findPartByIdOrElseThrow(partId);
+    public PartResDto updatePart(Long partId, LocalTime openAt, LocalTime closeAt, Integer headCount) {
+        Part findPart = partRepository.findPartById(partId);
         User user = userService.findAuthenticatedUser();
         // 일정을 수정하려는 사람이 해당 업체의 소유자인지 확인
         if (!findPart.getProduct().getCompany().getUser().getId().equals(user.getId())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "업체의 소유자만 일정을 수정할 수 있습니다.");
         }
-        findPart.updatePart(openAt, closeAt, number);
+        findPart.updatePart(openAt, closeAt, headCount);
         partRepository.save(findPart);
 
         return new PartResDto(
                 findPart.getId(),
                 findPart.getOpenAt(),
                 findPart.getCloseAt(),
-                findPart.getNumber()
+                findPart.getHeadCount()
         );
     }
 
     @Transactional
     public void deleteCompany(Long partId) {
-        Part findPart = partRepository.findPartByIdOrElseThrow(partId);
+        Part findPart = partRepository.findPartById(partId);
         User user = userService.findAuthenticatedUser();
         // 일정을 삭제하려는 사람이 해당 업체의 소유자인지 확인
         if (!findPart.getProduct().getCompany().getUser().getId().equals(user.getId())) {
@@ -77,7 +77,7 @@ public class PartService {
     }
 
     public Part findPartById(Long partId) {
-        return partRepository.findPartByIdOrElseThrow(partId);
+        return partRepository.findPartById(partId);
     }
 
     public Part findPartByProductId(Long productId) {

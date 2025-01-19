@@ -24,7 +24,7 @@ public class ReservationController {
     @PostMapping
     public ResponseEntity<CommonResDto<ReservationResDto>> createReservation(@PathVariable Long productId,
                                                                             @Valid @RequestBody ReservationReqDto reservationReqDto) {
-        ReservationResDto reservation = reservationService.createReservation(productId, reservationReqDto.getPartId(), reservationReqDto.getReservationDate(), reservationReqDto.getNumber());
+        ReservationResDto reservation = reservationService.createReservation(productId, reservationReqDto.getPartId(), reservationReqDto.getReservationDate(), reservationReqDto.getHeadCount());
 
         return new ResponseEntity<>(new CommonResDto<>("레저/티켓 예약 신청 완료", reservation), HttpStatus.CREATED);
     }
