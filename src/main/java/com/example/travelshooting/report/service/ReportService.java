@@ -88,7 +88,7 @@ public class ReportService {
         // 특정 댓글의 누적 신고가 5번일 경우, 댓글 삭제 처리
         int reportCount = reportRepository.countByFkIdAndType(commentId,ReportType.COMMENT);
 
-        if (reportCount >= 5 && report.getType().equals(ReportType.COMMENT)) {
+        if (reportCount >= Const.REPORT_COUNT && report.getType().equals(ReportType.COMMENT)) {
             commentService.deleteComment(commentId);
         }
 

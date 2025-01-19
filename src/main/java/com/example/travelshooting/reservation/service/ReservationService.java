@@ -29,21 +29,21 @@ public class ReservationService {
     private final PartService partService;
 
     @Transactional
-    public ReservationResDto createReservation(Long productId, Long partId, LocalDate reservationDate, int number) {
+    public ReservationResDto createReservation(Long productId, Long partId, LocalDate reservationDate, int headCount) {
         User user = userService.findAuthenticatedUser();
         Product product = productService.findProductById(productId);
         Part part = partService.findPartById(partId);
 
         int totalNumber = reservationRepository.findTotalNumberByPartId(part.getId());
 
-        if (part.getNumber() < totalNumber + number) {
-            int overNumber = Math.abs(part.getNumber() - totalNumber - number);
+        if (part.getHeadCount() < totalNumber + headCount) {
+            int overNumber = Math.abs(part.getHeadCount() - totalNumber - headCount);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "신청 가능한 인원을 초과했습니다. 초과된 인원: " + overNumber);
         }
 
-        int totalPrice = product.getPrice() * number;
+        int totalPrice = product.getPrice() * headCount;
 
-        Reservation reservation = new Reservation(user, product, part, reservationDate, number, totalPrice);
+        Reservation reservation = new Reservation(user, product, part, reservationDate, headCount, totalPrice);
         reservationRepository.save(reservation);
 
         return new ReservationResDto(
@@ -52,7 +52,7 @@ public class ReservationService {
                 reservation.getProduct().getId(),
                 reservation.getPart().getId(),
                 reservation.getReservationDate(),
-                reservation.getNumber(),
+                reservation.getHeadCount(),
                 reservation.getTotalPrice(),
                 reservation.getStatus(),
                 reservation.getCreatedAt(),
@@ -87,7 +87,7 @@ public class ReservationService {
                         reservation.getProduct().getId(),
                         reservation.getPart().getId(),
                         reservation.getReservationDate(),
-                        reservation.getNumber(),
+                        reservation.getHeadCount(),
                         reservation.getTotalPrice(),
                         reservation.getStatus(),
                         reservation.getCreatedAt(),
@@ -111,7 +111,7 @@ public class ReservationService {
                 reservation.getProduct().getId(),
                 reservation.getPart().getId(),
                 reservation.getReservationDate(),
-                reservation.getNumber(),
+                reservation.getHeadCount(),
                 reservation.getTotalPrice(),
                 reservation.getStatus(),
                 reservation.getCreatedAt(),

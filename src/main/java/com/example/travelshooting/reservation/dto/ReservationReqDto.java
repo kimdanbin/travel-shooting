@@ -15,5 +15,5 @@ public class ReservationReqDto {
     private LocalDate reservationDate;
 
     @NotNull(message = "인원 수를 입력해주세요.")
-    private Integer number;
+    private Integer headCount;
 }

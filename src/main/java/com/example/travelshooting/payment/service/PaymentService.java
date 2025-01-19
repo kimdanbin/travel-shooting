@@ -82,7 +82,7 @@ public class PaymentService {
         body.put("partner_order_id", reservation.getId().toString());
         body.put("partner_user_id", user.getId().toString());
         body.put("item_name", product.getName());
-        body.put("quantity", String.valueOf(reservation.getNumber()));
+        body.put("quantity", String.valueOf(reservation.getHeadCount()));
         body.put("total_amount", String.valueOf(reservation.getTotalPrice()));
         body.put("tax_free_amount", "0");
         body.put("approval_url", approvalUrl);

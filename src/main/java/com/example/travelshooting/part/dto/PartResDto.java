@@ -13,6 +13,6 @@ public class PartResDto implements BaseDtoDataType{
     private final Long id;
     private final LocalTime openAt;
     private final LocalTime closeAt;
-    private final Integer number;
+    private final Integer headCount;
 
 }

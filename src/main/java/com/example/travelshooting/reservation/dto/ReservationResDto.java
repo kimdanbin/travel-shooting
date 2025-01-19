@@ -17,7 +17,7 @@ public class ReservationResDto implements BaseDtoDataType {
     private final Long productId;
     private final Long partId;
     private final LocalDate reservationDate;
-    private final Integer number;
+    private final Integer headCount;
     private final Integer totalPrice;
     private final ReservationStatus status;
     private final LocalDateTime createdAt;

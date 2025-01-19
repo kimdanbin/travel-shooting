@@ -36,24 +36,24 @@ public class Part extends BaseEntity {
     private LocalTime closeAt;
 
     @Column(nullable = false)
-    private Integer number;
+    private Integer headCount;
 
     private boolean isDeleted = false;
 
     @OneToMany(mappedBy = "part")
     private List<Reservation> reservations = new ArrayList<>();
 
-    public Part(LocalTime openAt, LocalTime closeAt,  Integer number, Product product) {
+    public Part(LocalTime openAt, LocalTime closeAt,  Integer headCount, Product product) {
         this.openAt = openAt;
         this.closeAt = closeAt;
-        this.number = number;
+        this.headCount = headCount;
         this.product = product;
     }
 
-    public void updatePart(LocalTime openAt, LocalTime closeAt,  int number) {
+    public void updatePart(LocalTime openAt, LocalTime closeAt,  int headCount) {
         this.openAt = openAt;
         this.closeAt = closeAt;
-        this.number = number;
+        this.headCount = headCount;
     }
 
 }
