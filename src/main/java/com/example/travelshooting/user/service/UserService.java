@@ -138,6 +138,10 @@ public class UserService {
     public UserResDto uploadFile(Long userId, MultipartFile file) {
         User user = userRepository.findUserById(userId);
 
+        if (!user.getId().equals(findAuthenticatedUser().getId())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "본인 이미지만 업로드할 수 있습니다.");
+        }
+
         try {
             String fileUrl = s3Service.uploadFile(file);
 
