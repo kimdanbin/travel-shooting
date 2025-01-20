@@ -4,7 +4,6 @@ import com.example.travelshooting.common.BaseEntity;
 import com.example.travelshooting.enums.ReservationStatus;
 import com.example.travelshooting.part.entity.Part;
 import com.example.travelshooting.payment.entity.Payment;
-import com.example.travelshooting.product.entity.Product;
 import com.example.travelshooting.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -28,15 +27,11 @@ public class Reservation extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne
-    @JoinColumn(name = "leisure_product_id", nullable = false)
-    private Product product;
-
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_part_id", nullable = false)
     private Part part;
 
@@ -58,9 +53,8 @@ public class Reservation extends BaseEntity {
     @OneToMany(mappedBy = "reservation")
     private List<Payment> payments = new ArrayList<>();
 
-    public Reservation(User user, Product product, Part part, LocalDate reservationDate, Integer headCount, Integer totalPrice) {
+    public Reservation(User user, Part part, LocalDate reservationDate, Integer headCount, Integer totalPrice) {
         this.user = user;
-        this.product = product;
         this.part = part;
         this.reservationDate = reservationDate;
         this.headCount = headCount;
