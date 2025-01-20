@@ -17,7 +17,7 @@ import java.util.List;
 @Table(name = "leisure_product")
 @Getter
 @NoArgsConstructor
-@SQLDelete(sql = "UPDATE product SET is_deleted = true WHERE id = ?")
+@SQLDelete(sql = "UPDATE leisure_product SET is_deleted = true WHERE id = ?")
 @Where(clause = "is_deleted = false")
 public class Product extends BaseEntity {
 

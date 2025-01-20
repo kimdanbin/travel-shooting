@@ -31,8 +31,8 @@ public class PartService {
         if (!product.getCompany().getUser().getId().equals(user.getId())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "업체의 소유자만 일정을 등록할 수 있습니다.");
         }
-        // 이미 등록되어 있는 일정인지 확인
-        if (partRepository.existsByOpenAtAndCloseAt(openAt, closeAt)) {
+        // 해당 상품에 이미 등록되어 있는 일정인지 확인
+        if (partRepository.existsByProductIdAndOpenAtAndCloseAt(productId, openAt, closeAt)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "해당 일정이 이미 존재합니다.");
         }
         Part part = new Part(openAt, closeAt, headCount, product);
@@ -53,6 +53,10 @@ public class PartService {
         // 일정을 수정하려는 사람이 해당 업체의 소유자인지 확인
         if (!findPart.getProduct().getCompany().getUser().getId().equals(user.getId())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "업체의 소유자만 일정을 수정할 수 있습니다.");
+        }
+        // 해당 상품에 이미 등록되어 있는 일정인지 확인
+        if (partRepository.existsByProductIdAndOpenAtAndCloseAt(findPart.getProduct().getId(), openAt, closeAt)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "해당 일정이 이미 존재합니다.");
         }
         findPart.updatePart(openAt, closeAt, headCount);
         partRepository.save(findPart);

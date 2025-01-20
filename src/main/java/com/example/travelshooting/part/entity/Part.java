@@ -17,7 +17,7 @@ import java.util.List;
 @Table(name = "product_part")
 @Getter
 @NoArgsConstructor
-@SQLDelete(sql = "UPDATE part SET is_deleted = true WHERE id = ?")
+@SQLDelete(sql = "UPDATE product_part SET is_deleted = true WHERE id = ?")
 @Where(clause = "is_deleted = false")
 public class Part extends BaseEntity {
 
@@ -40,7 +40,7 @@ public class Part extends BaseEntity {
 
     private boolean isDeleted = false;
 
-    @OneToMany(mappedBy = "part")
+    @OneToMany(mappedBy = "part", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Reservation> reservations = new ArrayList<>();
 
     public Part(LocalTime openAt, LocalTime closeAt,  Integer headCount, Product product) {

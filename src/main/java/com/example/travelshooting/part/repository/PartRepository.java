@@ -22,4 +22,5 @@ public interface PartRepository extends JpaRepository<Part, Long> {
 
     boolean existsByOpenAtAndCloseAt(LocalTime openAt, LocalTime closeAt);
 
+    boolean existsByProductIdAndOpenAtAndCloseAt(Long productId, LocalTime openAt, LocalTime closeAt);
 }
