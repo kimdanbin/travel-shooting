@@ -47,7 +47,7 @@ public class PartService {
     }
 
     @Transactional
-    public PartResDto updatePart(Long partId, LocalTime openAt, LocalTime closeAt, Integer headCount) {
+    public PartResDto updatePart(Long productId, Long partId, LocalTime openAt, LocalTime closeAt, Integer headCount) {
         Part findPart = partRepository.findPartById(partId);
         User user = userService.findAuthenticatedUser();
         // 일정을 수정하려는 사람이 해당 업체의 소유자인지 확인
@@ -55,7 +55,7 @@ public class PartService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "업체의 소유자만 일정을 수정할 수 있습니다.");
         }
         // 해당 상품에 이미 등록되어 있는 일정인지 확인
-        if (partRepository.existsByProductIdAndOpenAtAndCloseAt(findPart.getProduct().getId(), openAt, closeAt)) {
+        if (partRepository.existsByProductIdAndOpenAtAndCloseAt(productId, openAt, closeAt)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "해당 일정이 이미 존재합니다.");
         }
         findPart.updatePart(openAt, closeAt, headCount);
