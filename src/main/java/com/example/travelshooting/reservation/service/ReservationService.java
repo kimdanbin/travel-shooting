@@ -29,27 +29,27 @@ public class ReservationService {
     private final PartService partService;
 
     @Transactional
-    public ReservationResDto createReservation(Long productId, Long partId, LocalDate reservationDate, int headCount) {
+    public ReservationResDto createReservation(Long productId, Long partId, LocalDate reservationDate, Integer headCount) {
         User user = userService.findAuthenticatedUser();
         Product product = productService.findProductById(productId);
         Part part = partService.findPartById(partId);
 
-        int totalNumber = reservationRepository.findTotalNumberByPartId(part.getId());
+        Integer totalNumber = reservationRepository.findTotalNumberByPartId(part.getId());
 
         if (part.getHeadCount() < totalNumber + headCount) {
-            int overNumber = Math.abs(part.getHeadCount() - totalNumber - headCount);
+            Integer overNumber = Math.abs(part.getHeadCount() - totalNumber - headCount);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "신청 가능한 인원을 초과했습니다. 초과된 인원: " + overNumber);
         }
 
-        int totalPrice = product.getPrice() * headCount;
+        Integer totalPrice = product.getPrice() * headCount;
 
-        Reservation reservation = new Reservation(user, product, part, reservationDate, headCount, totalPrice);
+        Reservation reservation = new Reservation(user, part, reservationDate, headCount, totalPrice);
         reservationRepository.save(reservation);
 
         return new ReservationResDto(
                 reservation.getId(),
                 reservation.getUser().getId(),
-                reservation.getProduct().getId(),
+                product.getId(),
                 reservation.getPart().getId(),
                 reservation.getReservationDate(),
                 reservation.getHeadCount(),
@@ -63,7 +63,8 @@ public class ReservationService {
     @Transactional
     public void deleteReservation(Long productId, Long reservationId) {
         User user = userService.findAuthenticatedUser();
-        Reservation reservation = reservationRepository.findReservationByUserIdAndProductIdAndId(user.getId(), productId, reservationId);
+        Product product = productService.findProductById(productId);
+        Reservation reservation = reservationRepository.findReservationByUserIdAndProductIdAndId(user.getId(), product.getId(), reservationId);
 
         if (reservation == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "예약 내역이 없습니다.");
@@ -75,7 +76,8 @@ public class ReservationService {
     @Transactional(readOnly = true)
     public List<ReservationResDto> findAllByUserIdAndProductId(Long productId) {
         User user = userService.findAuthenticatedUser();
-        List<Reservation> reservations = reservationRepository.findAllByUserIdAndProductId(user.getId(), productId);
+        Product product = productService.findProductById(productId);
+        List<Reservation> reservations = reservationRepository.findAllByUserIdAndProductId(user.getId(), product.getId());
 
         if (reservations.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "예약 내역이 없습니다.");
@@ -84,7 +86,7 @@ public class ReservationService {
         return reservations.stream().map(reservation -> new ReservationResDto(
                         reservation.getId(),
                         reservation.getUser().getId(),
-                        reservation.getProduct().getId(),
+                        product.getId(),
                         reservation.getPart().getId(),
                         reservation.getReservationDate(),
                         reservation.getHeadCount(),
@@ -99,7 +101,8 @@ public class ReservationService {
     @Transactional(readOnly = true)
     public ReservationResDto findReservationByUserIdAndProductIdAndId(Long productId, Long reservationId) {
         User user = userService.findAuthenticatedUser();
-        Reservation reservation = reservationRepository.findReservationByUserIdAndProductIdAndId(user.getId(), productId, reservationId);
+        Product product = productService.findProductById(productId);
+        Reservation reservation = reservationRepository.findReservationByUserIdAndProductIdAndId(user.getId(), product.getId(), reservationId);
 
         if (reservation == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "예약 내역이 없습니다.");
@@ -108,7 +111,7 @@ public class ReservationService {
         return new ReservationResDto(
                 reservation.getId(),
                 reservation.getUser().getId(),
-                reservation.getProduct().getId(),
+                product.getId(),
                 reservation.getPart().getId(),
                 reservation.getReservationDate(),
                 reservation.getHeadCount(),
@@ -119,7 +122,7 @@ public class ReservationService {
         );
     }
 
-    public Reservation findReservationByProductIdAndId(Long productId, Long reservationId) {
-        return reservationRepository.findReservationByProductIdAndId(productId, reservationId);
+    public Reservation findReservationByUserIdAndProductIdAndId(Long userId, Long productId, Long reservationId) {
+        return reservationRepository.findReservationByUserIdAndProductIdAndId(userId, productId, reservationId);
     }
 }

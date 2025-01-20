@@ -1,8 +1,10 @@
 package com.example.travelshooting.reservation.service;
 
 import com.example.travelshooting.enums.ReservationStatus;
-import com.example.travelshooting.reservation.entity.Reservation;
+import com.example.travelshooting.product.entity.Product;
+import com.example.travelshooting.product.service.ProductService;
 import com.example.travelshooting.reservation.dto.ReservationResDto;
+import com.example.travelshooting.reservation.entity.Reservation;
 import com.example.travelshooting.reservation.repository.ReservationRepository;
 import com.example.travelshooting.user.entity.User;
 import com.example.travelshooting.user.service.UserService;
@@ -21,11 +23,14 @@ public class ReservationPartnerService {
 
     private final ReservationRepository reservationRepository;
     private final UserService userService;
+    private final ProductService productService;
 
     @Transactional(readOnly = true)
     public List<ReservationResDto> findAllByProductIdAndUserId(Long productId) {
         User user = userService.findAuthenticatedUser();
-        List<Reservation> reservations = reservationRepository.findAllByProductIdAndUserId(productId, user.getId());
+        Product product = productService.findProductById(productId);
+
+        List<Reservation> reservations = reservationRepository.findAllByProductIdAndUserId(product.getId(), user.getId());
 
         if (reservations.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "예약 내역이 없습니다.");
@@ -34,7 +39,7 @@ public class ReservationPartnerService {
         return reservations.stream().map(reservation -> new ReservationResDto(
                 reservation.getId(),
                 reservation.getUser().getId(),
-                reservation.getProduct().getId(),
+                product.getId(),
                 reservation.getPart().getId(),
                 reservation.getReservationDate(),
                 reservation.getHeadCount(),
@@ -48,7 +53,8 @@ public class ReservationPartnerService {
     @Transactional(readOnly = true)
     public ReservationResDto findReservationByProductIdAndUserIdAndId(Long productId, Long reservationId) {
         User user = userService.findAuthenticatedUser();
-        Reservation reservation = reservationRepository.findReservationByProductIdAndUserIdAndId(productId, user.getId(), reservationId);
+        Product product = productService.findProductById(productId);
+        Reservation reservation = reservationRepository.findReservationByProductIdAndUserIdAndId(product.getId(), user.getId(), reservationId);
 
         if (reservation == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "예약 내역이 없습니다.");
@@ -57,7 +63,7 @@ public class ReservationPartnerService {
         return new ReservationResDto(
                 reservation.getId(),
                 reservation.getUser().getId(),
-                reservation.getProduct().getId(),
+                product.getId(),
                 reservation.getPart().getId(),
                 reservation.getReservationDate(),
                 reservation.getHeadCount(),
@@ -71,7 +77,8 @@ public class ReservationPartnerService {
     @Transactional
     public ReservationResDto updateReservationStatus(Long productId, Long reservationId, String status) {
         User user = userService.findAuthenticatedUser();
-        Reservation reservation = reservationRepository.findReservationByProductIdAndUserIdAndId(productId, user.getId(), reservationId);
+        Product product = productService.findProductById(productId);
+        Reservation reservation = reservationRepository.findReservationByProductIdAndUserIdAndId(product.getId(), user.getId(), reservationId);
 
         if (reservation == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "예약 내역이 없습니다.");
@@ -87,7 +94,7 @@ public class ReservationPartnerService {
         return new ReservationResDto(
                 updatedReservation.getId(),
                 updatedReservation.getUser().getId(),
-                updatedReservation.getProduct().getId(),
+                product.getId(),
                 updatedReservation.getPart().getId(),
                 updatedReservation.getReservationDate(),
                 updatedReservation.getHeadCount(),

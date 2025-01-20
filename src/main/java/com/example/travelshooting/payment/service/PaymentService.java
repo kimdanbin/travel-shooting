@@ -29,8 +29,8 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class PaymentService {
 
-    private final PaymentRepository paymentRepository;
     private final RestTemplate restTemplate;
+    private final PaymentRepository paymentRepository;
     private final ReservationService reservationService;
     private final UserService userService;
     private final ProductService productService;
@@ -59,8 +59,8 @@ public class PaymentService {
     // 카카오페이 결제창 연결
     public PaymentReadyResDto payReady(Long productId, Long reservationId) {
         Product product = productService.findProductById(productId);
-        Reservation reservation = reservationService.findReservationByProductIdAndId(product.getId(), reservationId);
         User user = userService.findAuthenticatedUser();
+        Reservation reservation = reservationService.findReservationByUserIdAndProductIdAndId(user.getId(), product.getId(), reservationId);
 
         if (reservation == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "예약 내역을 찾을 수 없습니다.");
@@ -129,8 +129,9 @@ public class PaymentService {
 
     // 최종적으로 결제 완료 처리를 하는 단계
     public PaymentAproveResDto payApprove(Long productId, Long reservationId, String pgToken) {
-        Reservation reservation = reservationService.findReservationByProductIdAndId(productId, reservationId);
+        Product product = productService.findProductById(productId);
         Payment payment = paymentRepository.findByReservationId(reservationId);
+        Reservation reservation = reservationService.findReservationByUserIdAndProductIdAndId(payment.getPartnerUserId(), product.getId(), reservationId);
 
         Map<String, String> body = new HashMap<>();
         body.put("cid", Const.KAKAO_PAY_TEST_CID);
@@ -189,7 +190,7 @@ public class PaymentService {
     private HttpHeaders getHttpHeaders() {
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.AUTHORIZATION, Const.KAKAO_PAY_HEADER + " " + secretKey);
-        headers.set("Content-type", "application/json");
+        headers.set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
 
         return headers;
     }
