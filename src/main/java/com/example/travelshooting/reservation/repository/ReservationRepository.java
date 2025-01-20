@@ -1,6 +1,7 @@
 package com.example.travelshooting.reservation.repository;
 
 import com.example.travelshooting.reservation.entity.Reservation;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -18,25 +19,29 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     }
 
     @Query("SELECT COALESCE(SUM(r.headCount), 0) FROM Reservation r WHERE r.part.id = :partId")
-    int findTotalNumberByPartId(@Param("partId") Long partId);
+    Integer findTotalNumberByPartId(@Param("partId") Long partId);
 
-    List<Reservation> findAllByUserIdAndProductId(Long userId, Long productId);
+    @EntityGraph(attributePaths = {"part", "part.product", "user"})
+    @Query("SELECT r FROM Reservation r WHERE r.user.id = :userId AND r.part.product.id = :productId")
+    List<Reservation> findAllByUserIdAndProductId(@Param("userId") Long userId, @Param("productId") Long productId);
 
-    Reservation findReservationByUserIdAndProductIdAndId(Long userId, Long productId, Long reservationId);
+    @EntityGraph(attributePaths = {"part", "part.product", "user"})
+    @Query("SELECT r FROM Reservation r WHERE r.user.id = :userId AND r.part.product.id = :productId AND r.id = :reservationId")
+    Reservation findReservationByUserIdAndProductIdAndId(@Param("userId") Long userId, @Param("productId") Long productId, @Param("reservationId") Long reservationId);
 
     @Query("SELECT r " +
             "FROM Reservation r " +
-            "INNER JOIN r.product p " +
+            "INNER JOIN r.part pa " +
+            "INNER JOIN pa.product p " +
             "INNER JOIN p.company c " +
             "WHERE p.id = :productId AND c.user.id = :userId")
     List<Reservation> findAllByProductIdAndUserId(@Param("productId") Long productId, @Param("userId") Long userId);
 
     @Query("SELECT r " +
             "FROM Reservation r " +
-            "INNER JOIN r.product p " +
+            "INNER JOIN r.part pa " +
+            "INNER JOIN pa.product p " +
             "INNER JOIN p.company c " +
             "WHERE p.id = :productId AND c.user.id = :userId AND r.id = :reservationId")
     Reservation findReservationByProductIdAndUserIdAndId(@Param("productId") Long productId, @Param("userId") Long userId, @Param("reservationId") Long reservationId);
-
-    Reservation findReservationByProductIdAndId(Long productId, Long reservationId);
 }
