@@ -44,10 +44,11 @@ public class PartController {
      */
     @PatchMapping("/partners/products/{productId}/parts/{partId}")
     public ResponseEntity<CommonResDto<PartResDto>> updatePart (
+            @PathVariable Long productId,
             @PathVariable Long partId,
             @Valid @RequestBody UpdatePartReqDto updatePartReqDto
     ) {
-        PartResDto result = partService.updatePart(partId, updatePartReqDto.getOpenAt(),updatePartReqDto.getCloseAt(),updatePartReqDto.getHeadCount());
+        PartResDto result = partService.updatePart(productId, partId, updatePartReqDto.getOpenAt(),updatePartReqDto.getCloseAt(),updatePartReqDto.getHeadCount());
 
         return new ResponseEntity<>(new CommonResDto<>("레저/티켓 일정 수정 완료", result), HttpStatus.OK);
     }
