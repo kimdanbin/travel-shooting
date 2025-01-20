@@ -33,13 +33,13 @@ public class ProductService {
 
     @Transactional
     public CreateProductResDto createProduct(Long companyId, String name, String description, Integer price, String address, Integer quantity) {
-        Company company = companyService.findCompanyById(companyId);
         User user = userService.findAuthenticatedUser();
-        // 상품을 등록하려는 사람이 해당 업체의 소유자인지 확인
-        if (!company.getUser().getId().equals(user.getId())) {
+        Company company = companyService.findCompanyByIdAndUserId(companyId, user.getId());
+        if (company == null) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "업체의 소유자만 상품을 등록할 수 있습니다.");
         }
-        // TODO 이미 등록된 업체 이름인지 확인
+
+        // 이미 등록된 업체 이름인지 확인
         if (productRepository.existsByCompanyAndName(company, name)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "같은 업체에서 동일한 이름의 상품을 중복 등록할 수 없습니다.");
         }
@@ -90,7 +90,7 @@ public class ProductService {
 
     @Transactional(readOnly = true)
     public ProductDetailResDto findProduct(Long companyId, Long productId) {
-        Product findProduct = productRepository.findByCompanyIdAndId(companyId,productId);
+        Product findProduct = productRepository.findByCompanyIdAndId(companyId, productId);
         if (findProduct == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 업체가 가진 해당 ID의 상품이 없습니다.");
         }
@@ -120,10 +120,11 @@ public class ProductService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 업체가 가진 해당 ID의 상품이 없습니다.");
         }
         User user = userService.findAuthenticatedUser();
-        // 상품을 수정하려는 사람이 해당 업체의 소유자인지 확인
-        if (!findProduct.getCompany().getUser().getId().equals(user.getId())) {
+        Product product = productRepository.findProductByIdAndUserId(findProduct.getId(), user.getId());
+        if (product == null) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "업체의 소유자만 상품을 수정할 수 있습니다.");
         }
+
         findProduct.updateProduct(description, price, address, quantity);
         productRepository.save(findProduct);
 
@@ -147,8 +148,8 @@ public class ProductService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 업체가 가진 해당 ID의 상품이 없습니다.");
         }
         User user = userService.findAuthenticatedUser();
-        // 상품을 삭제하려는 사람이 해당 업체의 소유자인지 확인
-        if (!findProduct.getCompany().getUser().getId().equals(user.getId())) {
+        Product product = productRepository.findProductByIdAndUserId(findProduct.getId(), user.getId());
+        if (product == null) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "업체의 소유자만 상품을 삭제할 수 있습니다.");
         }
         productRepository.delete(findProduct);
@@ -158,4 +159,7 @@ public class ProductService {
         return productRepository.findProductById(productId);
     }
 
+    public Product findProductByProductIdAndUserId(Long productId, Long userId) {
+        return productRepository.findProductByIdAndUserId(productId, userId);
+    }
 }

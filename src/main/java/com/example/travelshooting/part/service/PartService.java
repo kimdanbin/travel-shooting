@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalTime;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -25,16 +24,24 @@ public class PartService {
     private final UserService userService;
 
     public PartResDto createPart(Long productId, LocalTime openAt, LocalTime closeAt, Integer headCount) {
-        Product product = productService.findProductById(productId);
         User user = userService.findAuthenticatedUser();
-        // 일정을 등록하려는 사람이 해당 업체의 소유자인지 확인
-        if (!product.getCompany().getUser().getId().equals(user.getId())) {
+        Product product = productService.findProductByProductIdAndUserId(productId, user.getId());
+        Integer totalHeadCount = partRepository.findTotalHeadCountByProductId(product.getId());
+
+        if (product == null) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "업체의 소유자만 일정을 등록할 수 있습니다.");
         }
+
         // 해당 상품에 이미 등록되어 있는 일정인지 확인
         if (partRepository.existsByProductIdAndOpenAtAndCloseAt(productId, openAt, closeAt)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "해당 일정이 이미 존재합니다.");
         }
+
+        if (product.getQuantity() < totalHeadCount + headCount) {
+            Integer overHeadCount = Math.abs(product.getQuantity() - totalHeadCount - headCount);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "등록하려는 인원 수가 사용 가능한 상품의 수량을 "+overHeadCount+"만큼 초과했습니다.");
+        }
+
         Part part = new Part(openAt, closeAt, headCount, product);
         Part savedPart = partRepository.save(part);
 
@@ -48,16 +55,26 @@ public class PartService {
 
     @Transactional
     public PartResDto updatePart(Long productId, Long partId, LocalTime openAt, LocalTime closeAt, Integer headCount) {
-        Part findPart = partRepository.findPartById(partId);
+        Product product = productService.findProductById(productId);
         User user = userService.findAuthenticatedUser();
+        Integer totalHeadCount = partRepository.findTotalHeadCountByProductId(product.getId());
+        Part part = partRepository.findPartById(partId);
         // 일정을 수정하려는 사람이 해당 업체의 소유자인지 확인
-        if (!findPart.getProduct().getCompany().getUser().getId().equals(user.getId())) {
+        Part findPart = partRepository.findPartByProductIdAndUserIdAndId(product.getId(), user.getId(), partId);
+        if (findPart == null) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "업체의 소유자만 일정을 수정할 수 있습니다.");
         }
+
         // 해당 상품에 이미 등록되어 있는 일정인지 확인
         if (partRepository.existsByProductIdAndOpenAtAndCloseAt(productId, openAt, closeAt)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "해당 일정이 이미 존재합니다.");
         }
+
+        if (product.getQuantity() < totalHeadCount - part.getHeadCount() + headCount) {
+            Integer overHeadCount = Math.abs(product.getQuantity() - totalHeadCount + part.getHeadCount() - headCount);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정하려는 인원 수가 사용 가능한 상품의 수량을 "+overHeadCount+"만큼 초과했습니다.");
+        }
+
         findPart.updatePart(openAt, closeAt, headCount);
         partRepository.save(findPart);
 
@@ -70,38 +87,19 @@ public class PartService {
     }
 
     @Transactional
-    public void deleteCompany(Long partId) {
-        Part findPart = partRepository.findPartById(partId);
+    public void deletePart(Long productId, Long partId) {
+        Product product = productService.findProductById(productId);
         User user = userService.findAuthenticatedUser();
         // 일정을 삭제하려는 사람이 해당 업체의 소유자인지 확인
-        if (!findPart.getProduct().getCompany().getUser().getId().equals(user.getId())) {
+        Part findPart = partRepository.findPartByProductIdAndUserIdAndId(product.getId(), user.getId(), partId);
+        if (findPart == null) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "업체의 소유자만 일정을 삭제할 수 있습니다.");
         }
+
         partRepository.delete(findPart);
     }
 
     public Part findPartById(Long partId) {
         return partRepository.findPartById(partId);
     }
-
-    public Part findPartByProductId(Long productId) {
-        Part part = partRepository.findPartByProductId(productId);
-
-        if (part == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "아이디 " + part.getId() + "에 해당하는 레저/티켓 일정을 찾을 수 없습니다.");
-        }
-
-        return part;
-    }
-
-    public List<Part> findPartsByProductId(Long productId) {
-        List<Part> parts = partRepository.findPartsByProductId(productId);
-
-        if (parts.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "아이디 " + productId + "에 해당하는 레저/티켓 일정을 찾을 수 없습니다.");
-        }
-
-        return parts;
-    }
-
 }
