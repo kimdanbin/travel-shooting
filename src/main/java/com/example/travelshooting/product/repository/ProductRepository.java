@@ -5,6 +5,8 @@ import com.example.travelshooting.product.entity.Product;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.server.ResponseStatusException;
@@ -22,4 +24,9 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     Product findByCompanyIdAndId(Long companyId, Long id);
 
+    @Query("SELECT p " +
+            "FROM Product p " +
+            "INNER JOIN p.company c " +
+            "WHERE p.id = :productId AND c.user.id = :userId")
+    Product findProductByIdAndUserId(@Param("productId") Long productId, @Param("userId") Long userId);
 }

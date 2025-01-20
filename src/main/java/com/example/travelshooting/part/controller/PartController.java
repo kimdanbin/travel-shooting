@@ -60,8 +60,8 @@ public class PartController {
      * @return 삭제 성공 시, 메시지와 함께 상태코드 200 반환
      */
     @DeleteMapping("/partners/products/{productId}/parts/{partId}")
-    public ResponseEntity<String> deletePart(@PathVariable Long partId) {
-        partService.deleteCompany(partId);
+    public ResponseEntity<String> deletePart(@PathVariable Long productId, @PathVariable Long partId) {
+        partService.deletePart(productId, partId);
 
         return new ResponseEntity<>("레저/티켓 일정 삭제 완료", HttpStatus.OK);
     }
