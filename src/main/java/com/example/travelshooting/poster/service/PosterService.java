@@ -5,8 +5,7 @@ import com.example.travelshooting.like.entity.QLikePoster;
 import com.example.travelshooting.payment.entity.Payment;
 import com.example.travelshooting.payment.service.PaymentService;
 import com.example.travelshooting.poster.dto.PosterResDto;
-import com.example.travelshooting.poster.dto.QSearchPosterResDto;
-import com.example.travelshooting.poster.dto.SearchPosterResDto;
+import com.example.travelshooting.poster.dto.QPosterResDto;
 import com.example.travelshooting.poster.entity.Poster;
 import com.example.travelshooting.poster.entity.QPoster;
 import com.example.travelshooting.poster.repository.PosterRepository;
@@ -71,8 +70,9 @@ public class PosterService {
 
         return new PosterResDto(findPosterById(posterId));
     }
+
     // 포스터 전체 조회
-    public Page<SearchPosterResDto> findAll(Integer minExpenses, Integer maxExpenses, LocalDate travelStartAt, LocalDate travelEndAt, Pageable pageable) {
+    public Page<PosterResDto> findAll(Integer minExpenses, Integer maxExpenses, LocalDate travelStartAt, LocalDate travelEndAt, Integer minDays, Integer maxDays, Integer month, Pageable pageable) {
         QPoster poster = QPoster.poster;
         QLikePoster likePoster = QLikePoster.likePoster;
 
@@ -93,19 +93,41 @@ public class PosterService {
         if (travelEndAt != null) {
             conditions.and(poster.travelEndAt.loe(travelEndAt.atTime(LocalTime.MAX)));
         }
+        // 사용자가 입력한 month = ? 값과 여행 날짜의 월만 추출 후 비교
+        if (month != null) {
+            conditions.and(poster.travelStartAt.month().eq(month));
+        }
 
-        QueryResults<SearchPosterResDto> queryResults = jpaQueryFactory
-            .select(new QSearchPosterResDto(
+        QueryResults<PosterResDto> queryResults = jpaQueryFactory
+            .select(new QPosterResDto(
                 poster.id,
-                poster.title,
+                poster.user.id,
+                poster.restaurant.id,
+                poster.payment.id,
                 poster.expenses,
+                poster.title,
+                poster.content,
                 poster.travelStartAt,
                 poster.travelEndAt,
-                poster.likePosters.size()))
+                poster.likePosters.size(),
+                poster.createdAt,
+                poster.updatedAt))
             .from(poster)
             .leftJoin(likePoster).on(poster.id.eq(likePoster.poster.id))
             .where(conditions)
-            .groupBy(poster.id, poster.title, poster.expenses, poster.travelStartAt, poster.travelEndAt)
+            .groupBy(
+                poster.id,
+                poster.user.id,
+                poster.restaurant.id,
+                poster.payment.id,
+                poster.expenses,
+                poster.title,
+                poster.content,
+                poster.travelStartAt,
+                poster.travelEndAt,
+                poster.createdAt,
+                poster.updatedAt
+            )
             .orderBy(likePoster.count().desc())
             .offset(pageable.getOffset())
             .limit(pageable.getPageSize())

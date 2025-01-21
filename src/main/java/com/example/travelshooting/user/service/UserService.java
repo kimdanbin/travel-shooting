@@ -45,11 +45,11 @@ public class UserService {
         User savedUser = userRepository.save(user);
 
         return new UserResDto(
-                savedUser.getId(),
-                savedUser.getEmail(),
-                savedUser.getName(),
-                savedUser.getRole(),
-                savedUser.getImageUrl()
+            savedUser.getId(),
+            savedUser.getEmail(),
+            savedUser.getName(),
+            savedUser.getRole(),
+            savedUser.getImageUrl()
         );
     }
 
@@ -65,7 +65,7 @@ public class UserService {
 
         // 사용자 인증 후 인증 객체를 저장
         Authentication authentication = this.authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(email, password));
+            new UsernamePasswordAuthenticationToken(email, password));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
@@ -111,18 +111,34 @@ public class UserService {
         userRepository.save(user);
     }
 
-    // 회원 탈퇴
+    // 회원 탈퇴 v1
+//    @Transactional
+//    public void deleteUser(Long userId, PasswordVrfReqDto requestDto) {
+//        // 사용자 조회
+//        User user = userRepository.findUserById(userId);
+//
+//        // 비밀번호 확인
+//        if (!passwordEncoder.matches(requestDto.getPassword(), user.getPassword())) {
+//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "비밀번호가 일치하지 않습니다.");
+//        }
+//
+//        // 사용자 삭제
+//        userRepository.delete(user);
+//    }
+    // 회원 탈퇴 v2
+    // 비밀번호 비교
+    public boolean verifyPassword(Long userId, PasswordVrfReqDto requestDto) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 ID의 사용자를 찾을 수 없습니다."));
+
+        
+        return passwordEncoder.matches(requestDto.getPassword(), user.getPassword());
+    }
     @Transactional
-    public void deleteUser(Long userId, PasswordVrfReqDto requestDto) {
-        // 사용자 조회
-        User user = userRepository.findUserById(userId);
+    public void deleteUser(Long userId) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 ID의 사용자를 찾을 수 없습니다."));
 
-        // 비밀번호 확인
-        if (!passwordEncoder.matches(requestDto.getPassword(), user.getPassword())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "비밀번호가 일치하지 않습니다.");
-        }
-
-        // 사용자 삭제
         userRepository.delete(user);
     }
 
@@ -152,11 +168,11 @@ public class UserService {
         }
 
         return new UserResDto(
-                user.getId(),
-                user.getEmail(),
-                user.getName(),
-                user.getRole(),
-                user.getImageUrl()
+            user.getId(),
+            user.getEmail(),
+            user.getName(),
+            user.getRole(),
+            user.getImageUrl()
         );
     }
 
