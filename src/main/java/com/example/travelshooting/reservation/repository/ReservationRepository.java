@@ -19,7 +19,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     }
 
     @Query("SELECT COALESCE(SUM(r.headCount), 0) FROM Reservation r WHERE r.part.id = :partId")
-    Integer findTotalNumberByPartId(@Param("partId") Long partId);
+    Integer findTotalHeadCountByPartId(@Param("partId") Long partId);
 
     @EntityGraph(attributePaths = {"part", "part.product", "user"})
     @Query("SELECT r FROM Reservation r WHERE r.user.id = :userId AND r.part.product.id = :productId")

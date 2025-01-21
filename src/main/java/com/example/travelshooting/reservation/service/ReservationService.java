@@ -34,11 +34,11 @@ public class ReservationService {
         Product product = productService.findProductById(productId);
         Part part = partService.findPartById(partId);
 
-        Integer totalNumber = reservationRepository.findTotalNumberByPartId(part.getId());
+        Integer totalHeadCount = reservationRepository.findTotalHeadCountByPartId(part.getId());
 
-        if (part.getHeadCount() < totalNumber + headCount) {
-            Integer overNumber = Math.abs(part.getHeadCount() - totalNumber - headCount);
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "신청 가능한 인원을 초과했습니다. 초과된 인원: " + overNumber);
+        if (part.getHeadCount() < totalHeadCount + headCount) {
+            Integer overHeadCount = Math.abs(part.getHeadCount() - totalHeadCount - headCount);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "신청 가능한 인원을 초과했습니다. 초과된 인원: " + overHeadCount);
         }
 
         Integer totalPrice = product.getPrice() * headCount;
