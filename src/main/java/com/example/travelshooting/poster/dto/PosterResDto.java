@@ -2,6 +2,7 @@ package com.example.travelshooting.poster.dto;
 
 import com.example.travelshooting.common.BaseDtoDataType;
 import com.example.travelshooting.poster.entity.Poster;
+import com.querydsl.core.annotations.QueryProjection;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -35,6 +36,7 @@ public class PosterResDto implements BaseDtoDataType {
 
     private final LocalDateTime updatedAt;
 
+    @QueryProjection
     public PosterResDto(Poster poster) {
         this.id = poster.getId();
         this.userId = poster.getUser().getId();
@@ -49,5 +51,19 @@ public class PosterResDto implements BaseDtoDataType {
         this.createdAt = poster.getCreatedAt();
         this.updatedAt = poster.getUpdatedAt();
     }
-
+    @QueryProjection
+    public PosterResDto(Long id, Long userId, Long restaurantId, Long paymentId, Integer expenses, String title, String content, LocalDateTime travelStartAt, LocalDateTime travelEndAt, int likes, LocalDateTime createdAt, LocalDateTime updatedAt) {
+        this.id = id;
+        this.userId = userId;
+        this.restaurantId = restaurantId;
+        this.paymentId = paymentId;
+        this.expenses = expenses;
+        this.title = title;
+        this.content = content;
+        this.travelStartAt = travelStartAt;
+        this.travelEndAt = travelEndAt;
+        this.likes = likes;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+    }
 }
