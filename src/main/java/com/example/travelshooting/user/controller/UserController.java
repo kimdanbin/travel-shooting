@@ -48,14 +48,35 @@ public class UserController {
 //  }
 
     // 비밀번호 확인 후 회원탈퇴
-    @DeleteMapping("/{userId}")
-    public ResponseEntity<String> deleteUser(
-            @PathVariable Long userId,
-            @RequestBody PasswordVrfReqDto requestDto) {
-        userService.deleteUser(userId, requestDto);
+//    @DeleteMapping("/{userId}")
+//    public ResponseEntity<String> deleteUser(
+//            @PathVariable Long userId,
+//            @RequestBody PasswordVrfReqDto requestDto) {
+//        userService.deleteUser(userId, requestDto);
+//
+//        return ResponseEntity.ok("회원 탈퇴 성공");
+//    }
+    // 비밀번호 확인
+    @PostMapping("/{userId}/verify-password")
+    public ResponseEntity<String> verifyPassword(
+        @PathVariable Long userId,
+        @RequestBody PasswordVrfReqDto reqDto) {
+        boolean isVerified = userService.verifyPassword(userId, reqDto);
 
+        if (isVerified) {
+            return ResponseEntity.ok("비밀번호 확인 성공");
+        } else {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("비밀번호가 일치하지 않습니다.");
+        }
+    }
+
+    // 회원 탈퇴
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<String> deleteUser(@PathVariable Long userId) {
+        userService.deleteUser(userId);
         return ResponseEntity.ok("회원 탈퇴 성공");
     }
+
 
     // 비밀번호 변경
     @PutMapping("/{userId}/password")
