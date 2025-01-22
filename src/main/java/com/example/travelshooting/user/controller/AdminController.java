@@ -8,10 +8,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -22,8 +20,11 @@ public class AdminController {
 
   // 관리자 회원가입
   @PostMapping
-  public ResponseEntity<CommonResDto<UserResDto>> adminSignup(@Valid @RequestBody UserReqDto userReqDto) {
-    UserResDto adminSignup = adminService.adminSignup(userReqDto.getEmail(), userReqDto.getPassword(), userReqDto.getName());
+  public ResponseEntity<CommonResDto<UserResDto>> adminSignup(
+          @RequestPart MultipartFile file,
+          @Valid @RequestBody UserReqDto userReqDto
+  ) {
+    UserResDto adminSignup = adminService.adminSignup(userReqDto.getEmail(), userReqDto.getPassword(), userReqDto.getName(), file);
 
     return new ResponseEntity<>(new CommonResDto<>("관리자 회원가입 완료", adminSignup), HttpStatus.CREATED);
   }

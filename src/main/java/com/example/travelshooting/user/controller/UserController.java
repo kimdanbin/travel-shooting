@@ -19,8 +19,11 @@ public class UserController {
 
     // 사용자 권한으로 회원가입
     @PostMapping("/signup")
-    public ResponseEntity<CommonResDto<UserResDto>> userSignup(@Valid @RequestBody UserReqDto userReqDto) {
-        UserResDto userSignup = userService.userSignup(userReqDto.getEmail(), userReqDto.getPassword(), userReqDto.getName());
+    public ResponseEntity<CommonResDto<UserResDto>> userSignup(
+            @RequestPart(required = false) MultipartFile file,
+            @Valid @RequestPart UserReqDto userReqDto
+    ) {
+        UserResDto userSignup = userService.userSignup(userReqDto.getEmail(), userReqDto.getPassword(), userReqDto.getName(),file);
 
         return new ResponseEntity<>(new CommonResDto<>("사용자 회원가입 완료", userSignup), HttpStatus.CREATED);
     }

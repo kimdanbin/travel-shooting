@@ -32,7 +32,7 @@ public class UserService {
     private final S3Service s3Service;
 
     @Transactional
-    public UserResDto userSignup(String email, String password, String name) {
+    public UserResDto userSignup(String email, String password, String name, MultipartFile file) {
         Optional<User> optionalUser = userRepository.findByEmail(email);
 
         if (optionalUser.isPresent()) {
@@ -40,16 +40,25 @@ public class UserService {
         }
 
         String encodedPassword = passwordEncoder.encode(password);
+        String fileUrl = "";
 
-        User user = new User(email, encodedPassword, name, UserRole.USER);
+        if (file != null) {
+            try {
+                fileUrl = s3Service.uploadFile(file);
+            } catch (Exception e) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+            }
+        }
+
+        User user = new User(email, encodedPassword, name, UserRole.USER, fileUrl);
         User savedUser = userRepository.save(user);
 
         return new UserResDto(
-            savedUser.getId(),
-            savedUser.getEmail(),
-            savedUser.getName(),
-            savedUser.getRole(),
-            savedUser.getImageUrl()
+                savedUser.getId(),
+                savedUser.getEmail(),
+                savedUser.getName(),
+                savedUser.getRole(),
+                savedUser.getImageUrl()
         );
     }
 
@@ -65,7 +74,7 @@ public class UserService {
 
         // 사용자 인증 후 인증 객체를 저장
         Authentication authentication = this.authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(email, password));
+                new UsernamePasswordAuthenticationToken(email, password));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
@@ -129,15 +138,16 @@ public class UserService {
     // 비밀번호 비교
     public boolean verifyPassword(Long userId, PasswordVrfReqDto requestDto) {
         User user = userRepository.findById(userId)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 ID의 사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 ID의 사용자를 찾을 수 없습니다."));
 
-        
+
         return passwordEncoder.matches(requestDto.getPassword(), user.getPassword());
     }
+
     @Transactional
     public void deleteUser(Long userId) {
         User user = userRepository.findById(userId)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 ID의 사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 ID의 사용자를 찾을 수 없습니다."));
 
         userRepository.delete(user);
     }
@@ -168,11 +178,11 @@ public class UserService {
         }
 
         return new UserResDto(
-            user.getId(),
-            user.getEmail(),
-            user.getName(),
-            user.getRole(),
-            user.getImageUrl()
+                user.getId(),
+                user.getEmail(),
+                user.getName(),
+                user.getRole(),
+                user.getImageUrl()
         );
     }
 
