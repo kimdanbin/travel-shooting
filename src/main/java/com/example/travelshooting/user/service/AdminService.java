@@ -1,6 +1,7 @@
 package com.example.travelshooting.user.service;
 
 import com.example.travelshooting.enums.UserRole;
+import com.example.travelshooting.s3.S3Service;
 import com.example.travelshooting.user.dto.UserResDto;
 import com.example.travelshooting.user.entity.User;
 import com.example.travelshooting.user.repository.UserRepository;
@@ -9,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
@@ -19,9 +21,10 @@ public class AdminService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final S3Service s3Service;
 
     @Transactional
-    public UserResDto adminSignup(String email, String password, String name) {
+    public UserResDto adminSignup(String email, String password, String name, MultipartFile file) {
         Optional<User> optionalUser = userRepository.findByEmail(email);
 
         if (optionalUser.isPresent()) {
@@ -29,8 +32,17 @@ public class AdminService {
         }
 
         String encodedPassword = passwordEncoder.encode(password);
+        String fileUrl = "";
 
-        User user = new User(email, encodedPassword, name, UserRole.ADMIN);
+        if (file != null) {
+            try {
+                fileUrl = s3Service.uploadFile(file);
+            } catch (Exception e) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+            }
+        }
+
+        User user = new User(email, encodedPassword, name, UserRole.ADMIN, fileUrl);
         User savedUser = userRepository.save(user);
 
         return new UserResDto(

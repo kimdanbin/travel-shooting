@@ -40,20 +40,18 @@ public class UserService {
         }
 
         String encodedPassword = passwordEncoder.encode(password);
+        String fileUrl = "";
 
-        User user = new User(email, encodedPassword, name, UserRole.USER);
-        User savedUser = userRepository.save(user);
-
-        // 만약 파일이 있으면 이미지 추가
-        if (!file.isEmpty()) {
+        if (file != null) {
             try {
-                String fileUrl = s3Service.uploadFile(file);
-                savedUser.updateImage(fileUrl);
-                userRepository.save(savedUser);
+                fileUrl = s3Service.uploadFile(file);
             } catch (Exception e) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
             }
         }
+
+        User user = new User(email, encodedPassword, name, UserRole.USER, fileUrl);
+        User savedUser = userRepository.save(user);
 
         return new UserResDto(
                 savedUser.getId(),

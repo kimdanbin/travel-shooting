@@ -71,6 +71,16 @@ public class User extends BaseEntity {
         this.role = role;
     }
 
+    public User(String email, String password, String name, UserRole role, String imageUrl) {
+        this.email = email;
+        this.password = password;
+        this.name = name;
+        this.role = role;
+        if (!imageUrl.isEmpty()) {
+            this.imageUrl = imageUrl;
+        }
+    }
+
     public void updateRole() {
         this.role = UserRole.PARTNER;
     }
