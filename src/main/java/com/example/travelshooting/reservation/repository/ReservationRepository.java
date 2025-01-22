@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -44,4 +45,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             "INNER JOIN p.company c " +
             "WHERE p.id = :productId AND c.user.id = :userId AND r.id = :reservationId")
     Reservation findReservationByProductIdAndUserIdAndId(@Param("productId") Long productId, @Param("userId") Long userId, @Param("reservationId") Long reservationId);
+
+    @Query("SELECT r FROM Reservation r WHERE r.updatedAt <= :expirationTime AND r.status = 'APPROVED' AND r.isDeleted = false")
+    List<Reservation> findExpiredReservations(@Param("expirationTime") LocalDateTime expirationTime);
 }
