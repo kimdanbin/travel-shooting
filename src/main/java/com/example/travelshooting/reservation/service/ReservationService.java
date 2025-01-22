@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -124,5 +125,14 @@ public class ReservationService {
 
     public Reservation findReservationByUserIdAndProductIdAndId(Long userId, Long productId, Long reservationId) {
         return reservationRepository.findReservationByUserIdAndProductIdAndId(userId, productId, reservationId);
+    }
+
+    public List<Reservation> cancelExpiredReservations() {
+        LocalDateTime expirationTime = LocalDateTime.now().minusDays(1).withHour(18).withMinute(0).withSecond(0);
+        List<Reservation> expiredReservations = reservationRepository.findExpiredReservations(expirationTime);
+
+        expiredReservations.forEach(reservation -> reservation.updateExpiredReservations());
+
+        return reservationRepository.saveAll(expiredReservations);
     }
 }
