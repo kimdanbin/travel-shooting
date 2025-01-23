@@ -11,9 +11,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RequiredArgsConstructor
 @RestController
 @RequestMapping("/admins/reports")
+@RequiredArgsConstructor
 public class ReportAdminController {
 
     private final ReportService reportService;

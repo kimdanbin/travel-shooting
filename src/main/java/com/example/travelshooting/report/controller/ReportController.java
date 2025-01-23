@@ -10,9 +10,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@RequiredArgsConstructor
 @RestController
 @RequestMapping("/posters/{posterId}")
+@RequiredArgsConstructor
 public class ReportController {
 
     private final ReportService reportService;
