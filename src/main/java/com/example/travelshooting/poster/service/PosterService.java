@@ -15,6 +15,7 @@ import com.example.travelshooting.user.entity.User;
 import com.example.travelshooting.user.service.UserService;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.QueryResults;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -72,7 +73,7 @@ public class PosterService {
     }
 
     // 포스터 전체 조회
-    public Page<PosterResDto> findAll(Integer minExpenses, Integer maxExpenses, LocalDate travelStartAt, LocalDate travelEndAt, Integer minDays, Integer maxDays, Integer month, Pageable pageable) {
+    public Page<PosterResDto> findAll(Integer minExpenses, Integer maxExpenses, LocalDate travelStartAt, LocalDate travelEndAt, Integer days, Integer month, Pageable pageable) {
         QPoster poster = QPoster.poster;
         QLikePoster likePoster = QLikePoster.likePoster;
 
@@ -97,6 +98,14 @@ public class PosterService {
         if (month != null) {
             conditions.and(poster.travelStartAt.month().eq(month));
         }
+        if (days != null) {
+            conditions.and(
+                Expressions.numberTemplate(Long.class, "DATEDIFF({0}, {1})",
+                    poster.travelEndAt, poster.travelStartAt
+                ).eq((long) days - 1) // 5일이면 DATEDIFF는 4로 계산됨 (종료일 - 시작일)
+            );
+        }
+
 
         QueryResults<PosterResDto> queryResults = jpaQueryFactory
             .select(new QPosterResDto(
