@@ -35,7 +35,8 @@ public class ProductController {
                 createProductReqDto.getDescription(),
                 createProductReqDto.getPrice(),
                 createProductReqDto.getAddress(),
-                createProductReqDto.getQuantity()
+                createProductReqDto.getSaleStartAt(),
+                createProductReqDto.getSaleEndAt()
         );
 
         return new ResponseEntity<>(new CommonResDto<>("레저/티켓 생성 완료", result), HttpStatus.CREATED);
@@ -94,7 +95,8 @@ public class ProductController {
                 updateProductReqDto.getDescription(),
                 updateProductReqDto.getPrice(),
                 updateProductReqDto.getAddress(),
-                updateProductReqDto.getQuantity()
+                updateProductReqDto.getSaleStartAt(),
+                updateProductReqDto.getSaleEndAt()
                 );
 
         return new ResponseEntity<>(new CommonResDto<>("레저/티켓 수정 완료", result), HttpStatus.OK);

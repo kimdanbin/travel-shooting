@@ -23,10 +23,9 @@ public class PartService {
     private final PartRepository partRepository;
     private final UserService userService;
 
-    public PartResDto createPart(Long productId, LocalTime openAt, LocalTime closeAt, Integer headCount) {
+    public PartResDto createPart(Long productId, LocalTime openAt, LocalTime closeAt, Integer maxQuantity) {
         User user = userService.findAuthenticatedUser();
         Product product = productService.findProductByProductIdAndUserId(productId, user.getId());
-        Integer totalHeadCount = partRepository.findTotalHeadCountByProductId(product.getId());
 
         if (product == null) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "업체의 소유자만 일정을 등록할 수 있습니다.");
@@ -37,27 +36,21 @@ public class PartService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "해당 일정이 이미 존재합니다.");
         }
 
-        if (product.getQuantity() < totalHeadCount + headCount) {
-            Integer overHeadCount = Math.abs(product.getQuantity() - totalHeadCount - headCount);
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "등록하려는 인원 수가 사용 가능한 상품의 수량을 "+overHeadCount+"만큼 초과했습니다.");
-        }
-
-        Part part = new Part(openAt, closeAt, headCount, product);
+        Part part = new Part(openAt, closeAt, maxQuantity, product);
         Part savedPart = partRepository.save(part);
 
         return new PartResDto(
                 savedPart.getId(),
                 savedPart.getOpenAt(),
                 savedPart.getCloseAt(),
-                savedPart.getHeadCount()
+                savedPart.getMaxQuantity()
         );
     }
 
     @Transactional
-    public PartResDto updatePart(Long productId, Long partId, LocalTime openAt, LocalTime closeAt, Integer headCount) {
+    public PartResDto updatePart(Long productId, Long partId, LocalTime openAt, LocalTime closeAt, Integer maxQuantity) {
         Product product = productService.findProductById(productId);
         User user = userService.findAuthenticatedUser();
-        Integer totalHeadCount = partRepository.findTotalHeadCountByProductId(product.getId());
         Part part = partRepository.findPartById(partId);
         // 일정을 수정하려는 사람이 해당 업체의 소유자인지 확인
         Part findPart = partRepository.findPartByProductIdAndUserIdAndId(product.getId(), user.getId(), partId);
@@ -70,19 +63,14 @@ public class PartService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "해당 일정이 이미 존재합니다.");
         }
 
-        if (product.getQuantity() < totalHeadCount - part.getHeadCount() + headCount) {
-            Integer overHeadCount = Math.abs(product.getQuantity() - totalHeadCount + part.getHeadCount() - headCount);
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정하려는 인원 수가 사용 가능한 상품의 수량을 "+overHeadCount+"만큼 초과했습니다.");
-        }
-
-        findPart.updatePart(openAt, closeAt, headCount);
+        findPart.updatePart(openAt, closeAt, maxQuantity);
         partRepository.save(findPart);
 
         return new PartResDto(
                 findPart.getId(),
                 findPart.getOpenAt(),
                 findPart.getCloseAt(),
-                findPart.getHeadCount()
+                findPart.getMaxQuantity()
         );
     }
 

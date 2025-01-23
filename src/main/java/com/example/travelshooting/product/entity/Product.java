@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,8 +42,14 @@ public class Product extends BaseEntity {
     @Column(nullable = false, length = 200)
     private String address;
 
+//    @Column(nullable = false)
+//    private Integer quantity;
+
     @Column(nullable = false)
-    private Integer quantity;
+    private LocalDate saleStartAt;
+
+    @Column(nullable = false)
+    private LocalDate saleEndAt;
 
     private boolean isDeleted = false;
 
@@ -52,19 +59,21 @@ public class Product extends BaseEntity {
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Part> parts = new ArrayList<>();
 
-    public Product(String name, String description, Integer price, String address, Integer quantity, Company company) {
+    public Product(String name, String description, Integer price, String address, LocalDate saleStartAt, LocalDate saleEndAt, Company company) {
         this.name = name;
         this.description = description;
         this.price = price;
         this.address = address;
-        this.quantity = quantity;
+        this.saleStartAt = saleStartAt;
+        this.saleEndAt = saleEndAt;
         this.company = company;
     }
 
-    public void updateProduct(String description, Integer price, String address, Integer quantity) {
+    public void updateProduct(String description, Integer price, String address, LocalDate saleStartAt, LocalDate saleEndAt) {
         this.description = description;
         this.price = price;
         this.address = address;
-        this.quantity = quantity;
+        this.saleStartAt = saleStartAt;
+        this.saleEndAt = saleEndAt;
     }
 }
