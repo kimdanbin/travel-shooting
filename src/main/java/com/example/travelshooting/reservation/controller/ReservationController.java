@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/products/{productId}/reservations")
+@RequiredArgsConstructor
 public class ReservationController {
 
     private final ReservationService reservationService;
@@ -35,7 +35,7 @@ public class ReservationController {
                                                     @PathVariable Long reservationId) {
         reservationService.deleteReservation(productId, reservationId);
 
-        return new ResponseEntity<>("레저/티켓 예약 취소 완료", HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>("레저/티켓 예약 취소 완료", HttpStatus.OK);
     }
 
     // 예약 전체 조회

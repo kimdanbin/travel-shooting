@@ -12,8 +12,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/leisure/{leisureId}/attachments")
+@RequiredArgsConstructor
 public class LeisureFileController {
 
     private final LeisureFileService leisureFileService;

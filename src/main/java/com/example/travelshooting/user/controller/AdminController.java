@@ -12,20 +12,20 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/admins")
+@RequiredArgsConstructor
 public class AdminController {
 
-  private final AdminService adminService;
+    private final AdminService adminService;
 
-  // 관리자 회원가입
-  @PostMapping
-  public ResponseEntity<CommonResDto<UserResDto>> adminSignup(
-          @RequestPart MultipartFile file,
-          @Valid @RequestBody UserReqDto userReqDto
-  ) {
-    UserResDto adminSignup = adminService.adminSignup(userReqDto.getEmail(), userReqDto.getPassword(), userReqDto.getName(), file);
+    // 관리자 회원가입
+    @PostMapping
+    public ResponseEntity<CommonResDto<UserResDto>> adminSignup(
+            @RequestPart MultipartFile file,
+            @Valid @RequestBody UserReqDto userReqDto
+    ) {
+        UserResDto adminSignup = adminService.adminSignup(userReqDto.getEmail(), userReqDto.getPassword(), userReqDto.getName(), file);
 
-    return new ResponseEntity<>(new CommonResDto<>("관리자 회원가입 완료", adminSignup), HttpStatus.CREATED);
-  }
+        return new ResponseEntity<>(new CommonResDto<>("관리자 회원가입 완료", adminSignup), HttpStatus.CREATED);
+    }
 }

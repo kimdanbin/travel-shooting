@@ -7,15 +7,13 @@ import com.example.travelshooting.report.service.ReportService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
+@RequestMapping("/admins/reports")
 public class ReportAdminController {
 
     private final ReportService reportService;
@@ -25,7 +23,7 @@ public class ReportAdminController {
      *
      * @return 전체 신고 내역. 성공시 상태코드 200 반환
      */
-    @GetMapping("/admins/reports")
+    @GetMapping
     public ResponseEntity<CommonListResDto<ReportResDto>> findAllReport(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
@@ -42,7 +40,7 @@ public class ReportAdminController {
      * @param reportId 조회할 신고 id
      * @return 조회된 신고 내역. 성공시 상태코드 200 반환
      */
-    @GetMapping("/admins/reports/{reportId}")
+    @GetMapping("/{reportId}")
     public ResponseEntity<CommonResDto<ReportResDto>> findReport(@PathVariable Long reportId) {
         ReportResDto result = reportService.findReport(reportId);
 

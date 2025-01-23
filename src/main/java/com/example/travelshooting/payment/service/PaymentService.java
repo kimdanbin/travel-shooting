@@ -82,6 +82,11 @@ public class PaymentService {
                 reservation.getId()
         );
 
+        String cancelUrl = String.format(
+                kakaoPayCancelUrl,
+                payment.getId()
+        );
+
         Map<String, String> body = new HashMap<>();
         body.put("cid", Const.KAKAO_PAY_TEST_CID);
         body.put("partner_order_id", reservation.getId().toString());
@@ -91,7 +96,7 @@ public class PaymentService {
         body.put("total_amount", String.valueOf(reservation.getTotalPrice()));
         body.put("tax_free_amount", "0");
         body.put("approval_url", approvalUrl);
-        body.put("cancel_url", kakaoPayCancelUrl);
+        body.put("cancel_url", cancelUrl);
         body.put("fail_url", kakaoPayFailUrl);
 
         HttpHeaders headers = getHttpHeaders();
@@ -128,7 +133,7 @@ public class PaymentService {
     }
 
     // 최종적으로 결제 완료 처리를 하는 단계
-    public PaymentAproveResDto payApprove(Long productId, Long reservationId, String pgToken) {
+    public PaymentAproveResDto payCompleted(Long productId, Long reservationId, String pgToken) {
         Product product = productService.findProductById(productId);
         Payment payment = paymentRepository.findByReservationId(reservationId);
         Reservation reservation = reservationService.findReservationByUserIdAndProductIdAndId(payment.getPartnerUserId(), product.getId(), reservationId);

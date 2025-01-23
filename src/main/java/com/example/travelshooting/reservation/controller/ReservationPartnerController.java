@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/partners/products/{productId}/reservations")
+@RequiredArgsConstructor
 public class ReservationPartnerController {
 
     private final ReservationPartnerService reservationPartnerService;

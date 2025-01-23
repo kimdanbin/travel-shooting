@@ -15,8 +15,8 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/posters/{posterId}/comments")
+@RequiredArgsConstructor
 public class CommentController {
 
     private final CommentService commentService;
@@ -56,7 +56,7 @@ public class CommentController {
 
         CommentResDto commentResDto = commentService.updateComment(commentId, commentReqDto.getContent());
 
-        return new ResponseEntity<>(new CommonResDto<>("댓글 수정 완료", commentResDto), HttpStatus.CREATED);
+        return new ResponseEntity<>(new CommonResDto<>("댓글 수정 완료", commentResDto), HttpStatus.OK);
     }
 
     //댓글 삭제
@@ -72,7 +72,7 @@ public class CommentController {
 
         commentService.deleteComment(commentId);
 
-        return new ResponseEntity<>("댓글 삭제 완료", HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>("댓글 삭제 완료", HttpStatus.OK);
     }
 
 }

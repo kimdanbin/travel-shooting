@@ -11,9 +11,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-
-@RequiredArgsConstructor
 @RestController
+@RequestMapping("/partners/products/{productId}/parts")
+@RequiredArgsConstructor
 public class PartController {
 
     private final PartService partService;
@@ -25,7 +25,7 @@ public class PartController {
      * @param createPartReqDto 생성할 일정의 정보를 담고있는 dto
      * @return 생성된 일정의 정보를 담고 있는 dto. 성공시 상태코드 201 반환
      */
-    @PostMapping("/partners/products/{productId}/parts")
+    @PostMapping
     public ResponseEntity<CommonResDto<PartResDto>> createPart (
             @PathVariable Long productId,
             @Valid @RequestBody CreatePartReqDto createPartReqDto
@@ -42,7 +42,7 @@ public class PartController {
      * @param updatePartReqDto 수정할 레저/티켓 일정의 정보를 담고 있는 dto
      * @return 수정된 레저/티켓 일정의 정보를 담고 있는 dto. 성공시 상태코드 200 반환
      */
-    @PatchMapping("/partners/products/{productId}/parts/{partId}")
+    @PatchMapping("/{partId}")
     public ResponseEntity<CommonResDto<PartResDto>> updatePart (
             @PathVariable Long productId,
             @PathVariable Long partId,
@@ -59,7 +59,7 @@ public class PartController {
      * @param partId 삭제할 레저/티켓 일정의 id
      * @return 삭제 성공 시, 메시지와 함께 상태코드 200 반환
      */
-    @DeleteMapping("/partners/products/{productId}/parts/{partId}")
+    @DeleteMapping("/{partId}")
     public ResponseEntity<String> deletePart(@PathVariable Long productId, @PathVariable Long partId) {
         partService.deletePart(productId, partId);
 

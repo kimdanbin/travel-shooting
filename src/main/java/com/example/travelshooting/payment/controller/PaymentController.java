@@ -16,7 +16,7 @@ public class PaymentController {
     private final PaymentService paymentService;
 
     // 결제 준비
-    @PostMapping("/products/{productId}/reservations/{reservationId}/payment/ready")
+    @PostMapping("/products/{productId}/reservations/{reservationId}/payments/ready")
     public ResponseEntity<CommonResDto<PaymentReadyResDto>> payReady(@PathVariable Long productId,
                                                                      @PathVariable Long reservationId) {
         PaymentReadyResDto payReady = paymentService.payReady(productId, reservationId);
@@ -25,23 +25,23 @@ public class PaymentController {
     }
 
     // 결제 승인
-    @GetMapping("/products/{productId}/reservations/{reservationId}/payment/completed")
-    public ResponseEntity<CommonResDto<PaymentAproveResDto>> payApprove(@PathVariable Long productId,
+    @GetMapping("/products/{productId}/reservations/{reservationId}/payments/completed")
+    public ResponseEntity<CommonResDto<PaymentAproveResDto>> payCompleted(@PathVariable Long productId,
                                                                           @PathVariable Long reservationId,
                                                                           @RequestParam("pg_token") String pgToken) {
-        PaymentAproveResDto payApprove = paymentService.payApprove(productId, reservationId, pgToken);
+        PaymentAproveResDto payApprove = paymentService.payCompleted(productId, reservationId, pgToken);
 
         return new ResponseEntity<>(new CommonResDto<>("결제 승인 완료", payApprove), HttpStatus.OK);
     }
 
     // 결제 취소
-    @GetMapping("payment/cancel")
+    @GetMapping("/payments/{paymentId}/cancel")
     public ResponseEntity<String> payCancel() {
         return ResponseEntity.ok("결제 취소");
     }
 
     // 결제 실패
-    @GetMapping("payment/fail")
+    @GetMapping("payments/fail")
     public ResponseEntity<String> payFail() {
         return ResponseEntity.ok("결제 실패");
     }

@@ -17,8 +17,8 @@ import java.time.LocalDate;
 import java.util.List;
 
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/posters")
+@RequiredArgsConstructor
 public class PosterController {
     private final PosterService posterService;
 
@@ -97,6 +97,6 @@ public class PosterController {
 
         posterService.deletePoster(posterId);
 
-        return new ResponseEntity<>("포스터 삭제 완료", HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>("포스터 삭제 완료", HttpStatus.OK);
     }
 }

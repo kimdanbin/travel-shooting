@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/users")
+@RequiredArgsConstructor
 public class UserController {
 
     private final UserService userService;
@@ -23,7 +23,7 @@ public class UserController {
             @RequestPart(required = false) MultipartFile file,
             @Valid @RequestPart UserReqDto userReqDto
     ) {
-        UserResDto userSignup = userService.userSignup(userReqDto.getEmail(), userReqDto.getPassword(), userReqDto.getName(),file);
+        UserResDto userSignup = userService.userSignup(userReqDto.getEmail(), userReqDto.getPassword(), userReqDto.getName(), file);
 
         return new ResponseEntity<>(new CommonResDto<>("사용자 회원가입 완료", userSignup), HttpStatus.CREATED);
     }
@@ -57,13 +57,13 @@ public class UserController {
 //            @RequestBody PasswordVrfReqDto requestDto) {
 //        userService.deleteUser(userId, requestDto);
 //
-//        return ResponseEntity.ok("회원 탈퇴 성공");
+//        return new ResponseEntity<>("회원 탈퇴 성공", HttpStatus.OK);
 //    }
     // 비밀번호 확인
     @PostMapping("/{userId}/verify-password")
     public ResponseEntity<String> verifyPassword(
-        @PathVariable Long userId,
-        @RequestBody PasswordVrfReqDto reqDto) {
+            @PathVariable Long userId,
+            @RequestBody PasswordVrfReqDto reqDto) {
         boolean isVerified = userService.verifyPassword(userId, reqDto);
 
         if (isVerified) {
@@ -77,7 +77,8 @@ public class UserController {
     @DeleteMapping("/{userId}")
     public ResponseEntity<String> deleteUser(@PathVariable Long userId) {
         userService.deleteUser(userId);
-        return ResponseEntity.ok("회원 탈퇴 성공");
+
+        return new ResponseEntity<>("회원 탈퇴 성공", HttpStatus.OK);
     }
 
 
@@ -89,7 +90,7 @@ public class UserController {
 
         userService.changePassword(userId, passwordRequestDto);
 
-        return ResponseEntity.ok("비밀번호 변경 완료");
+        return new ResponseEntity<>("비밀번호 변경 완료", HttpStatus.OK);
     }
 //    @PostMapping("/refresh")
 //    public ResponseEntity<CommonResDto<TokenDto>> refreshAccessToken(@Valid @RequestBody TokenDto dto) {
@@ -103,8 +104,8 @@ public class UserController {
     @PostMapping("/{userId}/attachments")
     public ResponseEntity<CommonResDto<UserResDto>> uploadFile(@PathVariable Long userId,
                                                                @RequestParam MultipartFile file) {
-      UserResDto user = userService.uploadFile(userId, file);
+        UserResDto user = userService.uploadFile(userId, file);
 
-      return new ResponseEntity<>(new CommonResDto<>("파일 업로드 완료", user), HttpStatus.OK);
+        return new ResponseEntity<>(new CommonResDto<>("파일 업로드 완료", user), HttpStatus.OK);
     }
 }
