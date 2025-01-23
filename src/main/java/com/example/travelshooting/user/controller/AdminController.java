@@ -21,7 +21,7 @@ public class AdminController {
     // 관리자 회원가입
     @PostMapping
     public ResponseEntity<CommonResDto<UserResDto>> adminSignup(
-            @RequestPart MultipartFile file,
+            @RequestPart(required = false) MultipartFile file,
             @Valid @RequestBody UserReqDto userReqDto
     ) {
         UserResDto adminSignup = adminService.adminSignup(userReqDto.getEmail(), userReqDto.getPassword(), userReqDto.getName(), file);
