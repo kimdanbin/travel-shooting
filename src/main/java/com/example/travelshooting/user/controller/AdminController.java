@@ -22,7 +22,7 @@ public class AdminController {
     @PostMapping
     public ResponseEntity<CommonResDto<UserResDto>> adminSignup(
             @RequestPart(required = false) MultipartFile file,
-            @Valid @RequestBody UserReqDto userReqDto
+            @Valid @RequestPart UserReqDto userReqDto
     ) {
         UserResDto adminSignup = adminService.adminSignup(userReqDto.getEmail(), userReqDto.getPassword(), userReqDto.getName(), file);
 
