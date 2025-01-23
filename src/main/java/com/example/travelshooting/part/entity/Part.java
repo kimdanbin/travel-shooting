@@ -36,24 +36,24 @@ public class Part extends BaseEntity {
     private LocalTime closeAt;
 
     @Column(nullable = false)
-    private Integer headCount;
+    private Integer maxQuantity;
 
     private boolean isDeleted = false;
 
     @OneToMany(mappedBy = "part", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Reservation> reservations = new ArrayList<>();
 
-    public Part(LocalTime openAt, LocalTime closeAt,  Integer headCount, Product product) {
+    public Part(LocalTime openAt, LocalTime closeAt,  Integer maxQuantity, Product product) {
         this.openAt = openAt;
         this.closeAt = closeAt;
-        this.headCount = headCount;
+        this.maxQuantity = maxQuantity;
         this.product = product;
     }
 
-    public void updatePart(LocalTime openAt, LocalTime closeAt,  int headCount) {
+    public void updatePart(LocalTime openAt, LocalTime closeAt,  int maxQuantity) {
         this.openAt = openAt;
         this.closeAt = closeAt;
-        this.headCount = headCount;
+        this.maxQuantity = maxQuantity;
     }
 
 }

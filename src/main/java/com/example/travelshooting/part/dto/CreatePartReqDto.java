@@ -20,6 +20,6 @@ public class CreatePartReqDto {
     private final LocalTime closeAt;
 
     @NotNull(message = "인원을 입력해주세요.")
-    private final Integer headCount;
+    private final Integer maxQuantity;
 
 }

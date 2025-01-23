@@ -26,7 +26,4 @@ public interface PartRepository extends JpaRepository<Part, Long> {
             "WHERE p.id = :productId AND c.user.id = :userId AND pa.id = :partId")
     Part findPartByProductIdAndUserIdAndId(@Param("productId") Long productId, @Param("userId") Long userId, @Param("partId") Long partId);
 
-    @Query("SELECT COALESCE(SUM(p.headCount), 0) FROM Part p WHERE p.product.id = :productId")
-    Integer findTotalHeadCountByProductId(@Param("productId") Long productId);
-
 }

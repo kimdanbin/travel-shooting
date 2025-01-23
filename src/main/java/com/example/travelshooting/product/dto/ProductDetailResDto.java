@@ -5,6 +5,7 @@ import com.example.travelshooting.part.dto.PartResDto;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -18,7 +19,8 @@ public class ProductDetailResDto implements BaseDtoDataType {
     private final String description;
     private final Integer price;
     private final String address;
-    private final Integer quantity;
+    private final LocalDate saleStartAt;
+    private final LocalDate saleEndAt;
     private final LocalDateTime createdAt;
     private final LocalDateTime updatedAt;
     private final List<PartResDto> parts;

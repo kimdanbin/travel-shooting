@@ -37,8 +37,8 @@ public class ReservationService {
 
         Integer totalHeadCount = reservationRepository.findTotalHeadCountByPartId(part.getId());
 
-        if (part.getHeadCount() < totalHeadCount + headCount) {
-            Integer overHeadCount = Math.abs(part.getHeadCount() - totalHeadCount - headCount);
+        if (part.getMaxQuantity() < totalHeadCount + headCount) {
+            Integer overHeadCount = Math.abs(part.getMaxQuantity() - totalHeadCount - headCount);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "신청 가능한 인원을 초과했습니다. 초과된 인원: " + overHeadCount);
         }
 

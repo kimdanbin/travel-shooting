@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,7 +33,7 @@ public class ProductService {
     private final UserService userService;
 
     @Transactional
-    public CreateProductResDto createProduct(Long companyId, String name, String description, Integer price, String address, Integer quantity) {
+    public CreateProductResDto createProduct(Long companyId, String name, String description, Integer price, String address, LocalDate saleStartAt, LocalDate saleEndAt) {
         User user = userService.findAuthenticatedUser();
         Company company = companyService.findCompanyByIdAndUserId(companyId, user.getId());
         if (company == null) {
@@ -44,7 +45,7 @@ public class ProductService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "같은 업체에서 동일한 이름의 상품을 중복 등록할 수 없습니다.");
         }
 
-        Product product = new Product(name, description, price, address, quantity, company);
+        Product product = new Product(name, description, price, address, saleStartAt, saleEndAt, company);
         productRepository.save(product);
 
         return new CreateProductResDto(
@@ -54,7 +55,8 @@ public class ProductService {
                 product.getDescription(),
                 product.getPrice(),
                 product.getAddress(),
-                product.getQuantity(),
+                product.getSaleStartAt(),
+                product.getSaleEndAt(),
                 product.getCreatedAt(),
                 product.getUpdatedAt()
         );
@@ -80,7 +82,8 @@ public class ProductService {
                         product.getDescription(),
                         product.getPrice(),
                         product.getAddress(),
-                        product.getQuantity(),
+                        product.getSaleStartAt(),
+                        product.getSaleEndAt(),
                         product.getCreatedAt(),
                         product.getUpdatedAt()
                 ))
@@ -95,7 +98,7 @@ public class ProductService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 업체가 가진 해당 ID의 상품이 없습니다.");
         }
         List<PartResDto> parts = findProduct.getParts().stream()
-                .map(part -> new PartResDto(part.getId(), part.getOpenAt(), part.getCloseAt(), part.getHeadCount()))
+                .map(part -> new PartResDto(part.getId(), part.getOpenAt(), part.getCloseAt(), part.getMaxQuantity()))
                 .collect(Collectors.toList());
 
         return new ProductDetailResDto(
@@ -105,7 +108,8 @@ public class ProductService {
                 findProduct.getDescription(),
                 findProduct.getPrice(),
                 findProduct.getAddress(),
-                findProduct.getQuantity(),
+                findProduct.getSaleStartAt(),
+                findProduct.getSaleEndAt(),
                 findProduct.getCreatedAt(),
                 findProduct.getUpdatedAt(),
                 parts
@@ -114,7 +118,7 @@ public class ProductService {
 
 
     @Transactional
-    public UpdateProductResDto updateProduct(Long companyId, Long productId, String description, Integer price, String address, Integer quantity) {
+    public UpdateProductResDto updateProduct(Long companyId, Long productId, String description, Integer price, String address, LocalDate saleStartAt, LocalDate saleEndAt) {
         Product findProduct = productRepository.findByCompanyIdAndId(companyId, productId);
         if (findProduct == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 업체가 가진 해당 ID의 상품이 없습니다.");
@@ -125,7 +129,7 @@ public class ProductService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "업체의 소유자만 상품을 수정할 수 있습니다.");
         }
 
-        findProduct.updateProduct(description, price, address, quantity);
+        findProduct.updateProduct(description, price, address, saleStartAt, saleEndAt);
         productRepository.save(findProduct);
 
         return new UpdateProductResDto(
@@ -135,7 +139,8 @@ public class ProductService {
                 findProduct.getDescription(),
                 findProduct.getPrice(),
                 findProduct.getAddress(),
-                findProduct.getQuantity(),
+                findProduct.getSaleStartAt(),
+                findProduct.getSaleEndAt(),
                 findProduct.getCreatedAt(),
                 findProduct.getUpdatedAt()
         );

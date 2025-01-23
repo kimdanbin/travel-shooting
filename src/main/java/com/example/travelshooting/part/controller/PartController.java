@@ -30,7 +30,7 @@ public class PartController {
             @PathVariable Long productId,
             @Valid @RequestBody CreatePartReqDto createPartReqDto
     ) {
-        PartResDto result = partService.createPart(productId, createPartReqDto.getOpenAt(),createPartReqDto.getCloseAt(),createPartReqDto.getHeadCount());
+        PartResDto result = partService.createPart(productId, createPartReqDto.getOpenAt(),createPartReqDto.getCloseAt(),createPartReqDto.getMaxQuantity());
 
         return new ResponseEntity<>(new CommonResDto<>("레저/티켓 일정 등록 완료", result), HttpStatus.CREATED);
     }
@@ -48,7 +48,7 @@ public class PartController {
             @PathVariable Long partId,
             @Valid @RequestBody UpdatePartReqDto updatePartReqDto
     ) {
-        PartResDto result = partService.updatePart(productId, partId, updatePartReqDto.getOpenAt(),updatePartReqDto.getCloseAt(),updatePartReqDto.getHeadCount());
+        PartResDto result = partService.updatePart(productId, partId, updatePartReqDto.getOpenAt(),updatePartReqDto.getCloseAt(),updatePartReqDto.getMaxQuantity());
 
         return new ResponseEntity<>(new CommonResDto<>("레저/티켓 일정 수정 완료", result), HttpStatus.OK);
     }
