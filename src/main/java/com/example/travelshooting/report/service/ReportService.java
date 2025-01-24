@@ -55,7 +55,7 @@ public class ReportService {
         if (reportCount >= Const.REPORT_COUNT && report.getType().equals(ReportType.POSTER)){
             List<CommentResDto> comments = commentService.findComments(posterId);
             for (CommentResDto comment : comments) {
-                commentService.deleteComment(comment.getId()); // 관련 댓글 먼저 soft delete 처리
+                commentService.deleteComment(posterId, comment.getId()); // 관련 댓글 먼저 soft delete 처리
             }
             posterService.deletePoster(posterId);
         }
@@ -89,7 +89,7 @@ public class ReportService {
         int reportCount = reportRepository.countByFkIdAndType(commentId,ReportType.COMMENT);
 
         if (reportCount >= Const.REPORT_COUNT && report.getType().equals(ReportType.COMMENT)) {
-            commentService.deleteComment(commentId);
+            commentService.deleteComment(findComment.getPoster().getId() , commentId);
         }
 
         return new ReportResDto(
