@@ -157,6 +157,11 @@ public class ProductService {
         if (product == null) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "업체의 소유자만 상품을 삭제할 수 있습니다.");
         }
+        // 해당 상품에 일정이 존재하면 삭제할 수 없음
+        Product reservation = productRepository.findPartById(productId);
+        if(reservation != null) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "이미 일정이 존재하여 삭제할 수 없습니다.");
+        }
         productRepository.delete(findProduct);
     }
 

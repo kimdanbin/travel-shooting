@@ -29,4 +29,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             "INNER JOIN p.company c " +
             "WHERE p.id = :productId AND c.user.id = :userId")
     Product findProductByIdAndUserId(@Param("productId") Long productId, @Param("userId") Long userId);
+
+    @Query("SELECT p FROM Product p JOIN FETCH p.parts pp WHERE p.id = :productId ")
+    Product findPartById(@Param("productId") Long productId);
+
 }

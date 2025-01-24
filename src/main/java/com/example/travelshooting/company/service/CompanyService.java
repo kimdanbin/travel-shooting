@@ -103,6 +103,11 @@ public class CompanyService {
     @Transactional
     public void deleteCompany(Long companyId) {
         Company findCompany = companyRepository.findCompanyById(companyId);
+        // 해당 업체에 상품이 존재하면 삭제할 수 없음
+        Company product = companyRepository.findProductById(companyId);
+        if(product != null) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "이미 상품이 존재하여 삭제할 수 없습니다.");
+        }
         companyRepository.delete(findCompany);
     }
 
