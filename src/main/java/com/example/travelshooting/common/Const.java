@@ -10,5 +10,4 @@ public class Const {
     public static final String KAKAO_MAP_HEADER = "KakaoAK";
     public static final int REPORT_COUNT = 5;
     public static final int LOCAL_PAGE_DEFAULT = 1;
-    public static final int REFUND_MINUS_DAY = 1;
 }
