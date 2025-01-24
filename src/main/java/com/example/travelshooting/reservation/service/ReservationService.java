@@ -146,7 +146,7 @@ public class ReservationService {
         return reservationRepository.saveAll(expiredReservations);
     }
 
-    public Reservation findReservationByPaymentId(Long paymentId) {
-        return reservationRepository.findReservationByPaymentId(paymentId);
+    public Reservation findReservationByPaymentIdAndUserId(Long paymentId, Long userId) {
+        return reservationRepository.findReservationByPaymentIdAndUserId(paymentId, userId);
     }
 }
