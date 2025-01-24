@@ -48,10 +48,14 @@ public class CommentService {
 
     //댓글 수정
     @Transactional
-    public CommentResDto updateComment(Long commentId, String content) {
+    public CommentResDto updateComment(Long posterId, Long commentId, String content) {
 
         User user = userService.findAuthenticatedUser();
         Comment comment = findCommentById(commentId);
+
+        if (!isPosterIdValid(posterId, commentId)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 포스터에 없는 댓글입니다.");
+        }
 
         if (!user.getId().equals(comment.getUser().getId())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "본인이 작성한 댓글만 수정 가능합니다.");
@@ -64,10 +68,14 @@ public class CommentService {
 
     //댓글 삭제
     @Transactional
-    public void deleteComment(Long commentId) {
+    public void deleteComment(Long posterId, Long commentId) {
 
         User user = userService.findAuthenticatedUser();
         Comment comment = findCommentById(commentId);
+
+        if (!isPosterIdValid(posterId, commentId)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 포스터에 없는 댓글입니다.");
+        }
 
         // 관리자가 아니거나 본인이 작성한 포스터가 아닐 경우
         if (!user.getRole().equals(UserRole.ADMIN) && !user.getId().equals(comment.getUser().getId())) {

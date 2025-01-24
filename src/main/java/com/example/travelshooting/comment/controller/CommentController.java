@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -50,11 +49,7 @@ public class CommentController {
             @Valid @RequestBody CommentReqDto commentReqDto
     ) {
 
-        if (!commentService.isPosterIdValid(posterId, commentId)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 포스터에 없는 댓글입니다.");
-        }
-
-        CommentResDto commentResDto = commentService.updateComment(commentId, commentReqDto.getContent());
+        CommentResDto commentResDto = commentService.updateComment(posterId, commentId, commentReqDto.getContent());
 
         return new ResponseEntity<>(new CommonResDto<>("댓글 수정 완료", commentResDto), HttpStatus.OK);
     }
@@ -66,11 +61,7 @@ public class CommentController {
             @PathVariable Long commentId
     ) {
 
-        if (!commentService.isPosterIdValid(posterId, commentId)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 포스터에 없는 댓글입니다.");
-        }
-
-        commentService.deleteComment(commentId);
+        commentService.deleteComment(posterId, commentId);
 
         return new ResponseEntity<>("댓글 삭제 완료", HttpStatus.OK);
     }
