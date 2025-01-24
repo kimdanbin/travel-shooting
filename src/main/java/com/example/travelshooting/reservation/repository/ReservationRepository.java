@@ -1,6 +1,8 @@
 package com.example.travelshooting.reservation.repository;
 
 import com.example.travelshooting.reservation.entity.Reservation;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -27,7 +29,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
     @EntityGraph(attributePaths = {"part", "part.product", "user"})
     @Query("SELECT r FROM Reservation r WHERE r.user.id = :userId AND r.part.product.id = :productId")
-    List<Reservation> findAllByUserIdAndProductId(@Param("userId") Long userId, @Param("productId") Long productId);
+    Page<Reservation> findAllByUserIdAndProductId(@Param("userId") Long userId, @Param("productId") Long productId, Pageable pageable);
 
     @EntityGraph(attributePaths = {"part", "part.product", "user"})
     @Query("SELECT r FROM Reservation r WHERE r.user.id = :userId AND r.part.product.id = :productId AND r.id = :reservationId")
@@ -39,7 +41,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             "INNER JOIN pa.product p " +
             "INNER JOIN p.company c " +
             "WHERE p.id = :productId AND c.user.id = :userId")
-    List<Reservation> findAllByProductIdAndUserId(@Param("productId") Long productId, @Param("userId") Long userId);
+    Page<Reservation> findAllByProductIdAndUserId(@Param("productId") Long productId, @Param("userId") Long userId, Pageable pageable);
 
     @Query("SELECT r " +
             "FROM Reservation r " +

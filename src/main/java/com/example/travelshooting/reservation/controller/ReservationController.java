@@ -7,6 +7,7 @@ import com.example.travelshooting.reservation.dto.ReservationResDto;
 import com.example.travelshooting.reservation.service.ReservationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -40,8 +41,8 @@ public class ReservationController {
 
     // 예약 전체 조회
     @GetMapping
-    public ResponseEntity<CommonListResDto<ReservationResDto>> findAllByUserIdAndProductId(@PathVariable Long productId) {
-        List<ReservationResDto> reservations = reservationService.findAllByUserIdAndProductId(productId);
+    public ResponseEntity<CommonListResDto<ReservationResDto>> findAllByUserIdAndProductId(@PathVariable Long productId, Pageable pageable) {
+        List<ReservationResDto> reservations = reservationService.findAllByUserIdAndProductId(productId, pageable);
 
         return new ResponseEntity<>(new CommonListResDto<>("레저/티켓 예약 전체 조회 완료", reservations), HttpStatus.OK);
     }

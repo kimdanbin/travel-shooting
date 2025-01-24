@@ -10,6 +10,8 @@ import com.example.travelshooting.reservation.repository.ReservationRepository;
 import com.example.travelshooting.user.entity.User;
 import com.example.travelshooting.user.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -83,10 +85,10 @@ public class ReservationService {
     }
 
     @Transactional(readOnly = true)
-    public List<ReservationResDto> findAllByUserIdAndProductId(Long productId) {
+    public List<ReservationResDto> findAllByUserIdAndProductId(Long productId, Pageable pageable) {
         User user = userService.findAuthenticatedUser();
         Product product = productService.findProductById(productId);
-        List<Reservation> reservations = reservationRepository.findAllByUserIdAndProductId(user.getId(), product.getId());
+        Page<Reservation> reservations = reservationRepository.findAllByUserIdAndProductId(user.getId(), product.getId(), pageable);
 
         if (reservations.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "예약 내역이 없습니다.");
