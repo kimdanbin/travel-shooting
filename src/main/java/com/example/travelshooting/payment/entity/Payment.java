@@ -22,7 +22,6 @@ public class Payment extends BaseEntity {
     @JoinColumn(name = "reservaiton_id", nullable = false)
     private Reservation reservation;
 
-    @Column(nullable = false)
     private String tid;
 
     @Column(nullable = false)
@@ -38,17 +37,20 @@ public class Payment extends BaseEntity {
     @Column(length = 10)
     private String type;
 
-    private Integer cancelPrice;
+    private Integer cancelPrice = 0;
 
     @Column(nullable = false)
     @Enumerated(value = EnumType.STRING)
     private RefundType refundType = RefundType.NO_REFUND;
 
-    public Payment(Reservation reservation, String tid, Long userId, Integer totalPrice) {
+    public Payment(Reservation reservation, Long userId, Integer totalPrice) {
         this.reservation = reservation;
-        this.tid = tid;
         this.userId = userId;
         this.totalPrice = totalPrice;
+    }
+
+    public void updateTid(String tid) {
+        this.tid = tid;
     }
 
     public void updatePayment(PaymentStatus status, String type) {

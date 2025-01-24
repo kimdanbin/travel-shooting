@@ -1,7 +1,7 @@
 package com.example.travelshooting.payment.controller;
 
 import com.example.travelshooting.common.CommonResDto;
-import com.example.travelshooting.payment.dto.PaymentAproveResDto;
+import com.example.travelshooting.payment.dto.PaymentCompletedResDto;
 import com.example.travelshooting.payment.dto.PaymentReadyResDto;
 import com.example.travelshooting.payment.service.PaymentService;
 import lombok.RequiredArgsConstructor;
@@ -26,12 +26,12 @@ public class PaymentController {
 
     // 결제 승인
     @GetMapping("/products/{productId}/reservations/{reservationId}/payments/completed")
-    public ResponseEntity<CommonResDto<PaymentAproveResDto>> payCompleted(@PathVariable Long productId,
-                                                                          @PathVariable Long reservationId,
-                                                                          @RequestParam("pg_token") String pgToken) {
-        PaymentAproveResDto payApprove = paymentService.payCompleted(productId, reservationId, pgToken);
+    public ResponseEntity<CommonResDto<PaymentCompletedResDto>> payCompleted(@PathVariable Long productId,
+                                                                             @PathVariable Long reservationId,
+                                                                             @RequestParam("pg_token") String pgToken) {
+        PaymentCompletedResDto payCompleted = paymentService.payCompleted(productId, reservationId, pgToken);
 
-        return new ResponseEntity<>(new CommonResDto<>("결제 승인 완료", payApprove), HttpStatus.OK);
+        return new ResponseEntity<>(new CommonResDto<>("결제 승인 완료", payCompleted), HttpStatus.OK);
     }
 
     // 결제 취소
@@ -43,6 +43,6 @@ public class PaymentController {
     // 결제 실패
     @GetMapping("payments/fail")
     public ResponseEntity<String> payFail() {
-        return ResponseEntity.ok("결제 실패");
+        return new ResponseEntity<>("결제 실패", HttpStatus.BAD_REQUEST);
     }
 }

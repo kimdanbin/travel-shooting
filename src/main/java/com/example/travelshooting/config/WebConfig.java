@@ -34,7 +34,7 @@ public class WebConfig {
     private static final String[] WHITE_LIST = {"/users/signup",
             "/users/login",
             "/admins",
-            "/products/{productId}/reservations/{reservationId}/payment/completed",
+            "/products/{productId}/reservations/{reservationId}/payments/completed",
             "/attachments",
             "/posters", // 포스터 전체조회
             "/posters/{posterId}", // 포스터 단건 조회
