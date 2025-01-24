@@ -3,7 +3,7 @@ package com.example.travelshooting.payment.service;
 import com.example.travelshooting.common.Const;
 import com.example.travelshooting.enums.PaymentStatus;
 import com.example.travelshooting.enums.ReservationStatus;
-import com.example.travelshooting.payment.dto.PaymentAproveResDto;
+import com.example.travelshooting.payment.dto.PaymentCompletedResDto;
 import com.example.travelshooting.payment.dto.PaymentReadyResDto;
 import com.example.travelshooting.payment.entity.Payment;
 import com.example.travelshooting.payment.repository.PaymentRepository;
@@ -76,6 +76,9 @@ public class PaymentService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 결제된 예약입니다.");
         }
 
+        // 결제 정보 저장
+        Payment savedPayment = savePayment(reservation, user.getId(), reservation.getTotalPrice());
+
         String approvalUrl = String.format(
                 kakaoPayCompletedUrl,
                 product.getId(),
@@ -84,7 +87,7 @@ public class PaymentService {
 
         String cancelUrl = String.format(
                 kakaoPayCancelUrl,
-                payment.getId()
+                savedPayment.getId()
         );
 
         Map<String, String> body = new HashMap<>();
@@ -113,8 +116,8 @@ public class PaymentService {
                 String tid = root.path("tid").asText();
                 String redirectUrl = root.path(kakaoPayNextUrl).asText();
 
-                // 결제 정보 저장
-                savePayment(reservation, tid, user.getId(), reservation.getTotalPrice());
+                savedPayment.updateTid(tid);
+                paymentRepository.save(savedPayment);
 
                 return new PaymentReadyResDto(redirectUrl);
             } catch (Exception e) {
@@ -126,14 +129,14 @@ public class PaymentService {
         }
     }
 
-    public Payment savePayment(Reservation reservation, String tid, Long partnerUserId, Integer totalPrice) {
-        Payment payment = new Payment(reservation, tid, partnerUserId, totalPrice);
+    public Payment savePayment(Reservation reservation, Long partnerUserId, Integer totalPrice) {
+        Payment payment = new Payment(reservation, partnerUserId, totalPrice);
 
         return paymentRepository.save(payment);
     }
 
     // 최종적으로 결제 완료 처리를 하는 단계
-    public PaymentAproveResDto payCompleted(Long productId, Long reservationId, String pgToken) {
+    public PaymentCompletedResDto payCompleted(Long productId, Long reservationId, String pgToken) {
         Product product = productService.findProductById(productId);
         Payment payment = paymentRepository.findByReservationId(reservationId);
         Reservation reservation = reservationService.findReservationByUserIdAndProductIdAndId(payment.getUserId(), product.getId(), reservationId);
@@ -169,7 +172,7 @@ public class PaymentService {
                 int quantity = root.path("quantity").asInt();
                 int total = root.path("total").asInt();
 
-                PaymentAproveResDto paymentAproveResDto = new PaymentAproveResDto(
+                PaymentCompletedResDto paymentCompletedResDto = new PaymentCompletedResDto(
                         aid,
                         tid,
                         partnerOrderId,
@@ -182,13 +185,13 @@ public class PaymentService {
                 payment.updatePayment(PaymentStatus.APPROVED, paymentType);
                 paymentRepository.save(payment);
 
-                return paymentAproveResDto;
+                return paymentCompletedResDto;
             } catch (Exception e) {
                 e.printStackTrace();
                 throw new RuntimeException("카카오페이 결제 승인 응답 처리 중 오류가 발생했습니다.");
             }
         } else {
-            throw new RuntimeException("카카오페이 결제 승인 요청 실패.");
+            throw new RuntimeException("카카오페이 결제 승인 요청 실패");
         }
     }
 
