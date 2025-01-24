@@ -2,7 +2,10 @@ package com.example.travelshooting.payment.service;
 
 import com.example.travelshooting.common.Const;
 import com.example.travelshooting.enums.PaymentStatus;
+import com.example.travelshooting.enums.RefundPolicy;
+import com.example.travelshooting.enums.RefundType;
 import com.example.travelshooting.enums.ReservationStatus;
+import com.example.travelshooting.payment.dto.PaymentCancelResDto;
 import com.example.travelshooting.payment.dto.PaymentCompletedResDto;
 import com.example.travelshooting.payment.dto.PaymentReadyResDto;
 import com.example.travelshooting.payment.entity.Payment;
@@ -19,9 +22,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -50,17 +55,22 @@ public class PaymentService {
     @Value("${kakao.api.pay.cancel.url}")
     private String kakaoPayCancelUrl;
 
-    @Value("${kakao.api.pay.fail.url}")
-    private String kakaoPayFailUrl;
+    @Value("${payment.cancel.url}")
+    private String paymentCancelUrl;
 
-    @Value("${kakao.api.pay.completed.url}")
-    private String kakaoPayCompletedUrl;
+    @Value("${payment.fail.url}")
+    private String paymentFailUrl;
+
+    @Value("${payment.completed.url}")
+    private String paymentCompletedUrl;
 
     // 카카오페이 결제창 연결
+    @Transactional
     public PaymentReadyResDto payReady(Long productId, Long reservationId) {
         Product product = productService.findProductById(productId);
         User user = userService.findAuthenticatedUser();
         Reservation reservation = reservationService.findReservationByUserIdAndProductIdAndId(user.getId(), product.getId(), reservationId);
+        Payment payment = paymentRepository.findPaymentByReservationId(reservation.getId());
 
         if (reservation == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "예약 내역을 찾을 수 없습니다.");
@@ -70,8 +80,6 @@ public class PaymentService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "예약 승인이 먼저 되어야 합니다.");
         }
 
-        Payment payment = paymentRepository.findByReservationId(reservation.getId());
-
         if (payment != null && payment.getStatus().equals(PaymentStatus.APPROVED)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 결제된 예약입니다.");
         }
@@ -80,13 +88,13 @@ public class PaymentService {
         Payment savedPayment = savePayment(reservation, user.getId(), reservation.getTotalPrice());
 
         String approvalUrl = String.format(
-                kakaoPayCompletedUrl,
+                paymentCompletedUrl,
                 product.getId(),
                 reservation.getId()
         );
 
         String cancelUrl = String.format(
-                kakaoPayCancelUrl,
+                paymentCancelUrl,
                 savedPayment.getId()
         );
 
@@ -100,9 +108,9 @@ public class PaymentService {
         body.put("tax_free_amount", "0");
         body.put("approval_url", approvalUrl);
         body.put("cancel_url", cancelUrl);
-        body.put("fail_url", kakaoPayFailUrl);
+        body.put("fail_url", paymentFailUrl);
 
-        HttpHeaders headers = getHttpHeaders();
+        HttpHeaders headers = httpHeaders();
         HttpEntity<Map<String, String>> request = new HttpEntity<>(body, headers);
 
         ResponseEntity<String> response = restTemplate.exchange(
@@ -136,9 +144,10 @@ public class PaymentService {
     }
 
     // 최종적으로 결제 완료 처리를 하는 단계
+    @Transactional
     public PaymentCompletedResDto payCompleted(Long productId, Long reservationId, String pgToken) {
         Product product = productService.findProductById(productId);
-        Payment payment = paymentRepository.findByReservationId(reservationId);
+        Payment payment = paymentRepository.findPaymentByReservationId(reservationId);
         Reservation reservation = reservationService.findReservationByUserIdAndProductIdAndId(payment.getUserId(), product.getId(), reservationId);
 
         Map<String, String> body = new HashMap<>();
@@ -148,7 +157,7 @@ public class PaymentService {
         body.put("partner_user_id", payment.getUserId().toString());
         body.put("pg_token", pgToken);
 
-        HttpHeaders headers = getHttpHeaders();
+        HttpHeaders headers = httpHeaders();
         HttpEntity<Map<String, String>> request = new HttpEntity<>(body, headers);
 
         ResponseEntity<String> response = restTemplate.exchange(
@@ -169,8 +178,8 @@ public class PaymentService {
                 String partnerUserId = root.path("partner_user_id").asText();
                 String itemName = root.path("item_name").asText();
                 String paymentType = root.path("payment_method_type").asText();
-                int quantity = root.path("quantity").asInt();
-                int total = root.path("total").asInt();
+                Integer quantity = root.path("quantity").asInt();
+                Integer total = root.path("total").asInt();
 
                 PaymentCompletedResDto paymentCompletedResDto = new PaymentCompletedResDto(
                         aid,
@@ -182,7 +191,7 @@ public class PaymentService {
                         total
                 );
 
-                payment.updatePayment(PaymentStatus.APPROVED, paymentType);
+                payment.updateStatusAndType(PaymentStatus.APPROVED, paymentType);
                 paymentRepository.save(payment);
 
                 return paymentCompletedResDto;
@@ -195,7 +204,88 @@ public class PaymentService {
         }
     }
 
-    private HttpHeaders getHttpHeaders() {
+    @Transactional
+    public PaymentCancelResDto payCancel(Long paymentId) {
+        Payment payment = paymentRepository.findPaymentById(paymentId);
+        User user = userService.findAuthenticatedUser();
+        Reservation reservation = reservationService.findReservationByPaymentIdAndUserId(payment.getId(), user.getId());
+        Integer totalPrice = payment.getTotalPrice();
+        Integer cancelPrice;
+
+        if (LocalDate.now().equals(reservation.getReservationDate()) || LocalDate.now().isAfter(reservation.getReservationDate())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "예약 당일 혹은 이미 지난 예약은 결제를 취소할 수 없습니다.");
+        }
+
+        if (payment.getStatus().equals(PaymentStatus.CANCELED)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 결제가 취소 처리되었습니다.");
+        }
+
+        if (LocalDate.now().equals(reservation.getReservationDate().minusDays(RefundPolicy.PARTIAL_REFUND.getDaysBefore()))) {
+            cancelPrice = (int) Math.round(totalPrice * RefundPolicy.PARTIAL_REFUND.getRefundRate());
+        } else {
+            cancelPrice = totalPrice;
+        }
+
+        Map<String, String> body = new HashMap<>();
+        body.put("cid", Const.KAKAO_PAY_TEST_CID);
+        body.put("tid", payment.getTid());
+        body.put("cancel_amount", String.valueOf(cancelPrice));
+        body.put("cancel_tax_free_amount", "0");
+
+        HttpHeaders headers = httpHeaders();
+        HttpEntity<Map<String, String>> request = new HttpEntity<>(body, headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                kakaoPayCancelUrl,
+                HttpMethod.POST,
+                request,
+                String.class
+        );
+
+        if (response.getStatusCode() == HttpStatus.OK) {
+            ObjectMapper objectMapper = new ObjectMapper();
+            try {
+                JsonNode root = objectMapper.readTree(response.getBody());
+
+                String status = root.path("status").asText();
+                String partnerOrderId = root.path("partner_order_id").asText();
+                String partnerUserId = root.path("partner_user_id").asText();
+                String paymentType = root.path("payment_method_type").asText();
+                String itemName = root.path("item_name").asText();
+                Integer quantity = root.path("quantity").asInt();
+                Integer total = root.path("approved_cancel_amount").path("total").asInt();
+                String canceledAt = root.path("canceled_at").asText();
+
+                PaymentCancelResDto paymentCancelResDto = new PaymentCancelResDto(
+                        status,
+                        partnerOrderId,
+                        partnerUserId,
+                        paymentType,
+                        itemName,
+                        quantity,
+                        total,
+                        canceledAt
+                );
+
+                if (!payment.getTotalPrice().equals(total)) {
+                    payment.updateCancelInfo(PaymentStatus.CANCELED, RefundType.PARTIAL_REFUND, total);
+                } else {
+                    payment.updateCancelInfo(PaymentStatus.CANCELED, RefundType.FULL_REFUND, total);
+                }
+
+                paymentRepository.save(payment);
+
+                return paymentCancelResDto;
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new RuntimeException("카카오페이 결제 승인 응답 처리 중 오류가 발생했습니다.");
+            }
+        } else {
+            throw new RuntimeException("카카오페이 결제 승인 요청 실패");
+        }
+    }
+
+    private HttpHeaders httpHeaders() {
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.AUTHORIZATION, Const.KAKAO_PAY_HEADER + " " + secretKey);
         headers.set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
