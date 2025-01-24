@@ -27,9 +27,9 @@ public class RestaurantController {
 
     // 경기도 맛집 정보 저장
     @PostMapping("/regions/gyeonggi")
-    public ResponseEntity<CommonListResDto<GgRestaurantResDto>> saveRestaurants(@RequestParam int pIndex,
-                                                                                @RequestParam int pSize) {
-        List<GgRestaurantResDto> result = restaurantService.saveGgRestaurants(pIndex, pSize);
+    public ResponseEntity<CommonListResDto<GgRestaurantResDto>> saveRestaurants(@RequestParam int page,
+                                                                                @RequestParam int size) {
+        List<GgRestaurantResDto> result = restaurantService.saveGgRestaurants(page, size);
 
         return new ResponseEntity<>(new CommonListResDto<>("경기도 맛집 정보 저장 완료", result), HttpStatus.CREATED);
     }

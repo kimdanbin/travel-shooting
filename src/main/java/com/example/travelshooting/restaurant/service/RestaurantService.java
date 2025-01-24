@@ -45,11 +45,11 @@ public class RestaurantService {
     private String ggFoodUrl;
 
     @Transactional
-    public List<GgRestaurantResDto> saveGgRestaurants(int pIndex, int pSize) {
+    public List<GgRestaurantResDto> saveGgRestaurants(int page, int size) {
         String url = UriComponentsBuilder.fromHttpUrl(ggFoodUrl)
                 .queryParam("KEY", ggFoodKey)
-                .queryParam("pIndex", pIndex)
-                .queryParam("pSize", pSize)
+                .queryParam("pIndex", page)
+                .queryParam("pSize", size)
                 .build()
                 .toUriString();
 
