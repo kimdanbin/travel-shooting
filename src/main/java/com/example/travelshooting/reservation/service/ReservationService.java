@@ -145,4 +145,8 @@ public class ReservationService {
 
         return reservationRepository.saveAll(expiredReservations);
     }
+
+    public Reservation findReservationByPaymentId(Long paymentId) {
+        return reservationRepository.findReservationByPaymentId(paymentId);
+    }
 }
