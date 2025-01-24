@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public class PaymentAproveResDto implements BaseDtoDataType {
+public class PaymentCompletedResDto implements BaseDtoDataType {
 
     private final String aid; // 요청 고유 번호
     private final String tid; // 결제 고유 번호
