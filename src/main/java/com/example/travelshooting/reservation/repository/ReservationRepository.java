@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -19,8 +20,10 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
         return findById(reservationId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "아이디 " + reservationId + "에 해당하는 레저/티켓 예약을 찾을 수 없습니다."));
     }
 
-    @Query("SELECT COALESCE(SUM(r.headCount), 0) FROM Reservation r WHERE r.part.id = :partId")
-    Integer findTotalHeadCountByPartId(@Param("partId") Long partId);
+    @Query("SELECT COALESCE(SUM(r.headCount), 0) FROM Reservation r WHERE r.part.id = :partId AND r.reservationDate = :reservationDate")
+    Integer findTotalHeadCountByPartIdAndReservationDate(@Param("partId") Long partId, @Param("reservationDate")LocalDate reservationDate);
+
+    boolean existsByUserIdAndReservationDate(Long userId, LocalDate reservationDate);
 
     @EntityGraph(attributePaths = {"part", "part.product", "user"})
     @Query("SELECT r FROM Reservation r WHERE r.user.id = :userId AND r.part.product.id = :productId")

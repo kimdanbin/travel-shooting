@@ -34,8 +34,16 @@ public class ReservationService {
         User user = userService.findAuthenticatedUser();
         Product product = productService.findProductById(productId);
         Part part = partService.findPartById(partId);
+        boolean isReservation = reservationRepository.existsByUserIdAndReservationDate(user.getId(), reservationDate);
+        Integer totalHeadCount = reservationRepository.findTotalHeadCountByPartIdAndReservationDate(part.getId(), reservationDate);
 
-        Integer totalHeadCount = reservationRepository.findTotalHeadCountByPartId(part.getId());
+        if (isReservation) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 날짜에 예약한 내역이 있습니다.");
+        }
+
+        if (reservationDate.isBefore(product.getSaleStartAt()) || reservationDate.isAfter(product.getSaleEndAt())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "예약 날짜는 상품의 판매 기간 중에서만 선택할 수 있습니다.");
+        }
 
         if (part.getMaxQuantity() < totalHeadCount + headCount) {
             Integer overHeadCount = Math.abs(part.getMaxQuantity() - totalHeadCount - headCount);
