@@ -83,6 +83,11 @@ public class PartService {
         if (findPart == null) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "업체의 소유자만 일정을 삭제할 수 있습니다.");
         }
+        // 해당 일정에 예약이 존재하면 삭제할 수 없음
+        Part reservation = partRepository.findReservationById(partId);
+        if(reservation != null) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "이미 예약이 존재하여 삭제할 수 없습니다.");
+        }
 
         partRepository.delete(findPart);
     }
