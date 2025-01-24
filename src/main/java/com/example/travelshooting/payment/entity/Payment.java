@@ -2,6 +2,7 @@ package com.example.travelshooting.payment.entity;
 
 import com.example.travelshooting.common.BaseEntity;
 import com.example.travelshooting.enums.PaymentStatus;
+import com.example.travelshooting.enums.RefundType;
 import com.example.travelshooting.reservation.entity.Reservation;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -18,7 +19,7 @@ public class Payment extends BaseEntity {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "partner_order_id", nullable = false)
+    @JoinColumn(name = "reservaiton_id", nullable = false)
     private Reservation reservation;
 
     @Column(nullable = false)
@@ -29,22 +30,29 @@ public class Payment extends BaseEntity {
     private PaymentStatus status = PaymentStatus.READY;
 
     @Column(nullable = false)
-    private Long partnerUserId;
+    private Long userId;
 
     @Column(nullable = false)
     private Integer totalPrice;
 
-    private String paymentType;
+    @Column(length = 10)
+    private String type;
 
-    public Payment(Reservation reservation, String tid, Long partnerUserId, Integer totalPrice) {
+    private Integer cancelPrice;
+
+    @Column(nullable = false)
+    @Enumerated(value = EnumType.STRING)
+    private RefundType refundType = RefundType.NO_REFUND;
+
+    public Payment(Reservation reservation, String tid, Long userId, Integer totalPrice) {
         this.reservation = reservation;
         this.tid = tid;
-        this.partnerUserId = partnerUserId;
+        this.userId = userId;
         this.totalPrice = totalPrice;
     }
 
-    public void updatePayment(PaymentStatus status, String paymentType) {
+    public void updatePayment(PaymentStatus status, String type) {
         this.status = status;
-        this.paymentType = paymentType;
+        this.type = type;
     }
 }

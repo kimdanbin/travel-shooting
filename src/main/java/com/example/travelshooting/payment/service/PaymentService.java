@@ -136,13 +136,13 @@ public class PaymentService {
     public PaymentAproveResDto payCompleted(Long productId, Long reservationId, String pgToken) {
         Product product = productService.findProductById(productId);
         Payment payment = paymentRepository.findByReservationId(reservationId);
-        Reservation reservation = reservationService.findReservationByUserIdAndProductIdAndId(payment.getPartnerUserId(), product.getId(), reservationId);
+        Reservation reservation = reservationService.findReservationByUserIdAndProductIdAndId(payment.getUserId(), product.getId(), reservationId);
 
         Map<String, String> body = new HashMap<>();
         body.put("cid", Const.KAKAO_PAY_TEST_CID);
         body.put("tid", payment.getTid());
         body.put("partner_order_id", reservation.getId().toString());
-        body.put("partner_user_id", payment.getPartnerUserId().toString());
+        body.put("partner_user_id", payment.getUserId().toString());
         body.put("pg_token", pgToken);
 
         HttpHeaders headers = getHttpHeaders();
