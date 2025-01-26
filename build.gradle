@@ -60,6 +60,11 @@ dependencies {
 	// Redis
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
+	// Mail
+	implementation 'org.springframework.boot:spring-boot-starter-mail'
+
+	// Template Engine
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 }
 
 tasks.named('test') {
