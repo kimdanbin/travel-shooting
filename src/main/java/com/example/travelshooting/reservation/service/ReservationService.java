@@ -1,11 +1,13 @@
 package com.example.travelshooting.reservation.service;
 
+import com.example.travelshooting.enums.ReservationStatus;
+import com.example.travelshooting.notification.service.MailService;
 import com.example.travelshooting.part.entity.Part;
 import com.example.travelshooting.part.service.PartService;
 import com.example.travelshooting.product.entity.Product;
 import com.example.travelshooting.product.service.ProductService;
-import com.example.travelshooting.reservation.entity.Reservation;
 import com.example.travelshooting.reservation.dto.ReservationResDto;
+import com.example.travelshooting.reservation.entity.Reservation;
 import com.example.travelshooting.reservation.repository.ReservationRepository;
 import com.example.travelshooting.user.entity.User;
 import com.example.travelshooting.user.service.UserService;
@@ -20,6 +22,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,16 +33,17 @@ public class ReservationService {
     private final UserService userService;
     private final ProductService productService;
     private final PartService partService;
+    private final MailService mailService;
 
     @Transactional
     public ReservationResDto createReservation(Long productId, Long partId, LocalDate reservationDate, Integer headCount) {
         User user = userService.findAuthenticatedUser();
         Product product = productService.findProductById(productId);
         Part part = partService.findPartById(partId);
-        boolean isReservation = reservationRepository.existsByUserIdAndReservationDate(user.getId(), reservationDate);
+        Optional<Reservation> findReservation = reservationRepository.findReservationByUserIdAndReservationDate(user.getId(), reservationDate);
         Integer totalHeadCount = reservationRepository.findTotalHeadCountByPartIdAndReservationDate(part.getId(), reservationDate);
 
-        if (isReservation) {
+        if (findReservation.isPresent()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 날짜에 예약한 내역이 있습니다.");
         }
 
@@ -81,7 +85,8 @@ public class ReservationService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "예약 내역이 없습니다.");
         }
 
-        reservationRepository.delete(reservation);
+        reservation.updateReservation(ReservationStatus.CANCELED);
+        reservationRepository.save(reservation);
     }
 
     @Transactional(readOnly = true)
@@ -141,7 +146,7 @@ public class ReservationService {
         LocalDateTime expirationTime = LocalDateTime.now().minusDays(1).withHour(18).withMinute(0).withSecond(0);
         List<Reservation> expiredReservations = reservationRepository.findExpiredReservations(expirationTime);
 
-        expiredReservations.forEach(reservation -> reservation.updateExpiredReservations());
+        expiredReservations.forEach(reservation -> reservation.updateReservation(ReservationStatus.EXPIRED));
 
         return reservationRepository.saveAll(expiredReservations);
     }
