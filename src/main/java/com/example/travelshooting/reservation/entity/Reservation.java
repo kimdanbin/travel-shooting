@@ -8,7 +8,6 @@ import com.example.travelshooting.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
 import java.time.LocalDate;
@@ -19,7 +18,6 @@ import java.util.List;
 @Table(name = "reservation")
 @Getter
 @NoArgsConstructor
-@SQLDelete(sql = "UPDATE reservation SET is_deleted = true WHERE id = ?")
 @Where(clause = "is_deleted = false")
 public class Reservation extends BaseEntity {
 
@@ -65,8 +63,8 @@ public class Reservation extends BaseEntity {
         this.status = status;
     }
 
-    public void updateExpiredReservations() {
+    public void updateReservation(ReservationStatus status) {
         this.isDeleted = true;
-        this.status = ReservationStatus.EXPIRED;
+        this.status = status;
     }
 }
