@@ -1,6 +1,7 @@
 package com.example.travelshooting.payment.controller;
 
 import com.example.travelshooting.common.CommonResDto;
+import com.example.travelshooting.payment.dto.PaymentCancelResDto;
 import com.example.travelshooting.payment.dto.PaymentCompletedResDto;
 import com.example.travelshooting.payment.dto.PaymentReadyResDto;
 import com.example.travelshooting.payment.service.PaymentService;
@@ -35,9 +36,11 @@ public class PaymentController {
     }
 
     // 결제 취소
-    @GetMapping("/payments/{paymentId}/cancel")
-    public ResponseEntity<String> payCancel() {
-        return ResponseEntity.ok("결제 취소");
+    @PostMapping("/payments/{paymentId}/cancel")
+    public ResponseEntity<CommonResDto<PaymentCancelResDto>> payCancel(@PathVariable Long paymentId) {
+        PaymentCancelResDto payCancel = paymentService.payCancel(paymentId);
+
+        return new ResponseEntity<>(new CommonResDto<>("결제 취소 완료", payCancel), HttpStatus.OK);
     }
 
     // 결제 실패

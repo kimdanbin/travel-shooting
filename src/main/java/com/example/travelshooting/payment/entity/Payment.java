@@ -18,7 +18,7 @@ public class Payment extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reservaiton_id", nullable = false)
     private Reservation reservation;
 
@@ -53,8 +53,14 @@ public class Payment extends BaseEntity {
         this.tid = tid;
     }
 
-    public void updatePayment(PaymentStatus status, String type) {
+    public void updateStatusAndType(PaymentStatus status, String type) {
         this.status = status;
         this.type = type;
+    }
+
+    public void updateCancelInfo(PaymentStatus status, RefundType refundType, Integer cancelPrice) {
+        this.status = status;
+        this.refundType = refundType;
+        this.cancelPrice = cancelPrice;
     }
 }

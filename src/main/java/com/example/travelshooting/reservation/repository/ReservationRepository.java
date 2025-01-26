@@ -53,4 +53,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
     @Query("SELECT r FROM Reservation r WHERE r.updatedAt <= :expirationTime AND r.status = 'APPROVED' AND r.isDeleted = false")
     List<Reservation> findExpiredReservations(@Param("expirationTime") LocalDateTime expirationTime);
+
+    @Query("SELECT r FROM Reservation r INNER JOIN Payment p ON r.id = p.reservation.id WHERE p.id = :paymentId AND p.userId = :userId")
+    Reservation findReservationByPaymentIdAndUserId(@Param("paymentId") Long paymentId, @Param("userId") Long userId);
 }
