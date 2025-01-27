@@ -19,6 +19,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
     return this.findById(userId)
         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "아이디: " + userId + "에 해당하는 사용자를 찾을 수 없습니다."));
   }
+
   @Query("SELECT u FROM User u INNER JOIN u.companies c ON u.id = c.user.id WHERE c.id = :companyId")
   User findUserByCompanyId(@Param("companyId") Long companyId);
+
+  @Query("SELECT u FROM User u JOIN FETCH u.reservations r WHERE r.id = :reservationId")
+  User findUserByReservationId(@Param("reservationId") Long reservationId);
 }

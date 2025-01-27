@@ -4,10 +4,14 @@ import com.example.travelshooting.config.util.JwtProvider;
 import com.example.travelshooting.enums.AuthenticationScheme;
 import com.example.travelshooting.enums.UserRole;
 import com.example.travelshooting.s3.S3Service;
-import com.example.travelshooting.user.dto.*;
+import com.example.travelshooting.user.dto.ChangePasswordReqDto;
+import com.example.travelshooting.user.dto.JwtAuthResDto;
+import com.example.travelshooting.user.dto.PasswordVrfReqDto;
+import com.example.travelshooting.user.dto.UserResDto;
 import com.example.travelshooting.user.entity.User;
 import com.example.travelshooting.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -30,6 +34,7 @@ public class UserService {
     private final AuthenticationManager authenticationManager;
     private final JwtProvider jwtProvider;
     private final S3Service s3Service;
+    private final RedisTemplate<String, String> redisTemplate;
 
     @Transactional
     public UserResDto userSignup(String email, String password, String name, MultipartFile file) {
@@ -79,10 +84,18 @@ public class UserService {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         // 토큰 생성
-        String accessToken = jwtProvider.generateToken(authentication);
+        String accessToken = jwtProvider.generateAccessToken(authentication);
+        String refreshToken = jwtProvider.generateRefreshToken(authentication);
 
-        return new JwtAuthResDto(AuthenticationScheme.BEARER.getName(), accessToken);
+        return new JwtAuthResDto(AuthenticationScheme.BEARER.getName(), accessToken, refreshToken);
     }
+    // 로그아웃
+    public void logout(String email) {
+        redisTemplate.delete(email); // Redis에서 해당 이메일의 Refresh Token 삭제
+    }
+
+
+
     // Refresh token 요청
 //    public TokenDto refresh(String accessToken, String refreshToken) {
 //
@@ -99,6 +112,25 @@ public class UserService {
 //
 //        return jwtProvider.generateToken(email);
 //    }
+    @Transactional
+    public JwtAuthResDto refreshAccessToken(String refreshToken) {
+        // Refresh Token 검증
+        String email = jwtProvider.getUsername(refreshToken);
+
+        if (!jwtProvider.validateRefreshToken(email, refreshToken)) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "유효하지 않은 Refresh Token입니다.");
+        }
+
+        // Access Token 갱신
+        String newAccessToken = jwtProvider.generateAccessToken(email);
+
+        return new JwtAuthResDto(
+            AuthenticationScheme.BEARER.getName(),
+            newAccessToken,
+            refreshToken
+        );
+    }
+
 
     //비밀번호 변경
     @Transactional
@@ -197,7 +229,12 @@ public class UserService {
 
         return user.get();
     }
+
     public User findUserByCompanyId(Long companyId) {
         return userRepository.findUserByCompanyId(companyId);
+    }
+
+    public User findUserByReservationId(Long reservationId) {
+        return userRepository.findUserByReservationId(reservationId);
     }
 }
