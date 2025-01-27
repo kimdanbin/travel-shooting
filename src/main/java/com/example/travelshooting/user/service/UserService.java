@@ -73,7 +73,7 @@ public class UserService {
         validatePassword(password, user.get().getPassword());
 
         // 사용자 인증 후 인증 객체를 저장
-        Authentication authentication = this.authenticationManager.authenticate(
+        Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(email, password));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -196,5 +196,8 @@ public class UserService {
         Optional<User> user = userRepository.findByEmail(authEmail);
 
         return user.get();
+    }
+    public User findUserByCompanyId(Long companyId) {
+        return userRepository.findUserByCompanyId(companyId);
     }
 }
