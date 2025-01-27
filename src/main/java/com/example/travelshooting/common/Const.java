@@ -20,6 +20,8 @@ public class Const {
     public static final String USER_RESERVATION_APPROVED_SUBJECT = "예약이 승인되었습니다.";
     public static final String USER_RESERVATION_REJECTED_SUBJECT = "예약이 거절되었습니다.";
     public static final String PARTNER_RESERVATION_APPLY_SUBJECT = "새로운 예약 신청이 접수되었습니다.";
+    public static final String PARTNER_RESERVATION_APPROVED_SUBJECT = "예약을 승인하였습니다.";
+    public static final String PARTNER_RESERVATION_REJECTED_SUBJECT = "예약을 거절하였습니다.";
     public static final String RESERVATION_CANCELED_SUBJECT = "예약이 취소되었습니다.";
 
     public static final int REPORT_COUNT = 5;

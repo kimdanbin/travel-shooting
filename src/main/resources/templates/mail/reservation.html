@@ -36,6 +36,12 @@
         시간이 지체될 경우, 사용자가 다른 예약을 선택할 수 있으니 빠른 결정을 부탁드립니다. <br /><br />
         감사합니다! <br /><br />
     </p>
+    <p th:if="${role == 'PARTNER' and status == 'APPROVED'}">
+        예약을 승인하였습니다. <br /><br />
+    </p>
+    <p th:if="${role == 'PARTNER' and status == 'REJECTED'}">
+        예약을 거절하였습니다. <br /><br />
+    </p>
     <p th:if="${role == 'PARTNER' and status == 'CANCELED'}">
         고객의 사정으로 인해 예약이 취소되었습니다. <br /><br />
     </p>
@@ -60,7 +66,7 @@
         <strong>레저/티켓 일정:</strong> <span th:text="${partOpenAt}"></span> ~ <span th:text="${partCloseAt}"></span>
     </p>
     <p>
-        <strong>예약 인원:</strong> <span th:text="${headCount}">명</span>
+        <strong>예약 인원:</strong> <span th:text="${headCount}"></span> 명
     </p>
     <p>
         <strong>예약 신청일:</strong> <span th:text="${createdAt}"></span>

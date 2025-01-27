@@ -53,8 +53,6 @@ public class ReservationMailService {
                 return Const.USER_RESERVATION_APPROVED_SUBJECT;
             case REJECTED:
                 return Const.USER_RESERVATION_REJECTED_SUBJECT;
-            case CANCELED:
-                return Const.RESERVATION_CANCELED_SUBJECT;
             default:
                 return "예약 상태 알림";
         }
@@ -64,8 +62,10 @@ public class ReservationMailService {
         switch (status) {
             case PENDING:
                 return Const.PARTNER_RESERVATION_APPLY_SUBJECT;
-            case CANCELED:
-                return Const.RESERVATION_CANCELED_SUBJECT;
+            case APPROVED:
+                return Const.PARTNER_RESERVATION_APPROVED_SUBJECT;
+            case REJECTED:
+                return Const.PARTNER_RESERVATION_REJECTED_SUBJECT;
             default:
                 return "업체 예약 상태 알림";
         }
