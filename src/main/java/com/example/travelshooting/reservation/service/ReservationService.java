@@ -1,7 +1,6 @@
 package com.example.travelshooting.reservation.service;
 
 import com.example.travelshooting.enums.ReservationStatus;
-import com.example.travelshooting.notification.service.MailService;
 import com.example.travelshooting.part.entity.Part;
 import com.example.travelshooting.part.service.PartService;
 import com.example.travelshooting.product.entity.Product;
@@ -33,12 +32,12 @@ public class ReservationService {
     private final UserService userService;
     private final ProductService productService;
     private final PartService partService;
-    private final MailService mailService;
+    private final ReservationMailService reservationMailService;
 
     @Transactional
     public ReservationResDto createReservation(Long productId, Long partId, LocalDate reservationDate, Integer headCount) {
-        User user = userService.findAuthenticatedUser();
         Product product = productService.findProductById(productId);
+        User user = userService.findAuthenticatedUser();
         Part part = partService.findPartById(partId);
         Optional<Reservation> findReservation = reservationRepository.findReservationByUserIdAndReservationDate(user.getId(), reservationDate);
         Integer totalHeadCount = reservationRepository.findTotalHeadCountByPartIdAndReservationDate(part.getId(), reservationDate);
@@ -60,6 +59,9 @@ public class ReservationService {
 
         Reservation reservation = new Reservation(user, part, reservationDate, headCount, totalPrice);
         reservationRepository.save(reservation);
+
+        // 사용자 예약 신청 완료 메일
+        reservationMailService.sendMail(user, product, part, reservation, user.getRole(), reservation.getStatus());
 
         return new ReservationResDto(
                 reservation.getId(),
