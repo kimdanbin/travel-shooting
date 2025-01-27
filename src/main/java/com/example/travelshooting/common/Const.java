@@ -15,10 +15,6 @@ public class Const {
     public static final String KAKAO_PAY_HEADER = "SECRET_KEY";
     public static final String KAKAO_MAP_HEADER = "KakaoAK";
 
-    // 메일
-    public static final boolean SMTP_AUTH = true;
-    public static final boolean SMTP_STARTTLS = true;
-
     // 예약 메일 제목
     public static final String USER_RESERVATION_APPLY_SUBJECT = "예약 신청이 완료되었습니다.";
     public static final String USER_RESERVATION_APPROVED_SUBJECT = "예약이 승인되었습니다.";
