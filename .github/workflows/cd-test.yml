@@ -40,7 +40,7 @@ jobs:
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ec2-user
-          key: ${{ secrets.EC2_KEY }}c
+          key: ${{ secrets.EC2_KEY }}
           script: |
             cd /
             chmod +x /mnt/c/Users/ec2-user/Desktop/hot-six/travel-shooting/scripts/deploy.sh
