@@ -1,6 +1,8 @@
 package com.example.travelshooting.reservation.service;
 
 import com.example.travelshooting.enums.ReservationStatus;
+import com.example.travelshooting.part.entity.Part;
+import com.example.travelshooting.part.service.PartService;
 import com.example.travelshooting.product.entity.Product;
 import com.example.travelshooting.product.service.ProductService;
 import com.example.travelshooting.reservation.dto.ReservationResDto;
@@ -26,6 +28,8 @@ public class ReservationPartnerService {
     private final ReservationRepository reservationRepository;
     private final UserService userService;
     private final ProductService productService;
+    private final ReservationMailService reservationMailService;
+    private final PartService partService;
 
     @Transactional(readOnly = true)
     public List<ReservationResDto> findAllByProductIdAndUserId(Long productId, Pageable pageable) {
@@ -78,13 +82,16 @@ public class ReservationPartnerService {
 
     @Transactional
     public ReservationResDto updateReservationStatus(Long productId, Long reservationId, String status) {
-        User user = userService.findAuthenticatedUser();
+        User partner = userService.findAuthenticatedUser();
         Product product = productService.findProductById(productId);
-        Reservation reservation = reservationRepository.findReservationByProductIdAndUserIdAndId(product.getId(), user.getId(), reservationId);
+        Reservation reservation = reservationRepository.findReservationByProductIdAndUserIdAndId(product.getId(), partner.getId(), reservationId);
 
         if (reservation == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "예약 내역이 없습니다.");
         }
+
+        Part part = partService.findPartByReservationId(reservation.getId());
+        User user = userService.findUserByReservationId(reservation.getId());
 
         if (!reservation.getStatus().equals(ReservationStatus.PENDING)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 수락 또는 거절 상태입니다.");
@@ -92,6 +99,10 @@ public class ReservationPartnerService {
 
         reservation.updateStatus(ReservationStatus.valueOf(status));
         Reservation updatedReservation = reservationRepository.save(reservation);
+
+        // 예약 신청 및 거절 메일
+        reservationMailService.sendMail(partner, product, part, reservation, partner.getRole(), reservation.getStatus());
+        reservationMailService.sendMail(user, product, part, reservation, user.getRole(), reservation.getStatus());
 
         return new ReservationResDto(
                 updatedReservation.getId(),
