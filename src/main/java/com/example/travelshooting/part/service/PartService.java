@@ -95,4 +95,8 @@ public class PartService {
     public Part findPartById(Long partId) {
         return partRepository.findPartById(partId);
     }
+
+    public Part findPartByReservationId(Long reservationId) {
+        return partRepository.findPartByReservationId(reservationId);
+    }
 }
