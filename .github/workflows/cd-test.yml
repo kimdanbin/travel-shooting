@@ -42,6 +42,5 @@ jobs:
           username: ec2-user
           key: ${{ secrets.EC2_KEY }}
           script: |
-            cd /
-            chmod +x /mnt/c/Users/ec2-user/Desktop/hot-six/travel-shooting/scripts/deploy.sh
-            /mnt/c/Users/ec2-user/Desktop/hot-six/travel-shooting/scripts/deploy.sh
+            chmod +x ~/deploy.sh
+            ~/deploy.sh
