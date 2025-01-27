@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ECR_REPOSITORY=$AWS_ACCOUNT.dkr.ecr.$REGION.amazonaws.com/aws-demo
+ECR_REPOSITORY=$AWS_ACCOUNT.dkr.ecr.$REGION.amazonaws.com/aws-travel-shooting
 IMAGE_TAG=latest
 
 # Pull new image
