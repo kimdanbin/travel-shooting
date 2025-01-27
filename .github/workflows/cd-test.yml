@@ -43,4 +43,4 @@ jobs:
           key: ${{ secrets.EC2_KEY }}
           script: |
             chmod +x ~/deploy.sh
-            ~/deploy.sh
+            ~/deploy.sh ${{ secrets.AWS_ACCOUNT }} ${{ secrets.AWS_REGION }}
