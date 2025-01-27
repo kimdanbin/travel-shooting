@@ -6,23 +6,29 @@ import com.example.travelshooting.company.repository.CompanyRepository;
 import com.example.travelshooting.user.entity.User;
 import com.example.travelshooting.user.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CompanyService {
 
     private final CompanyRepository companyRepository;
     private final UserService userService;
+    private final RedisTemplate<String, Object> redisObjectTemplate;
+    private static final String CACHE_KEY_PREFIX = "companies:page:";
 
     @Transactional
     public CompanyResDto createCompany(Long userId, String name, String description) {
@@ -53,11 +59,22 @@ public class CompanyService {
 
     @Transactional(readOnly = true)
     public List<CompanyResDto> findAllCompanies(int page, int size) {
+        final String cacheKey = CACHE_KEY_PREFIX + page;
+
+        if (page == 0) {
+            @SuppressWarnings("unchecked")
+            List<CompanyResDto> cachedCompanies = (List<CompanyResDto>) redisObjectTemplate.opsForValue().get(cacheKey);
+            if (cachedCompanies != null) {
+                log.info("캐시에서 첫 번째 페이지 조회: {}", cacheKey);
+                return cachedCompanies;
+            }
+        }
+
         // 페이지 번호와 크기를 기반으로 Pageable 객체 생성
         Pageable pageable = PageRequest.of(page, size);
         Page<Company> companyPage = companyRepository.findAll(pageable);
 
-        return companyPage.stream()
+        List<CompanyResDto> result = companyPage.stream()
                 .map(company -> new CompanyResDto(
                         company.getId(),
                         company.getUser().getId(),
@@ -67,6 +84,14 @@ public class CompanyService {
                         company.getUpdatedAt()
                 ))
                 .collect(Collectors.toList());
+
+        // 첫 번째 페이지 캐시에 저장
+        if (page == 0) {
+            redisObjectTemplate.opsForValue().set(cacheKey, result, 10, TimeUnit.MINUTES);
+            log.info("첫 번째 페이지 캐시 저장: {}", cacheKey);
+        }
+
+        return result;
     }
 
     @Transactional(readOnly = true)
