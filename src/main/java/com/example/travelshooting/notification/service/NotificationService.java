@@ -1,10 +1,6 @@
 package com.example.travelshooting.notification.service;
 
-import com.example.travelshooting.common.Const;
 import com.example.travelshooting.enums.NotificationStatus;
-import com.example.travelshooting.enums.NotificationType;
-import com.example.travelshooting.enums.ReservationStatus;
-import com.example.travelshooting.notification.dto.NotificationDetails;
 import com.example.travelshooting.notification.dto.NotificationResDto;
 import com.example.travelshooting.notification.entity.Notification;
 import com.example.travelshooting.notification.repository.NotificationRepository;
@@ -15,7 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -32,14 +28,15 @@ public class NotificationService {
     @Transactional(readOnly = true)
     public List<NotificationResDto> findAllByUserIdAndStatus() {
         User user = userService.findAuthenticatedUser();
+        List<Notification> notifications = notificationRepository.findAllByUserIdAndStatus(user.getId(), NotificationStatus.SENT);
 
-        return notificationRepository.findAllByUserIdAndStatus(user.getId(), NotificationStatus.SENT);
-    }
-
-    public Map<ReservationStatus, NotificationDetails> reservationDetails() {
-        return Map.of(
-                ReservationStatus.APPROVED, new NotificationDetails(Const.RESERVATION_APPROVED_SUBJECT, NotificationType.RESERVATION_APPROVED),
-                ReservationStatus.REJECTED, new NotificationDetails(Const.RESERVATION_REJECTED_SUBJECT, NotificationType.RESERVATION_REJECTED)
-        );
+        return notifications.stream().map(notification -> new NotificationResDto(
+                notification.getId(),
+                notification.getDomainType(),
+                notification.getFkId(),
+                notification.getSubject(),
+                notification.getNotificationType(),
+                notification.getCreatedAt()))
+                .collect(Collectors.toList());
     }
 }
