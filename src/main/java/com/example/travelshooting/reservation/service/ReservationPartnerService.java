@@ -1,6 +1,6 @@
 package com.example.travelshooting.reservation.service;
 
-import com.example.travelshooting.enums.CacheTime;
+import com.example.travelshooting.common.Const;
 import com.example.travelshooting.enums.NotificationStatus;
 import com.example.travelshooting.enums.ReservationStatus;
 import com.example.travelshooting.notification.dto.NotificationDetails;
@@ -83,7 +83,7 @@ public class ReservationPartnerService {
 
         // 첫 번째 페이지일 경우 캐시에 저장
         if (pageable.getPageNumber() == 0) {
-            redisObjectTemplate.opsForValue().set(cacheKey, result, CacheTime.RESERVATION_CASH_TIMEOUT.getMinutes(), TimeUnit.MINUTES);
+            redisObjectTemplate.opsForValue().set(cacheKey, result, Const.RESERVATION_CASH_TIMEOUT, TimeUnit.MINUTES);
             log.info("첫 번째 페이지 캐시 저장: {}", cacheKey);
         }
 

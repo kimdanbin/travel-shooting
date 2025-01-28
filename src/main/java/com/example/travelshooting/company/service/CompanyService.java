@@ -1,9 +1,9 @@
 package com.example.travelshooting.company.service;
 
+import com.example.travelshooting.common.Const;
 import com.example.travelshooting.company.dto.CompanyResDto;
 import com.example.travelshooting.company.entity.Company;
 import com.example.travelshooting.company.repository.CompanyRepository;
-import com.example.travelshooting.enums.CacheTime;
 import com.example.travelshooting.user.entity.User;
 import com.example.travelshooting.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -88,7 +88,7 @@ public class CompanyService {
 
         // 첫 번째 페이지 캐시에 저장
         if (page == 0) {
-            redisObjectTemplate.opsForValue().set(cacheKey, result, CacheTime.COMPANY_CASH_TIMEOUT.getMinutes(), TimeUnit.MINUTES);
+            redisObjectTemplate.opsForValue().set(cacheKey, result, Const.COMPANY_CASH_TIMEOUT, TimeUnit.MINUTES);
             log.info("첫 번째 페이지 캐시 저장: {}", cacheKey);
         }
 

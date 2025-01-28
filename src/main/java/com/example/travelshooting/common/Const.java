@@ -9,6 +9,8 @@ public class Const {
     public static final int API_CONNECT_TIMEOUT = 5000;
     public static final int API_READ_TIMEOUT = 5000;
     public static final int SMTP_TIMEOUT = 5000;
+    public static final int RESERVATION_CASH_TIMEOUT = 5;
+    public static final int COMPANY_CASH_TIMEOUT = 5;
 
     // 카카오
     public static final String KAKAO_PAY_TEST_CID = "TC0ONETIME";
@@ -23,4 +25,5 @@ public class Const {
 
     public static final int REPORT_COUNT = 5;
     public static final int LOCAL_PAGE_DEFAULT = 1;
+
 }
