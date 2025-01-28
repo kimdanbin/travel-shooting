@@ -1,6 +1,6 @@
 package com.example.travelshooting.report.repository;
 
-import com.example.travelshooting.enums.ReportType;
+import com.example.travelshooting.enums.DomainType;
 import com.example.travelshooting.report.entity.Report;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,10 +17,10 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
         return findById(reportId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "아이디 " + reportId + "에 해당하는 신고를 찾을 수 없습니다."));
     }
 
-    int countByFkIdAndType(Long posterId, ReportType type);
+    int countByFkIdAndType(Long posterId, DomainType type);
 
 
-    boolean existsByTypeAndFkIdAndUserId(ReportType reportType, Long posterId, Long id);
+    boolean existsByTypeAndFkIdAndUserId(DomainType domainType, Long posterId, Long id);
 
     // 삭제 되지 않은 글과 댓글의 신고 내역 조회
     @Query("SELECT r FROM Report r " +

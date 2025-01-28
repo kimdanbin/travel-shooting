@@ -4,7 +4,7 @@ import com.example.travelshooting.comment.dto.CommentResDto;
 import com.example.travelshooting.comment.entity.Comment;
 import com.example.travelshooting.comment.service.CommentService;
 import com.example.travelshooting.common.Const;
-import com.example.travelshooting.enums.ReportType;
+import com.example.travelshooting.enums.DomainType;
 import com.example.travelshooting.poster.entity.Poster;
 import com.example.travelshooting.poster.service.PosterService;
 import com.example.travelshooting.report.dto.ReportResDto;
@@ -43,16 +43,16 @@ public class ReportService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "본인이 작성한 글은 신고할 수 없습니다.");
         }
         // 신고한 글을 또 신고하려는 경우
-        if(reportRepository.existsByTypeAndFkIdAndUserId(ReportType.POSTER, posterId, user.getId())) {
+        if(reportRepository.existsByTypeAndFkIdAndUserId(DomainType.POSTER, posterId, user.getId())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "이미 신고한 포스터입니다.");
         }
-        Report report = new Report(user, ReportType.POSTER, posterId, reason);
+        Report report = new Report(user, DomainType.POSTER, posterId, reason);
         reportRepository.save(report);
 
         // 특정 포스터의 누적 신고가 5번일 경우, 포스터 삭제 처리
-        int reportCount = reportRepository.countByFkIdAndType(posterId, ReportType.POSTER);
+        int reportCount = reportRepository.countByFkIdAndType(posterId, DomainType.POSTER);
 
-        if (reportCount >= Const.REPORT_COUNT && report.getType().equals(ReportType.POSTER)){
+        if (reportCount >= Const.REPORT_COUNT && report.getType().equals(DomainType.POSTER)){
             List<CommentResDto> comments = commentService.findComments(posterId);
             for (CommentResDto comment : comments) {
                 commentService.deleteComment(posterId, comment.getId()); // 관련 댓글 먼저 soft delete 처리
@@ -79,16 +79,16 @@ public class ReportService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "본인이 작성한 댓글은 신고할 수 없습니다.");
         }
         // 신고한 댓글을 또 신고하려는 경우
-        if(reportRepository.existsByTypeAndFkIdAndUserId(ReportType.COMMENT, commentId, user.getId())) {
+        if(reportRepository.existsByTypeAndFkIdAndUserId(DomainType.COMMENT, commentId, user.getId())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "이미 신고한 댓글입니다.");
         }
-        Report report = new Report(user, ReportType.COMMENT, commentId, reason);
+        Report report = new Report(user, DomainType.COMMENT, commentId, reason);
         reportRepository.save(report);
 
         // 특정 댓글의 누적 신고가 5번일 경우, 댓글 삭제 처리
-        int reportCount = reportRepository.countByFkIdAndType(commentId,ReportType.COMMENT);
+        int reportCount = reportRepository.countByFkIdAndType(commentId, DomainType.COMMENT);
 
-        if (reportCount >= Const.REPORT_COUNT && report.getType().equals(ReportType.COMMENT)) {
+        if (reportCount >= Const.REPORT_COUNT && report.getType().equals(DomainType.COMMENT)) {
             commentService.deleteComment(findComment.getPoster().getId() , commentId);
         }
 
@@ -124,7 +124,7 @@ public class ReportService {
         Report findReport = reportRepository.findByIdOrElseThrow(reportId);
 
         // 타입이 POSTER 인 경우, 해당 포스터 삭제 유무 확인
-        if (findReport.getType() == ReportType.POSTER) {
+        if (findReport.getType() == DomainType.POSTER) {
             Poster poster = posterService.findByIdIncludeDeleted((findReport.getFkId()))
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "아이디 " + findReport.getFkId() + "에 해당하는 포스터를 찾을 수 없습니다."));
             if(poster.isDeleted()) {
@@ -133,7 +133,7 @@ public class ReportService {
         }
 
         // 타입이 COMMENT 인 경우, 해당 댓글 삭제 유무 확인
-        if (findReport.getType() == ReportType.COMMENT) {
+        if (findReport.getType() == DomainType.COMMENT) {
             Comment comment = commentService.findByIdIncludeDeleted((findReport.getFkId()))
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "아이디 " + findReport.getFkId() + "에 해당하는 댓글을 찾을 수 없습니다."));
             if(comment.isDeleted()) {

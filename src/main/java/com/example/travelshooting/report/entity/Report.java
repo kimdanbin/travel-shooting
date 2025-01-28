@@ -1,7 +1,7 @@
 package com.example.travelshooting.report.entity;
 
 import com.example.travelshooting.common.BaseEntity;
-import com.example.travelshooting.enums.ReportType;
+import com.example.travelshooting.enums.DomainType;
 import com.example.travelshooting.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -23,7 +23,7 @@ public class Report extends BaseEntity {
 
     @Column(nullable = false, length = 10)
     @Enumerated(value = EnumType.STRING)
-    private ReportType type;
+    private DomainType type;
 
     @Column(nullable = false)
     private Long fkId;
@@ -31,9 +31,9 @@ public class Report extends BaseEntity {
     @Column(nullable = false)
     private String reason;
 
-    public Report(User user, ReportType reportType, Long posterId, String reason) {
+    public Report(User user, DomainType domainType, Long posterId, String reason) {
         this.user = user;
-        this.type = reportType;
+        this.type = domainType;
         this.fkId = posterId;
         this.reason = reason;
 
