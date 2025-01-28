@@ -1,5 +1,6 @@
 package com.example.travelshooting.company.service;
 
+import com.example.travelshooting.common.Const;
 import com.example.travelshooting.company.dto.CompanyResDto;
 import com.example.travelshooting.company.entity.Company;
 import com.example.travelshooting.company.repository.CompanyRepository;
@@ -87,7 +88,7 @@ public class CompanyService {
 
         // 첫 번째 페이지 캐시에 저장
         if (page == 0) {
-            redisObjectTemplate.opsForValue().set(cacheKey, result, 10, TimeUnit.MINUTES);
+            redisObjectTemplate.opsForValue().set(cacheKey, result, Const.COMPANY_CASH_TIMEOUT, TimeUnit.MINUTES);
             log.info("첫 번째 페이지 캐시 저장: {}", cacheKey);
         }
 
@@ -115,6 +116,11 @@ public class CompanyService {
         findCompany.updateCompany(description);
         companyRepository.save(findCompany);
 
+        // 첫 번째 페이지 캐시 삭제
+        String cacheKey = CACHE_KEY_PREFIX + "0"; // 첫 번째 페이지 캐시 키
+        redisObjectTemplate.delete(cacheKey);
+        log.info("업데이트 시 첫 번째 페이지 캐시 삭제: {}", cacheKey);
+
         return new CompanyResDto(
                 findCompany.getId(),
                 findCompany.getUser().getId(),
@@ -134,6 +140,11 @@ public class CompanyService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "이미 상품이 존재하여 삭제할 수 없습니다.");
         }
         companyRepository.delete(findCompany);
+
+        // 첫 번째 페이지 캐시 삭제
+        String cacheKey = CACHE_KEY_PREFIX + "0"; // 첫 번째 페이지 캐시 키
+        redisObjectTemplate.delete(cacheKey);
+        log.info("업체 삭제 시 첫 번째 페이지 캐시 삭제: {}", cacheKey);
     }
 
     public Company findCompanyById(Long companyId) {
