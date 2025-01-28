@@ -11,8 +11,10 @@ import com.example.travelshooting.reservation.repository.ReservationRepository;
 import com.example.travelshooting.user.entity.User;
 import com.example.travelshooting.user.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +26,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ReservationService {
@@ -33,6 +36,8 @@ public class ReservationService {
     private final ProductService productService;
     private final PartService partService;
     private final ReservationMailService reservationMailService;
+    private final RedisTemplate<String, Object> redisObjectTemplate;
+    private static final String CACHE_KEY_PREFIX = "reservations:product:";
 
     @Transactional
     public ReservationResDto createReservation(Long productId, Long partId, LocalDate reservationDate, Integer headCount) {
@@ -89,6 +94,11 @@ public class ReservationService {
 
         reservation.updateReservation(ReservationStatus.CANCELED);
         reservationRepository.save(reservation);
+
+        // 예약 취소 시 첫 번째 페이지 캐시 삭제
+        final String cacheKey = CACHE_KEY_PREFIX + productId + ":page:0";
+        redisObjectTemplate.delete(cacheKey);
+        log.info("예약 취소 시 첫 번째 페이지 캐시 삭제: {}", cacheKey);
     }
 
     @Transactional(readOnly = true)
