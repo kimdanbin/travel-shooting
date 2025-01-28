@@ -1,6 +1,7 @@
 package com.example.travelshooting.reservation.service;
 
 import com.example.travelshooting.enums.ReservationStatus;
+import com.example.travelshooting.notification.service.ReservationMailService;
 import com.example.travelshooting.part.entity.Part;
 import com.example.travelshooting.part.service.PartService;
 import com.example.travelshooting.product.entity.Product;
@@ -46,6 +47,7 @@ public class ReservationService {
         Part part = partService.findPartById(partId);
         Optional<Reservation> findReservation = reservationRepository.findReservationByUserIdAndReservationDate(user.getId(), reservationDate);
         Integer totalHeadCount = reservationRepository.findTotalHeadCountByPartIdAndReservationDate(part.getId(), reservationDate);
+        User partner = userService.findUserByReservationId(findReservation.get().getId());
 
         if (findReservation.isPresent()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 날짜에 예약한 내역이 있습니다.");
@@ -65,8 +67,9 @@ public class ReservationService {
         Reservation reservation = new Reservation(user, part, reservationDate, headCount, totalPrice);
         reservationRepository.save(reservation);
 
-        // 사용자 예약 신청 완료 메일
-        reservationMailService.sendMail(user, product, part, reservation, reservation.getStatus());
+        // 메일
+        reservationMailService.sendMail(user, product, part, reservation);
+        reservationMailService.sendMail(partner, product, part, reservation);
 
         return new ReservationResDto(
                 reservation.getId(),
@@ -87,6 +90,8 @@ public class ReservationService {
         User user = userService.findAuthenticatedUser();
         Product product = productService.findProductById(productId);
         Reservation reservation = reservationRepository.findReservationByUserIdAndProductIdAndId(user.getId(), product.getId(), reservationId);
+        User partner = userService.findUserByReservationId(reservation.getId());
+        Part part = partService.findPartByReservationId(reservation.getId());
 
         if (reservation == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "예약 내역이 없습니다.");
@@ -94,6 +99,10 @@ public class ReservationService {
 
         reservation.updateReservation(ReservationStatus.CANCELED);
         reservationRepository.save(reservation);
+
+        // 메일
+        reservationMailService.sendMail(user, product, part, reservation);
+        reservationMailService.sendMail(partner, product, part, reservation);
 
         // 예약 취소 시 첫 번째 페이지 캐시 삭제
         final String cacheKey = CACHE_KEY_PREFIX + productId + ":page:0";
