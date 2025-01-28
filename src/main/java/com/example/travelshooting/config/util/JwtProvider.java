@@ -8,6 +8,8 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
@@ -17,6 +19,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 @Component
@@ -40,17 +43,32 @@ public class JwtProvider {
   /**
    * 리프레시 토큰 만료시간(밀리초).
    */
-//  @Getter
-//  @Value("${jwt.refresh-expiry-millis}")
-//  private long refreshExpiryMillis;
+  @Getter
+  @Value("${jwt.refresh-expiry-millis}")
+  private long refreshExpiryMillis;
 
   private final UserRepository userRepository;
+  private final RedisTemplate<String, String> redisTemplate;
 
-  public String generateToken(Authentication authentication) {
+  public String generateAccessToken(Authentication authentication) {
     String username = authentication.getName();
+//    String accessToken = generateAccessTokenBy(username);
 
-    return this.generateTokenBy(username);
+    return generateAccessTokenBy(username);
   }
+
+  public String generateAccessToken(String email) {
+    return generateAccessTokenBy(email);
+  }
+
+  public String generateRefreshToken(Authentication authentication) {
+    String username = authentication.getName();
+    String refreshToken = generateRefreshTokenBy(username);
+    ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
+    valueOperations.set(username, refreshToken, refreshExpiryMillis, TimeUnit.MILLISECONDS);
+    return refreshToken;
+  }
+
   // Refresh token
 //  public TokenDto generateToken(Authentication authentication) throws EntityNotFoundException {
 //
@@ -62,13 +80,6 @@ public class JwtProvider {
 //    return new TokenDto(accessToken, refreshToken);
 //  }
 
-//  public TokenDto generateToken(String email) throws EntityNotFoundException {
-//
-//    String accessToken = this.generateTokenBy(email);
-//    String refreshToken = this.generateRefreshToken(email);
-//
-//    return new TokenDto(accessToken, refreshToken);
-//  }
 
   public String getUsername(String token) {
     Claims claims = this.getClaims(token);
@@ -90,7 +101,7 @@ public class JwtProvider {
     return false;
   }
 
-  private String generateTokenBy(String email) {
+  private String generateAccessTokenBy(String email) {
     Optional<User> user = userRepository.findByEmail(email);
 
     if (user.isEmpty()) {
@@ -108,6 +119,24 @@ public class JwtProvider {
         .claim("role", user.get().getRole()) // 사용자의 역할(Role)을 role이라는 클레임에 추가, 클레임은 JWT의 Payload에 포함되며, 인증 및 인가 과정에서 사용
         .signWith(Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8)), Jwts.SIG.HS256) // 비밀 키 생성 , 문자열을 바이트 배열로 변환
         .compact(); // 토큰 생성
+  }
+  // 리프레시 토큰 생성
+  public String generateRefreshTokenBy(String email) {
+    Optional<User> user = userRepository.findByEmail(email);
+
+    if (user.isEmpty()) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "유효하지 않은 이메일 입니다.");
+    }
+
+    Date currentDate = new Date();
+    Date expireDate = new Date(currentDate.getTime() + this.refreshExpiryMillis);
+
+    return Jwts.builder()
+        .subject(email)
+        .issuedAt(currentDate)
+        .expiration(expireDate)
+        .signWith(Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8)), Jwts.SIG.HS256)
+        .compact();
   }
 
   private Claims getClaims(String token) {
@@ -127,18 +156,7 @@ public class JwtProvider {
 
     return expiration.before(new Date());
   }
-    // 리프레시 토큰 생성
-//  public String generateRefreshToken(String email) {
-//    Date currentDate = new Date();
-//    Date expireDate = new Date(currentDate.getTime() + this.refreshExpiryMillis);
-//
-//    return Jwts.builder()
-//        .subject(email)
-//        .issuedAt(currentDate)
-//        .expiration(expireDate)
-//        .signWith(Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8)), Jwts.SIG.HS256)
-//        .compact();
-//  }
+
 
 //  // 리프레시 토큰 검증
 //  public boolean validRefreshToken(String token) {
@@ -150,6 +168,26 @@ public class JwtProvider {
 //      return false;
 //    }
 //  }
+  // 리프레시 토큰 검증
+public boolean validateRefreshToken(String email, String refreshToken) {
+  ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
+  String savedToken = valueOperations.get(email);
+
+  if (savedToken == null || !savedToken.equals(refreshToken)) {
+    return false;
+  }
+
+  try {
+    Jwts.parser()
+        .setSigningKey(Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8)))
+        .build()
+        .parseClaimsJws(refreshToken);
+    return true;
+  } catch (JwtException e) {
+    log.error("Invalid Refresh Token: {}", e.getMessage());
+    return false;
+  }
+}
 
   private Date getExpirationDateFromToken(String token) {
     return resolveClaims(token, Claims::getExpiration);

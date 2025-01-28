@@ -5,8 +5,6 @@
 </head>
 <body>
     <!-- 사용자가 받을 메세지 -->
-    <p th:if="${role == 'USER'}" th:text="'안녕하세요, ' + ${userName} + '님!'"></p>
-
     <p th:if="${role == 'USER' and status == 'PENDING'}">
         예약 신청이 완료되었습니다. <br />
         예약 승인은 업체의 사정에 따라 늦어질 수 있습니다. <br />
@@ -20,7 +18,6 @@
         Travel Shooting 서비스를 이용해 주셔서 감사합니다!😊 <br /><br />
     </p>
     <p th:if="${role == 'USER' and status == 'REJECTED'}">
-        죄송합니다. <br />
         업체 사정으로 인해 예약이 거절되었습니다. <br /><br />
         Travel Shooting 서비스를 이용해 주셔서 감사합니다!😊 <br /><br />
     </p>
@@ -60,7 +57,7 @@
         <strong>레저/티켓 일정:</strong> <span th:text="${partOpenAt}"></span> ~ <span th:text="${partCloseAt}"></span>
     </p>
     <p>
-        <strong>예약 인원:</strong> <span th:text="${headCount}">명</span>
+        <strong>예약 인원:</strong> <span th:text="${headCount}"></span> 명
     </p>
     <p>
         <strong>예약 신청일:</strong> <span th:text="${createdAt}"></span>

@@ -13,4 +13,7 @@ public class JwtAuthResDto implements BaseDtoDataType {
 
   // access token.
   private final String accessToken;
+
+  // refresh token.
+  private final String refreshToken;
 }

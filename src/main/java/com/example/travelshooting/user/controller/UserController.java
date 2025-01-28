@@ -49,6 +49,11 @@ public class UserController {
 //    }
 //    throw new UsernameNotFoundException("로그인이 먼저 필요합니다.");
 //  }
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(@RequestParam String email) {
+        userService.logout(email); // 서비스 레이어 호출
+        return ResponseEntity.ok("로그아웃 성공");
+    }
 
     // 비밀번호 확인 후 회원탈퇴
 //    @DeleteMapping("/{userId}")

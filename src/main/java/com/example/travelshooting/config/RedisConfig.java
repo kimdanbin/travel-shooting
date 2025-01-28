@@ -1,5 +1,8 @@
 package com.example.travelshooting.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -48,11 +51,20 @@ public class RedisConfig {
     RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
     redisTemplate.setConnectionFactory(redisConnectionFactory());
 
+    // Jackson ObjectMapper 설정
+    ObjectMapper objectMapper = new ObjectMapper(); // 자바 객체를 JSON으로 변환
+    objectMapper.registerModule(new JavaTimeModule()); // Java 8 Time Module 등록 -> Jackson이 LocalDate, LocalDateTime을 처리할 수 있게 해줌
+    objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS); // ISO-8601 형식 사용
+
+    // GenericJackson2JsonRedisSerializer -> 객체를 JSON 형식으로 직렬화
+    // objectMapper를 GenericJackson2JsonRedisSerializer에 전달 -> LocalDate, LocalDateTime 직렬화 가능
+    GenericJackson2JsonRedisSerializer serializer = new GenericJackson2JsonRedisSerializer(objectMapper);
+
     // 직렬화 설정
     redisTemplate.setKeySerializer(new StringRedisSerializer());
-    redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer());
+    redisTemplate.setValueSerializer(serializer);
     redisTemplate.setHashKeySerializer(new StringRedisSerializer());
-    redisTemplate.setHashValueSerializer(new GenericJackson2JsonRedisSerializer());
+    redisTemplate.setHashValueSerializer(serializer);
 
     return redisTemplate;
   }
