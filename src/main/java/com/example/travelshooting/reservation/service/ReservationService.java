@@ -61,7 +61,7 @@ public class ReservationService {
         reservationRepository.save(reservation);
 
         // 사용자 예약 신청 완료 메일
-        reservationMailService.sendMail(user, product, part, reservation, user.getRole(), reservation.getStatus());
+        reservationMailService.sendMail(user, product, part, reservation, reservation.getStatus());
 
         return new ReservationResDto(
                 reservation.getId(),

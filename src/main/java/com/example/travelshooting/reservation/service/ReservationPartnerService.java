@@ -1,6 +1,10 @@
 package com.example.travelshooting.reservation.service;
 
+import com.example.travelshooting.enums.NotificationStatus;
 import com.example.travelshooting.enums.ReservationStatus;
+import com.example.travelshooting.notification.dto.NotificationDetails;
+import com.example.travelshooting.notification.entity.Notification;
+import com.example.travelshooting.notification.service.NotificationService;
 import com.example.travelshooting.part.entity.Part;
 import com.example.travelshooting.part.service.PartService;
 import com.example.travelshooting.product.entity.Product;
@@ -19,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,6 +35,7 @@ public class ReservationPartnerService {
     private final ProductService productService;
     private final ReservationMailService reservationMailService;
     private final PartService partService;
+    private final NotificationService notificationService;
 
     @Transactional(readOnly = true)
     public List<ReservationResDto> findAllByProductIdAndUserId(Long productId, Pageable pageable) {
@@ -100,9 +106,13 @@ public class ReservationPartnerService {
         reservation.updateStatus(ReservationStatus.valueOf(status));
         Reservation updatedReservation = reservationRepository.save(reservation);
 
-        // 예약 신청 및 거절 메일
-        reservationMailService.sendMail(partner, product, part, reservation, partner.getRole(), reservation.getStatus());
-        reservationMailService.sendMail(user, product, part, reservation, user.getRole(), reservation.getStatus());
+        // 메일
+        reservationMailService.sendMail(user, product, part, reservation, reservation.getStatus());
+
+        // 알림
+        Map<ReservationStatus, NotificationDetails> detailsMap = notificationService.reservationDetails();
+        NotificationDetails details = detailsMap.get(reservation.getStatus());
+        notificationService.save(new Notification(user, reservation, details.subject(), NotificationStatus.SENT, details.type()));
 
         return new ReservationResDto(
                 updatedReservation.getId(),
