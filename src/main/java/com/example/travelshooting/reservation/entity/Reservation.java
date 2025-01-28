@@ -2,7 +2,6 @@ package com.example.travelshooting.reservation.entity;
 
 import com.example.travelshooting.common.BaseEntity;
 import com.example.travelshooting.enums.ReservationStatus;
-import com.example.travelshooting.notification.entity.Notification;
 import com.example.travelshooting.part.entity.Part;
 import com.example.travelshooting.payment.entity.Payment;
 import com.example.travelshooting.user.entity.User;
@@ -51,9 +50,6 @@ public class Reservation extends BaseEntity {
 
     @OneToMany(mappedBy = "reservation")
     private List<Payment> payments = new ArrayList<>();
-
-    @OneToMany(mappedBy = "reservation")
-    private List<Notification> notifications = new ArrayList<>();
 
     public Reservation(User user, Part part, LocalDate reservationDate, Integer headCount, Integer totalPrice) {
         this.user = user;

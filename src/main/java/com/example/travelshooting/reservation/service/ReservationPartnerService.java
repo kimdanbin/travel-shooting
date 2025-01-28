@@ -1,6 +1,7 @@
 package com.example.travelshooting.reservation.service;
 
 import com.example.travelshooting.common.Const;
+import com.example.travelshooting.enums.DomainType;
 import com.example.travelshooting.enums.NotificationStatus;
 import com.example.travelshooting.enums.ReservationStatus;
 import com.example.travelshooting.notification.dto.NotificationDetails;
@@ -140,7 +141,7 @@ public class ReservationPartnerService {
         // 알림
         Map<ReservationStatus, NotificationDetails> detailsMap = notificationService.reservationDetails();
         NotificationDetails details = detailsMap.get(reservation.getStatus());
-        notificationService.save(new Notification(user, reservation, details.subject(), NotificationStatus.SENT, details.type()));
+        notificationService.save(new Notification(user, DomainType.RESERVATION, reservation.getId(), details.subject(), NotificationStatus.SENT, details.type()));
 
         // 상태 업데이트 시 첫 번째 페이지 캐시 삭제
         final String cacheKey = CACHE_KEY_PREFIX + productId + ":page:0";
