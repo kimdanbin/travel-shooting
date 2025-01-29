@@ -70,11 +70,12 @@ public class PaymentService {
         Product product = productService.findProductById(productId);
         User user = userService.findAuthenticatedUser();
         Reservation reservation = reservationService.findReservationByUserIdAndProductIdAndId(user.getId(), product.getId(), reservationId);
-        Payment payment = paymentRepository.findPaymentByReservationId(reservation.getId());
 
         if (reservation == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "예약 내역을 찾을 수 없습니다.");
         }
+
+        Payment payment = paymentRepository.findPaymentByReservationId(reservation.getId());
 
         if (!reservation.getStatus().equals(ReservationStatus.APPROVED)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "예약 승인이 먼저 되어야 합니다.");
