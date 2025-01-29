@@ -25,11 +25,11 @@ public class ReservationMailService {
     private final NotificationService notificationService;
 
     // 예약 메일 전송
-    public void sendMail(User user, Product product, Part part, Reservation reservation) {
+    public void sendMail(User user, Product product, Part part, Reservation reservation, String userName) {
         Map<ReservationStatus, NotificationDetails> detailsMap = reservationDetails();
         NotificationDetails details = detailsMap.get(reservation.getStatus());
 
-        String content = mailContent(user, product, part, reservation);
+        String content = mailContent(user, product, part, reservation, userName);
         mailService.sendMail(user.getEmail(), details.subject(), content);
 
         try {
@@ -40,11 +40,11 @@ public class ReservationMailService {
     }
 
     // 예약 메일 내용에 들어갈 데이터
-    public String mailContent(User user, Product product, Part part, Reservation reservation) {
+    public String mailContent(User user, Product product, Part part, Reservation reservation, String userName) {
         Map<String, Object> contents = new HashMap<>();
         contents.put("role", user.getRole().name());
         contents.put("status", reservation.getStatus().name());
-        contents.put("userName", user.getName());
+        contents.put("userName", userName); // 예약자 이름
         contents.put("reservationDate", reservation.getReservationDate());
         contents.put("productName", product.getName());
         contents.put("partOpenAt", part.getOpenAt());

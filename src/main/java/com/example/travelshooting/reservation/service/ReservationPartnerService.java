@@ -130,7 +130,7 @@ public class ReservationPartnerService {
         Reservation updatedReservation = reservationRepository.save(reservation);
 
         // 메일
-        reservationMailService.sendMail(user, product, part, reservation);
+        reservationMailService.sendMail(user, product, part, reservation, user.getName());
 
         // 상태 업데이트 시 첫 번째 페이지 캐시 삭제
         final String cacheKey = CACHE_KEY_PREFIX + productId + ":page:0";
