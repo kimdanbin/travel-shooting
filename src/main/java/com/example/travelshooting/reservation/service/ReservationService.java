@@ -72,8 +72,8 @@ public class ReservationService {
         reservationRepository.save(reservation);
 
         // 메일
-        reservationMailService.sendMail(user, product, part, reservation);
-        reservationMailService.sendMail(partner, product, part, reservation);
+        reservationMailService.sendMail(user, product, part, reservation, user.getName());
+        reservationMailService.sendMail(partner, product, part, reservation, user.getName());
 
         return new ReservationResDto(
                 reservation.getId(),
@@ -106,8 +106,8 @@ public class ReservationService {
         reservationRepository.save(reservation);
 
         // 메일
-        reservationMailService.sendMail(user, product, part, reservation);
-        reservationMailService.sendMail(partner, product, part, reservation);
+        reservationMailService.sendMail(user, product, part, reservation, user.getName());
+        reservationMailService.sendMail(partner, product, part, reservation, user.getName());
 
         // 예약 취소 시 첫 번째 페이지 캐시 삭제
         final String cacheKey = CACHE_KEY_PREFIX + productId + ":page:0";
