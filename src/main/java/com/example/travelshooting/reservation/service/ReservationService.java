@@ -1,5 +1,7 @@
 package com.example.travelshooting.reservation.service;
 
+import com.example.travelshooting.company.entity.Company;
+import com.example.travelshooting.company.service.CompanyService;
 import com.example.travelshooting.enums.ReservationStatus;
 import com.example.travelshooting.notification.service.ReservationMailService;
 import com.example.travelshooting.part.entity.Part;
@@ -36,6 +38,7 @@ public class ReservationService {
     private final UserService userService;
     private final ProductService productService;
     private final PartService partService;
+    private final CompanyService companyService;
     private final ReservationMailService reservationMailService;
     private final RedisTemplate<String, Object> redisObjectTemplate;
     private static final String CACHE_KEY_PREFIX = "reservations:product:";
@@ -45,9 +48,10 @@ public class ReservationService {
         Product product = productService.findProductById(productId);
         User user = userService.findAuthenticatedUser();
         Part part = partService.findPartById(partId);
+        Company company = companyService.findCompanyByProductId(product.getId());
+        User partner = userService.findUserByCompanyId(company.getId());
         Optional<Reservation> findReservation = reservationRepository.findReservationByUserIdAndReservationDate(user.getId(), reservationDate);
         Integer totalHeadCount = reservationRepository.findTotalHeadCountByPartIdAndReservationDate(part.getId(), reservationDate);
-        User partner = userService.findUserByReservationId(findReservation.get().getId());
 
         if (findReservation.isPresent()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 날짜에 예약한 내역이 있습니다.");
@@ -89,8 +93,9 @@ public class ReservationService {
     public void deleteReservation(Long productId, Long reservationId) {
         User user = userService.findAuthenticatedUser();
         Product product = productService.findProductById(productId);
+        Company company = companyService.findCompanyByProductId(product.getId());
+        User partner = userService.findUserByCompanyId(company.getId());
         Reservation reservation = reservationRepository.findReservationByUserIdAndProductIdAndId(user.getId(), product.getId(), reservationId);
-        User partner = userService.findUserByReservationId(reservation.getId());
         Part part = partService.findPartByReservationId(reservation.getId());
 
         if (reservation == null) {
