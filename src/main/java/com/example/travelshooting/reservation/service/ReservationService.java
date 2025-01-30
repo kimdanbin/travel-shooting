@@ -23,6 +23,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.event.TransactionalEventListener;
 import org.springframework.web.server.ResponseStatusException;
@@ -193,6 +194,7 @@ public class ReservationService {
     }
 
     @TransactionalEventListener
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void sendExpiredReservationMail(SendEmailEvent<Reservation> event) {
         Reservation reservation = event.getData();
 
