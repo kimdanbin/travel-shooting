@@ -26,5 +26,6 @@ public class Const {
 
     public static final int REPORT_COUNT = 5;
     public static final int LOCAL_PAGE_DEFAULT = 1;
-
+    public static final int RESERVATION_EXPIRED_DAY = 1;
+    public static final int RESERVATION_EXPIRED_HOUR = 18;
 }

@@ -1,5 +1,6 @@
 package com.example.travelshooting.reservation.service;
 
+import com.example.travelshooting.common.Const;
 import com.example.travelshooting.company.entity.Company;
 import com.example.travelshooting.company.service.CompanyService;
 import com.example.travelshooting.enums.PaymentStatus;
@@ -182,7 +183,7 @@ public class ReservationService {
             boolean isPaid = reservation.getPayments().stream()
                     .anyMatch(payment -> payment.getStatus() == PaymentStatus.APPROVED);
 
-            LocalDateTime expirationTime = reservation.getUpdatedAt().plusDays(1).withHour(18).withMinute(0).withSecond(0).withNano(0);
+            LocalDateTime expirationTime = reservation.getUpdatedAt().plusDays(Const.RESERVATION_EXPIRED_DAY).withHour(Const.RESERVATION_EXPIRED_HOUR).withMinute(0).withSecond(0).withNano(0);
 
             if (!isPaid && LocalDateTime.now().isAfter(expirationTime)) {
                 reservation.updateReservation(ReservationStatus.EXPIRED);
