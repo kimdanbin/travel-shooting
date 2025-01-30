@@ -14,7 +14,7 @@ public class SchedulerConfig {
     private final ReservationService reservationService;
 
     @Scheduled(cron = "0 0 18 * * ?")
-    public void autoCancelReservations() {
+    public void cancelExpiredReservations() {
         reservationService.cancelExpiredReservations();
     }
 }
