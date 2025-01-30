@@ -5,42 +5,41 @@ on:
   pull_request:
     branches: [ "test" ]
 jobs:
-  deploy:
+  docker-build-and-push:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-
-      - name: Build with Gradle
-        run: |
-          chmod +x ./gradlew
-          ./gradlew build
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
-          aws-region: ap-northeast-2
-
-      - name: Login to ECR
-        uses: aws-actions/amazon-ecr-login@v1
-        id: login-ecr
-
-      - name: Build and Push Docker image
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: travel-shooting
-          IMAGE_TAG: latest
-        run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-
+          username: kimdanbin
+          password: ${{ secrets.DOCKER_TOKEN }}
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          file: ./Dockerfile
+          push: true
+          tags: kimdanbin/travel-shooting:latest
+  # Ec2 에 배포
+  deploy-to-ec2:
+    needs: docker-build-and-push
+    runs-on: ubuntu-latest
+    # https://github.com/marketplace/actions/ssh-remote-commands
+    steps:
       - name: Deploy to EC2
-        uses: appleboy/ssh-action@master
+        env:
+          ENV: ${{ secrets.ENV }}
+        uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.EC2_HOST }}
-          username: ec2-user
+          username: ubuntu
           key: ${{ secrets.EC2_KEY }}
           script: |
-            chmod +x ~/deploy.sh
-            ~/deploy.sh ${{ secrets.AWS_ACCOUNT }} ${{ secrets.AWS_REGION }}
+            cd ~
+            sudo echo "$ENV" > .env
+            sudo docker-compose down
+            sudo docker-compose pull
+            sudo docker-compose up -d
