@@ -22,6 +22,7 @@ public class Const {
     public static final String RESERVATION_APPROVED_SUBJECT = "예약 승인 알림이 왔습니다.";
     public static final String RESERVATION_REJECTED_SUBJECT = "예약 거절 알림이 왔습니다.";
     public static final String RESERVATION_CANCELED_SUBJECT = "예약 취소 알림이 왔습니다.";
+    public static final String RESERVATION_EXPIRED_SUBJECT = "예약 만료 알림이 왔습니다.";
 
     public static final int REPORT_COUNT = 5;
     public static final int LOCAL_PAGE_DEFAULT = 1;
