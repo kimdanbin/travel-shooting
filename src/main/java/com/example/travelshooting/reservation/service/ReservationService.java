@@ -2,8 +2,10 @@ package com.example.travelshooting.reservation.service;
 
 import com.example.travelshooting.company.entity.Company;
 import com.example.travelshooting.company.service.CompanyService;
+import com.example.travelshooting.enums.PaymentStatus;
 import com.example.travelshooting.enums.ReservationStatus;
 import com.example.travelshooting.notification.service.ReservationMailService;
+import com.example.travelshooting.notification.service.SendEmailEvent;
 import com.example.travelshooting.part.entity.Part;
 import com.example.travelshooting.part.service.PartService;
 import com.example.travelshooting.product.entity.Product;
@@ -15,12 +17,14 @@ import com.example.travelshooting.user.entity.User;
 import com.example.travelshooting.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.event.TransactionalEventListener;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
@@ -40,6 +44,7 @@ public class ReservationService {
     private final PartService partService;
     private final CompanyService companyService;
     private final ReservationMailService reservationMailService;
+    private final ApplicationEventPublisher eventPublisher;
     private final RedisTemplate<String, Object> redisObjectTemplate;
     private static final String CACHE_KEY_PREFIX = "reservations:product:";
 
@@ -168,13 +173,37 @@ public class ReservationService {
         return reservationRepository.findReservationByUserIdAndProductIdAndId(userId, productId, reservationId);
     }
 
-    public List<Reservation> cancelExpiredReservations() {
-        LocalDateTime expirationTime = LocalDateTime.now().minusDays(1).withHour(18).withMinute(0).withSecond(0);
-        List<Reservation> expiredReservations = reservationRepository.findExpiredReservations(expirationTime);
+    @Transactional
+    public void cancelExpiredReservations() {
+        List<Reservation> approvedReservations = reservationRepository.findAllByStatus(ReservationStatus.APPROVED);
 
-        expiredReservations.forEach(reservation -> reservation.updateReservation(ReservationStatus.EXPIRED));
+        approvedReservations.forEach(reservation -> {
+            boolean isPaid = reservation.getPayments().stream()
+                    .anyMatch(payment -> payment.getStatus() == PaymentStatus.APPROVED);
 
-        return reservationRepository.saveAll(expiredReservations);
+            LocalDateTime expirationTime = reservation.getUpdatedAt().plusDays(1).withHour(18).withMinute(0).withSecond(0).withNano(0);
+
+            if (!isPaid && LocalDateTime.now().isAfter(expirationTime)) {
+                reservation.updateReservation(ReservationStatus.EXPIRED);
+                reservationRepository.save(reservation);
+
+                eventPublisher.publishEvent(new SendEmailEvent(this, reservation));
+            }
+        });
+    }
+
+    @TransactionalEventListener
+    public void sendExpiredReservationMail(SendEmailEvent<Reservation> event) {
+        Reservation expiredReservation = event.getData();
+
+        Part part = partService.findPartByReservationId(expiredReservation.getId());
+        Product product = productService.findProductByPartId(part.getId());
+        Company company = companyService.findCompanyByProductId(product.getId());
+        User partner = userService.findUserByCompanyId(company.getId());
+        User user = userService.findUserByReservationId(expiredReservation.getId());
+
+        reservationMailService.sendMail(user, product, part, expiredReservation, user.getName());
+        reservationMailService.sendMail(partner, product, part, expiredReservation, user.getName());
     }
 
     public Reservation findReservationByPaymentIdAndUserId(Long paymentId, Long userId) {
