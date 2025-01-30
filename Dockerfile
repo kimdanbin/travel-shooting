@@ -20,6 +20,7 @@
 FROM amazoncorretto:21 AS builder
 WORKDIR /build
 COPY . .
+RUN chmod +x ./gradlew
 RUN ./gradlew build -x test
 
 # Run stage
