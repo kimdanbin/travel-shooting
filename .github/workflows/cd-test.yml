@@ -30,8 +30,6 @@ jobs:
     # https://github.com/marketplace/actions/ssh-remote-commands
     steps:
       - name: Deploy to EC2
-        env:
-          ENV: ${{ secrets.ENV }}
         uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.EC2_HOST }}
@@ -39,8 +37,7 @@ jobs:
           key: ${{ secrets.EC2_KEY }}
           script: |
             cd ~
-            sudo echo "$ENV" > .env
+            sudo echo "${{ secrets.ENV }}" > .env
             sudo cat .env
             sudo docker-compose down
-            sudo docker-compose pull
             sudo docker-compose up -d
