@@ -60,4 +60,8 @@ public class Notification {
         this.status = status;
         this.notificationType = notificationType;
     }
+
+    public void updateNotification() {
+        this.isDeleted = true;
+    }
 }
