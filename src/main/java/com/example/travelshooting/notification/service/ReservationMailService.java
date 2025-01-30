@@ -61,7 +61,7 @@ public class ReservationMailService {
                 ReservationStatus.REJECTED, new NotificationDetails(Const.RESERVATION_REJECTED_SUBJECT, NotificationType.RESERVATION_REJECTED),
                 ReservationStatus.PENDING, new NotificationDetails(Const.RESERVATION_APPLY_SUBJECT, NotificationType.RESERVATION_APPLY),
                 ReservationStatus.CANCELED, new NotificationDetails(Const.RESERVATION_CANCELED_SUBJECT, NotificationType.RESERVATION_CANCELED),
-                ReservationStatus.EXPIRED, new NotificationDetails(Const.RESERVATION_CANCELED_SUBJECT, NotificationType.RESERVATION_CANCELED)
+                ReservationStatus.EXPIRED, new NotificationDetails(Const.RESERVATION_EXPIRED_SUBJECT, NotificationType.RESERVATION_EXPIRED)
         );
     }
 }

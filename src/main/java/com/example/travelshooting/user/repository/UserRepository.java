@@ -23,6 +23,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
   @Query("SELECT u FROM User u INNER JOIN u.companies c ON u.id = c.user.id WHERE c.id = :companyId")
   User findUserByCompanyId(@Param("companyId") Long companyId);
 
-  @Query("SELECT u FROM User u JOIN FETCH u.reservations r WHERE r.id = :reservationId")
+  @Query("SELECT u FROM User u INNER JOIN Reservation r ON u.id = r.user.id WHERE r.id = :reservationId")
   User findUserByReservationId(@Param("reservationId") Long reservationId);
 }

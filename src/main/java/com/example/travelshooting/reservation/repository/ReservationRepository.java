@@ -1,5 +1,6 @@
 package com.example.travelshooting.reservation.repository;
 
+import com.example.travelshooting.enums.ReservationStatus;
 import com.example.travelshooting.reservation.entity.Reservation;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,7 +13,6 @@ import org.springframework.stereotype.Repository;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,7 +24,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     }
 
     @Query("SELECT COALESCE(SUM(r.headCount), 0) FROM Reservation r WHERE r.part.id = :partId AND r.reservationDate = :reservationDate")
-    Integer findTotalHeadCountByPartIdAndReservationDate(@Param("partId") Long partId, @Param("reservationDate")LocalDate reservationDate);
+    Integer findTotalHeadCountByPartIdAndReservationDate(@Param("partId") Long partId, @Param("reservationDate") LocalDate reservationDate);
 
     Optional<Reservation> findReservationByUserIdAndReservationDate(Long userId, LocalDate reservationDate);
 
@@ -52,9 +52,8 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             "WHERE p.id = :productId AND c.user.id = :userId AND r.id = :reservationId")
     Reservation findReservationByProductIdAndUserIdAndId(@Param("productId") Long productId, @Param("userId") Long userId, @Param("reservationId") Long reservationId);
 
-    @Query("SELECT r FROM Reservation r WHERE r.updatedAt <= :expirationTime AND r.status = 'APPROVED' AND r.isDeleted = false")
-    List<Reservation> findExpiredReservations(@Param("expirationTime") LocalDateTime expirationTime);
-
     @Query("SELECT r FROM Reservation r INNER JOIN Payment p ON r.id = p.reservation.id WHERE p.id = :paymentId AND p.userId = :userId")
     Reservation findReservationByPaymentIdAndUserId(@Param("paymentId") Long paymentId, @Param("userId") Long userId);
+
+    List<Reservation> findAllByStatus(ReservationStatus reservationStatus);
 }

@@ -29,7 +29,7 @@ public class Notification {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(nullable = false, length = 10)
+    @Column(nullable = false, length = 20)
     @Enumerated(value = EnumType.STRING)
     private DomainType domainType;
 
@@ -43,7 +43,7 @@ public class Notification {
     @Enumerated(value = EnumType.STRING)
     private NotificationStatus status = NotificationStatus.PENDING;
 
-    @Column(nullable = false, length = 10)
+    @Column(nullable = false, length = 30)
     @Enumerated(value = EnumType.STRING)
     private NotificationType notificationType;
 
@@ -59,5 +59,9 @@ public class Notification {
         this.subject = subject;
         this.status = status;
         this.notificationType = notificationType;
+    }
+
+    public void updateNotification() {
+        this.isDeleted = true;
     }
 }
