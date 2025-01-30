@@ -151,8 +151,11 @@ public class CompanyService {
         return companyRepository.findCompanyById(companyId);
     }
 
-    public  Company findCompanyByIdAndUserId(Long companyId, Long userId) {
+    public Company findCompanyByIdAndUserId(Long companyId, Long userId) {
         return companyRepository.findCompanyByIdAndUserId(companyId, userId);
     }
 
+    public Company findCompanyByProductId(Long productId) {
+        return companyRepository.findCompanyByProductId(productId);
+    }
 }
