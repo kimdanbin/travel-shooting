@@ -194,16 +194,16 @@ public class ReservationService {
 
     @TransactionalEventListener
     public void sendExpiredReservationMail(SendEmailEvent<Reservation> event) {
-        Reservation expiredReservation = event.getData();
+        Reservation reservation = event.getData();
 
-        Part part = partService.findPartByReservationId(expiredReservation.getId());
+        Part part = partService.findPartByReservationId(reservation.getId());
         Product product = productService.findProductByPartId(part.getId());
         Company company = companyService.findCompanyByProductId(product.getId());
         User partner = userService.findUserByCompanyId(company.getId());
-        User user = userService.findUserByReservationId(expiredReservation.getId());
+        User user = userService.findUserByReservationId(reservation.getId());
 
-        reservationMailService.sendMail(user, product, part, expiredReservation, user.getName());
-        reservationMailService.sendMail(partner, product, part, expiredReservation, user.getName());
+        reservationMailService.sendMail(user, product, part, reservation, user.getName());
+        reservationMailService.sendMail(partner, product, part, reservation, user.getName());
     }
 
     public Reservation findReservationByPaymentIdAndUserId(Long paymentId, Long userId) {
