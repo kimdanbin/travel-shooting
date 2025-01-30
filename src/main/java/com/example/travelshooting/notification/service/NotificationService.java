@@ -1,5 +1,6 @@
 package com.example.travelshooting.notification.service;
 
+import com.example.travelshooting.common.Const;
 import com.example.travelshooting.enums.NotificationStatus;
 import com.example.travelshooting.notification.dto.NotificationResDto;
 import com.example.travelshooting.notification.entity.Notification;
@@ -10,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,5 +40,19 @@ public class NotificationService {
                 notification.getNotificationType(),
                 notification.getCreatedAt()))
                 .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void deleteNotification() {
+        List<Notification> notifications = notificationRepository.findAll();
+
+        notifications.forEach(notification -> {
+            LocalDateTime expirationTime = notification.getCreatedAt().plusDays(Const.NOTIFICATION_EXPIRED_DAY);
+
+            if (LocalDateTime.now().isAfter(expirationTime)) {
+                notification.updateNotification();
+                notificationRepository.save(notification);
+            }
+        });
     }
 }
