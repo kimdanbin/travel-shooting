@@ -29,10 +29,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     Optional<Reservation> findReservationByUserIdAndReservationDate(Long userId, LocalDate reservationDate);
 
     @EntityGraph(attributePaths = {"part", "part.product", "user"})
-    @Query("SELECT r FROM Reservation r WHERE r.user.id = :userId AND r.part.product.id = :productId")
-    Page<Reservation> findAllByUserIdAndProductId(@Param("userId") Long userId, @Param("productId") Long productId, Pageable pageable);
-
-    @EntityGraph(attributePaths = {"part", "part.product", "user"})
     @Query("SELECT r FROM Reservation r WHERE r.user.id = :userId AND r.part.product.id = :productId AND r.id = :reservationId")
     Reservation findReservationByUserIdAndProductIdAndId(@Param("userId") Long userId, @Param("productId") Long productId, @Param("reservationId") Long reservationId);
 
