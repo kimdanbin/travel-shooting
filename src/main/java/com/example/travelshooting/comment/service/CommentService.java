@@ -99,4 +99,9 @@ public class CommentService {
     public Optional<Comment> findByIdIncludeDeleted(Long commentId) {
         return commentRepository.findByIdIncludeDeleted(commentId);
     }
+
+    // posterId로 댓글 삭제
+    public void deleteCommentsByPosterId(Long posterId) {
+        commentRepository.deleteByPosterId(posterId);
+    }
 }

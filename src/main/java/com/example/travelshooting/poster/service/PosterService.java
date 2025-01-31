@@ -200,4 +200,8 @@ public class PosterService {
     public Optional<Poster> findByIdIncludeDeleted(Long posterId) {
         return posterRepository.findByIdIncludeDeleted(posterId);
     }
+
+    public void deleteReportPoster(Long posterId) {
+        posterRepository.deleteById(posterId);
+    }
 }
