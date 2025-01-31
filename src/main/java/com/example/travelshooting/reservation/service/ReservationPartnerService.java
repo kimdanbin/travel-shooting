@@ -99,7 +99,7 @@ public class ReservationPartnerService {
     }
 
     @Transactional(readOnly = true)
-    public ReservationResDto findReservationByProductIdAndUserIdAndId(Long productId, Long reservationId) {
+    public ReservationResDto findReservationByProductIdAndId(Long productId, Long reservationId) {
         QReservation reservation = QReservation.reservation;
         QCompany company = QCompany.company;
         QProduct product = QProduct.product;
@@ -140,7 +140,7 @@ public class ReservationPartnerService {
 
     @Transactional
     public ReservationResDto updateReservationStatus(Long productId, Long reservationId, String status) {
-        findReservationByProductIdAndUserIdAndId(productId, reservationId);
+        findReservationByProductIdAndId(productId, reservationId);
         Reservation reservation = reservationRepository.findReservationById(reservationId);
 
         if (reservation == null) {
