@@ -105,32 +105,6 @@ public class ReservationService {
         );
     }
 
-    @Transactional
-    public void deleteReservation(Long productId, Long reservationId) {
-        User user = userService.findAuthenticatedUser();
-        Product product = productService.findProductById(productId);
-        Company company = companyService.findCompanyByProductId(product.getId());
-        User partner = userService.findUserByCompanyId(company.getId());
-        Reservation reservation = reservationRepository.findReservationByUserIdAndProductIdAndId(user.getId(), product.getId(), reservationId);
-        Part part = partService.findPartByReservationId(reservation.getId());
-
-        if (reservation == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "예약 내역이 없습니다.");
-        }
-
-        reservation.updateReservation(ReservationStatus.CANCELED);
-        reservationRepository.save(reservation);
-
-        // 메일
-        reservationMailService.sendMail(user, product, part, reservation, user.getName());
-        reservationMailService.sendMail(partner, product, part, reservation, user.getName());
-
-        // 예약 취소 시 첫 번째 페이지 캐시 삭제
-        final String cacheKey = CACHE_KEY_PREFIX + productId + ":page:0";
-        redisObjectTemplate.delete(cacheKey);
-        log.info("예약 취소 시 첫 번째 페이지 캐시 삭제: {}", cacheKey);
-    }
-
     @Transactional(readOnly = true)
     public Page<ReservationResDto> findAllByUserIdAndProductId(Long productId, Pageable pageable) {
         QReservation reservation = QReservation.reservation;
@@ -170,31 +144,68 @@ public class ReservationService {
     }
 
     @Transactional(readOnly = true)
-    public ReservationResDto findReservationByUserIdAndProductIdAndId(Long productId, Long reservationId) {
+    public ReservationResDto findReservationByProductIdAndId(Long productId, Long reservationId) {
+        QReservation reservation = QReservation.reservation;
+        QUser user = QUser.user;
+        QProduct product = QProduct.product;
+        QPart part = QPart.part;
+
+        BooleanBuilder conditions = new BooleanBuilder();
+        User authenticatedUser = userService.findAuthenticatedUser();
+
+        conditions.and(product.id.eq(productId));
+        conditions.and(user.id.eq(authenticatedUser.getId()));
+        conditions.and(reservation.id.eq(reservationId));
+
+        ReservationResDto result = jpaQueryFactory
+                .select(new QReservationResDto(
+                        reservation.id,
+                        user.id,
+                        product.id,
+                        part.id,
+                        reservation.reservationDate,
+                        reservation.headCount,
+                        reservation.totalPrice,
+                        reservation.status,
+                        reservation.createdAt,
+                        reservation.updatedAt))
+                .from(reservation)
+                .innerJoin(user).on(reservation.user.id.eq(user.id)).fetchJoin()
+                .innerJoin(part).on(reservation.part.id.eq(part.id)).fetchJoin()
+                .innerJoin(product).on(part.product.id.eq(product.id)).fetchJoin()
+                .where(conditions)
+                .fetchOne();
+
+        if (result == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "예약 내역이 없습니다.");
+        }
+
+        return result;
+    }
+
+    @Transactional
+    public void deleteReservation(Long productId, Long reservationId) {
         User user = userService.findAuthenticatedUser();
-        Product product = productService.findProductById(productId);
-        Reservation reservation = reservationRepository.findReservationByUserIdAndProductIdAndId(user.getId(), product.getId(), reservationId);
+        Reservation reservation = reservationRepository.findReservationByUserIdAndProductIdAndId(user.getId(), productId, reservationId);
+        Company company = companyService.findCompanyByProductId(productId);
+        User partner = userService.findUserByCompanyId(company.getId());
+        Part part = partService.findPartByReservationId(reservation.getId());
 
         if (reservation == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "예약 내역이 없습니다.");
         }
 
-        return new ReservationResDto(
-                reservation.getId(),
-                reservation.getUser().getId(),
-                product.getId(),
-                reservation.getPart().getId(),
-                reservation.getReservationDate(),
-                reservation.getHeadCount(),
-                reservation.getTotalPrice(),
-                reservation.getStatus(),
-                reservation.getCreatedAt(),
-                reservation.getUpdatedAt()
-        );
-    }
+        reservation.updateReservation(ReservationStatus.CANCELED);
+        reservationRepository.save(reservation);
 
-    public Reservation findReservationByUserIdAndProductIdAndId(Long userId, Long productId, Long reservationId) {
-        return reservationRepository.findReservationByUserIdAndProductIdAndId(userId, productId, reservationId);
+        // 메일
+        reservationMailService.sendMail(user, part.getProduct(), part, reservation, user.getName());
+        reservationMailService.sendMail(partner, part.getProduct(), part, reservation, user.getName());
+
+        // 예약 취소 시 첫 번째 페이지 캐시 삭제
+        final String cacheKey = CACHE_KEY_PREFIX + productId + ":page:0";
+        redisObjectTemplate.delete(cacheKey);
+        log.info("예약 취소 시 첫 번째 페이지 캐시 삭제: {}", cacheKey);
     }
 
     @Transactional
@@ -229,6 +240,10 @@ public class ReservationService {
 
         reservationMailService.sendMail(user, product, part, reservation, user.getName());
         reservationMailService.sendMail(partner, product, part, reservation, user.getName());
+    }
+
+    public Reservation findReservationByUserIdAndProductIdAndId(Long userId, Long productId, Long reservationId) {
+        return reservationRepository.findReservationByUserIdAndProductIdAndId(userId, productId, reservationId);
     }
 
     public Reservation findReservationByPaymentIdAndUserId(Long paymentId, Long userId) {

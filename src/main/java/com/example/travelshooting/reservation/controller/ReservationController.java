@@ -25,7 +25,7 @@ public class ReservationController {
     // 예약
     @PostMapping
     public ResponseEntity<CommonResDto<ReservationResDto>> createReservation(@PathVariable Long productId,
-                                                                            @Valid @RequestBody ReservationReqDto reservationReqDto) {
+                                                                             @Valid @RequestBody ReservationReqDto reservationReqDto) {
         ReservationResDto reservation = reservationService.createReservation(productId, reservationReqDto.getPartId(), reservationReqDto.getReservationDate(), reservationReqDto.getHeadCount());
 
         return new ResponseEntity<>(new CommonResDto<>("레저/티켓 예약 신청 완료", reservation), HttpStatus.CREATED);
@@ -50,10 +50,10 @@ public class ReservationController {
     }
 
     // 예약 단 건 조회
-    @GetMapping ("/{reservationId}")
-    ResponseEntity<CommonResDto<ReservationResDto>> findReservationByUserIdAndProductIdAndId(@PathVariable Long productId,
-                                                                             @PathVariable Long reservationId) {
-        ReservationResDto reservation = reservationService.findReservationByUserIdAndProductIdAndId(productId, reservationId);
+    @GetMapping("/{reservationId}")
+    ResponseEntity<CommonResDto<ReservationResDto>> findReservationByProductIdAndId(@PathVariable Long productId,
+                                                                                    @PathVariable Long reservationId) {
+        ReservationResDto reservation = reservationService.findReservationByProductIdAndId(productId, reservationId);
 
         return new ResponseEntity<>(new CommonResDto<>("레저/티켓 예약 단 건 조회 완료", reservation), HttpStatus.OK);
     }
