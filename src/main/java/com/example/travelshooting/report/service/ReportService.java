@@ -1,6 +1,5 @@
 package com.example.travelshooting.report.service;
 
-import com.example.travelshooting.comment.dto.CommentResDto;
 import com.example.travelshooting.comment.entity.Comment;
 import com.example.travelshooting.comment.service.CommentService;
 import com.example.travelshooting.common.Const;
@@ -52,12 +51,10 @@ public class ReportService {
         // 특정 포스터의 누적 신고가 5번일 경우, 포스터 삭제 처리
         int reportCount = reportRepository.countByFkIdAndType(posterId, DomainType.POSTER);
 
-        if (reportCount >= Const.REPORT_COUNT && report.getType().equals(DomainType.POSTER)){
-            List<CommentResDto> comments = commentService.findComments(posterId);
-            for (CommentResDto comment : comments) {
-                commentService.deleteComment(posterId, comment.getId()); // 관련 댓글 먼저 soft delete 처리
-            }
-            posterService.deletePoster(posterId);
+        if (reportCount >= Const.REPORT_COUNT && report.getType().equals(DomainType.POSTER)) {
+            commentService.deleteCommentsByPosterId(posterId);
+            // 포스터 삭제
+            posterService.deleteReportPoster(posterId);
         }
 
         return new ReportResDto(
