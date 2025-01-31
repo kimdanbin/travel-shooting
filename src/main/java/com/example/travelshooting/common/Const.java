@@ -24,6 +24,11 @@ public class Const {
     public static final String RESERVATION_CANCELED_SUBJECT = "예약 취소 알림이 왔습니다.";
     public static final String RESERVATION_EXPIRED_SUBJECT = "예약 만료 알림이 왔습니다.";
 
+    // 레디스
+    public static final String REDISSON_PREFIX = "redis://";
+    public static final String REDISSON_RESERVATION_PREFIX = "reservation:";
+
+    // 기타
     public static final int REPORT_COUNT = 5;
     public static final int LOCAL_PAGE_DEFAULT = 1;
     public static final int RESERVATION_EXPIRED_DAY = 1;
