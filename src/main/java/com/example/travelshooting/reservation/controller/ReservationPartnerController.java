@@ -7,6 +7,7 @@ import com.example.travelshooting.reservation.dto.ReservationStatusReqDto;
 import com.example.travelshooting.reservation.service.ReservationPartnerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,16 +25,17 @@ public class ReservationPartnerController {
     // 레저/티켓 예약 전체 조회
     @GetMapping
     public ResponseEntity<CommonListResDto<ReservationResDto>> findAllByProductIdAndUserId(@PathVariable Long productId, Pageable pageable) {
-        List<ReservationResDto> reservations = reservationPartnerService.findAllByProductIdAndUserId(productId, pageable);
+        Page<ReservationResDto> reservations = reservationPartnerService.findAllByProductIdAndUserId(productId, pageable);
+        List<ReservationResDto> content = reservations.getContent();
 
-        return new ResponseEntity<>(new CommonListResDto<>("레저/티켓 예약 전체 조회 완료", reservations), HttpStatus.OK);
+        return new ResponseEntity<>(new CommonListResDto<>("레저/티켓 예약 전체 조회 완료", content), HttpStatus.OK);
     }
 
     // 레저/티켓 예약 단 건 조회
     @GetMapping("/{reservationId}")
-    public ResponseEntity<CommonResDto<ReservationResDto>> findReservationByProductIdAndUserIdAndId(@PathVariable Long productId,
-                                                                                @PathVariable Long reservationId) {
-        ReservationResDto reservation = reservationPartnerService.findReservationByProductIdAndUserIdAndId(productId, reservationId);
+    public ResponseEntity<CommonResDto<ReservationResDto>> findReservationByProductIdAndId(@PathVariable Long productId,
+                                                                                           @PathVariable Long reservationId) {
+        ReservationResDto reservation = reservationPartnerService.findReservationByProductIdAndId(productId, reservationId);
 
         return new ResponseEntity<>(new CommonResDto<>("레저/티켓 예약 단 건 조회 완료", reservation), HttpStatus.OK);
     }
