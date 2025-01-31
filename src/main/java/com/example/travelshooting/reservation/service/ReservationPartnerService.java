@@ -103,26 +103,42 @@ public class ReservationPartnerService {
 
     @Transactional(readOnly = true)
     public ReservationResDto findReservationByProductIdAndUserIdAndId(Long productId, Long reservationId) {
-        User user = userService.findAuthenticatedUser();
-        Product product = productService.findProductById(productId);
-        Reservation reservation = reservationRepository.findReservationByProductIdAndUserIdAndId(product.getId(), user.getId(), reservationId);
+        QReservation reservation = QReservation.reservation;
+        QCompany company = QCompany.company;
+        QProduct product = QProduct.product;
+        QPart part = QPart.part;
 
-        if (reservation == null) {
+        BooleanBuilder conditions = new BooleanBuilder();
+        User authenticatedUser = userService.findAuthenticatedUser();
+
+        conditions.and(product.id.eq(productId));
+        conditions.and(company.user.id.eq(authenticatedUser.getId()));
+        conditions.and(reservation.id.eq(reservationId));
+
+        ReservationResDto result = jpaQueryFactory
+                .select(new QReservationResDto(
+                        reservation.id,
+                        reservation.user.id,
+                        product.id,
+                        part.id,
+                        reservation.reservationDate,
+                        reservation.headCount,
+                        reservation.totalPrice,
+                        reservation.status,
+                        reservation.createdAt,
+                        reservation.updatedAt))
+                .from(reservation)
+                .innerJoin(part).on(reservation.part.id.eq(part.id)).fetchJoin()
+                .innerJoin(product).on(part.product.id.eq(product.id)).fetchJoin()
+                .innerJoin(company).on(product.company.id.eq(company.id)).fetchJoin()
+                .where(conditions)
+                .fetchOne();
+
+        if (result == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "예약 내역이 없습니다.");
         }
 
-        return new ReservationResDto(
-                reservation.getId(),
-                reservation.getUser().getId(),
-                product.getId(),
-                reservation.getPart().getId(),
-                reservation.getReservationDate(),
-                reservation.getHeadCount(),
-                reservation.getTotalPrice(),
-                reservation.getStatus(),
-                reservation.getCreatedAt(),
-                reservation.getUpdatedAt()
-        );
+        return result;
     }
 
     @Transactional
