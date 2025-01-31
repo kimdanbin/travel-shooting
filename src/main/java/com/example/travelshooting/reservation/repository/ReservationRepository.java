@@ -12,7 +12,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
@@ -24,7 +23,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     @Query("SELECT COALESCE(SUM(r.headCount), 0) FROM Reservation r WHERE r.part.id = :partId AND r.reservationDate = :reservationDate")
     Integer findTotalHeadCountByPartIdAndReservationDate(@Param("partId") Long partId, @Param("reservationDate") LocalDate reservationDate);
 
-    Optional<Reservation> findReservationByUserIdAndReservationDate(Long userId, LocalDate reservationDate);
+    boolean existsReservationByUserIdAndReservationDate(Long userId, LocalDate reservationDate);
 
     @EntityGraph(attributePaths = {"part", "part.product", "user"})
     @Query("SELECT r FROM Reservation r WHERE r.user.id = :userId AND r.part.product.id = :productId AND r.id = :reservationId")

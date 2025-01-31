@@ -1,8 +1,6 @@
 package com.example.travelshooting.reservation.service;
 
 import com.example.travelshooting.common.Const;
-import com.example.travelshooting.company.entity.Company;
-import com.example.travelshooting.company.service.CompanyService;
 import com.example.travelshooting.enums.PaymentStatus;
 import com.example.travelshooting.enums.ReservationStatus;
 import com.example.travelshooting.notification.service.ReservationMailService;
@@ -40,8 +38,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -53,7 +51,6 @@ public class ReservationService {
     private final UserService userService;
     private final ProductService productService;
     private final PartService partService;
-    private final CompanyService companyService;
     private final ReservationMailService reservationMailService;
     private final ApplicationEventPublisher eventPublisher;
     private final RedisTemplate<String, Object> redisObjectTemplate;
@@ -64,17 +61,19 @@ public class ReservationService {
         Product product = productService.findProductById(productId);
         User user = userService.findAuthenticatedUser();
         Part part = partService.findPartById(partId);
-        Company company = companyService.findCompanyByProductId(product.getId());
-        User partner = userService.findUserByCompanyId(company.getId());
-        Optional<Reservation> findReservation = reservationRepository.findReservationByUserIdAndReservationDate(user.getId(), reservationDate);
+        boolean isReservation = reservationRepository.existsReservationByUserIdAndReservationDate(user.getId(), reservationDate);
         Integer totalHeadCount = reservationRepository.findTotalHeadCountByPartIdAndReservationDate(part.getId(), reservationDate);
 
-        if (findReservation.isPresent()) {
+        if (isReservation) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 날짜에 예약한 내역이 있습니다.");
         }
 
-        if (reservationDate.isBefore(product.getSaleStartAt()) || reservationDate.isAfter(product.getSaleEndAt())) {
+        if (product.getSaleStartAt().isAfter(reservationDate) || product.getSaleEndAt().isBefore(reservationDate)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "예약 날짜는 상품의 판매 기간 중에서만 선택할 수 있습니다.");
+        }
+
+        if (LocalDate.now().equals(reservationDate) && LocalTime.now().isAfter(part.getOpenAt())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 오픈 시간이 지나 예약이 불가능합니다.");
         }
 
         if (part.getMaxQuantity() < totalHeadCount + headCount) {
@@ -89,7 +88,7 @@ public class ReservationService {
 
         // 메일
         reservationMailService.sendMail(user, product, part, reservation, user.getName());
-        reservationMailService.sendMail(partner, product, part, reservation, user.getName());
+        reservationMailService.sendMail(product.getCompany().getUser(), product, part, reservation, user.getName());
 
         return new ReservationResDto(
                 reservation.getId(),
@@ -186,10 +185,8 @@ public class ReservationService {
     @Transactional
     public void deleteReservation(Long productId, Long reservationId) {
         User user = userService.findAuthenticatedUser();
-        Reservation reservation = reservationRepository.findReservationByUserIdAndProductIdAndId(user.getId(), productId, reservationId);
-        Company company = companyService.findCompanyByProductId(productId);
-        User partner = userService.findUserByCompanyId(company.getId());
-        Part part = partService.findPartByReservationId(reservation.getId());
+        Product product = productService.findProductById(productId);
+        Reservation reservation = reservationRepository.findReservationByUserIdAndProductIdAndId(user.getId(), product.getId(), reservationId);
 
         if (reservation == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "예약 내역이 없습니다.");
@@ -199,8 +196,8 @@ public class ReservationService {
         reservationRepository.save(reservation);
 
         // 메일
-        reservationMailService.sendMail(user, part.getProduct(), part, reservation, user.getName());
-        reservationMailService.sendMail(partner, part.getProduct(), part, reservation, user.getName());
+        reservationMailService.sendMail(user, product, reservation.getPart(), reservation, user.getName());
+        reservationMailService.sendMail(product.getCompany().getUser(), product, reservation.getPart(), reservation, user.getName());
 
         // 예약 취소 시 첫 번째 페이지 캐시 삭제
         final String cacheKey = CACHE_KEY_PREFIX + productId + ":page:0";
@@ -234,12 +231,10 @@ public class ReservationService {
 
         Part part = partService.findPartByReservationId(reservation.getId());
         Product product = productService.findProductByPartId(part.getId());
-        Company company = companyService.findCompanyByProductId(product.getId());
-        User partner = userService.findUserByCompanyId(company.getId());
         User user = userService.findUserByReservationId(reservation.getId());
 
         reservationMailService.sendMail(user, product, part, reservation, user.getName());
-        reservationMailService.sendMail(partner, product, part, reservation, user.getName());
+        reservationMailService.sendMail(product.getCompany().getUser(), product, part, reservation, user.getName());
     }
 
     public Reservation findReservationByUserIdAndProductIdAndId(Long userId, Long productId, Long reservationId) {

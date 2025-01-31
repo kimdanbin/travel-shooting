@@ -3,9 +3,7 @@ package com.example.travelshooting.reservation.service;
 import com.example.travelshooting.company.entity.QCompany;
 import com.example.travelshooting.enums.ReservationStatus;
 import com.example.travelshooting.notification.service.ReservationMailService;
-import com.example.travelshooting.part.entity.Part;
 import com.example.travelshooting.part.entity.QPart;
-import com.example.travelshooting.part.service.PartService;
 import com.example.travelshooting.product.entity.QProduct;
 import com.example.travelshooting.reservation.dto.QReservationResDto;
 import com.example.travelshooting.reservation.dto.ReservationResDto;
@@ -36,7 +34,6 @@ public class ReservationPartnerService {
     private final ReservationRepository reservationRepository;
     private final JPAQueryFactory jpaQueryFactory;
     private final UserService userService;
-    private final PartService partService;
     private final ReservationMailService reservationMailService;
     private final RedisTemplate<String, Object> redisObjectTemplate;
     private static final String CACHE_KEY_PREFIX = "reservations:product:";
@@ -147,9 +144,6 @@ public class ReservationPartnerService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "예약 내역이 없습니다.");
         }
 
-        Part part = partService.findPartByReservationId(reservation.getId());
-        User user = userService.findUserByReservationId(reservation.getId());
-
         if (!reservation.getStatus().equals(ReservationStatus.PENDING)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 수락 또는 거절 상태입니다.");
         }
@@ -158,7 +152,7 @@ public class ReservationPartnerService {
         Reservation updatedReservation = reservationRepository.save(reservation);
 
         // 메일
-        reservationMailService.sendMail(user, part.getProduct(), part, reservation, user.getName());
+        reservationMailService.sendMail(reservation.getUser(), reservation.getPart().getProduct(), reservation.getPart(), reservation, reservation.getUser().getName());
 
         // 상태 업데이트 시 첫 번째 페이지 캐시 삭제
         final String cacheKey = CACHE_KEY_PREFIX + productId + ":page:0";
@@ -168,7 +162,7 @@ public class ReservationPartnerService {
         return new ReservationResDto(
                 updatedReservation.getId(),
                 updatedReservation.getUser().getId(),
-                part.getProduct().getId(),
+                reservation.getPart().getProduct().getId(),
                 updatedReservation.getPart().getId(),
                 updatedReservation.getReservationDate(),
                 updatedReservation.getHeadCount(),
