@@ -32,11 +32,8 @@ public class ReservationMailService {
         String content = mailContent(user, product, part, reservation, userName);
         mailService.sendMail(user.getEmail(), details.subject(), content);
 
-        try {
-            notificationService.save(new Notification(user, DomainType.RESERVATION, reservation.getId(), details.subject(), NotificationStatus.SENT, details.type()));
-        } catch (Exception e) {
-            notificationService.save(new Notification(user, DomainType.RESERVATION, reservation.getId(), details.subject(), NotificationStatus.FAILED, details.type()));
-        }
+        // 알림 저장
+        notificationService.save(new Notification(user, DomainType.RESERVATION, reservation.getId(), details.subject(), NotificationStatus.SENT, details.type()));
     }
 
     // 예약 메일 내용에 들어갈 데이터
