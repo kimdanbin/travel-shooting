@@ -1,6 +1,7 @@
 package com.example.travelshooting.reservation.service;
 
 import com.example.travelshooting.common.Const;
+import com.example.travelshooting.config.util.CacheKeyUtil;
 import com.example.travelshooting.config.util.LockKeyUtil;
 import com.example.travelshooting.enums.PaymentStatus;
 import com.example.travelshooting.enums.ReservationStatus;
@@ -59,7 +60,6 @@ public class ReservationService {
     private final ApplicationEventPublisher eventPublisher;
     private final RedisTemplate<String, Object> redisObjectTemplate;
     private final RedissonClient redissonClient;
-    private static final String CACHE_KEY_PREFIX = "reservations:product:";
 
     @Transactional
     public ReservationResDto createReservation(Long productId, Long partId, LocalDate reservationDate, Integer headCount) {
@@ -212,7 +212,7 @@ public class ReservationService {
         sendMail(user, product, reservation.getPart(), reservation);
 
         // 예약 취소 시 첫 번째 페이지 캐시 삭제
-        final String cacheKey = CACHE_KEY_PREFIX + productId + ":page:0";
+        final String cacheKey = CacheKeyUtil.getReservationProductPageKey(productId, 0);;
         redisObjectTemplate.delete(cacheKey);
         log.info("예약 취소 시 첫 번째 페이지 캐시 삭제: {}", cacheKey);
     }

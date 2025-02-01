@@ -4,6 +4,7 @@ import com.example.travelshooting.common.Const;
 import com.example.travelshooting.company.dto.CompanyResDto;
 import com.example.travelshooting.company.entity.Company;
 import com.example.travelshooting.company.repository.CompanyRepository;
+import com.example.travelshooting.config.util.CacheKeyUtil;
 import com.example.travelshooting.user.entity.User;
 import com.example.travelshooting.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +30,6 @@ public class CompanyService {
     private final CompanyRepository companyRepository;
     private final UserService userService;
     private final RedisTemplate<String, Object> redisObjectTemplate;
-    private static final String CACHE_KEY_PREFIX = "companies:page:";
 
     @Transactional
     public CompanyResDto createCompany(Long userId, String name, String description) {
@@ -60,7 +60,7 @@ public class CompanyService {
 
     @Transactional(readOnly = true)
     public List<CompanyResDto> findAllCompanies(int page, int size) {
-        final String cacheKey = CACHE_KEY_PREFIX + page;
+        final String cacheKey = CacheKeyUtil.getCompanyPageKey(page);
 
         if (page == 0) {
             @SuppressWarnings("unchecked")
@@ -117,7 +117,7 @@ public class CompanyService {
         companyRepository.save(findCompany);
 
         // 첫 번째 페이지 캐시 삭제
-        String cacheKey = CACHE_KEY_PREFIX + "0"; // 첫 번째 페이지 캐시 키
+        String cacheKey = CacheKeyUtil.getCompanyPageKey(0); // 첫 번째 페이지 캐시 키
         redisObjectTemplate.delete(cacheKey);
         log.info("업데이트 시 첫 번째 페이지 캐시 삭제: {}", cacheKey);
 
@@ -142,7 +142,7 @@ public class CompanyService {
         companyRepository.delete(findCompany);
 
         // 첫 번째 페이지 캐시 삭제
-        String cacheKey = CACHE_KEY_PREFIX + "0"; // 첫 번째 페이지 캐시 키
+        String cacheKey = CacheKeyUtil.getCompanyPageKey(0); // 첫 번째 페이지 캐시 키
         redisObjectTemplate.delete(cacheKey);
         log.info("업체 삭제 시 첫 번째 페이지 캐시 삭제: {}", cacheKey);
     }
