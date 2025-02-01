@@ -30,6 +30,10 @@ public class Const {
     public static final int RESERVATION_LOCK_WAIT_TIME = 5;
     public static final int RESERVATION_LOCK_LEASE_TIME = 10;
 
+    // 캐싱
+    public static final String COMPANY_CACHE_PREFIX = "companies:page:";
+    public static final String RESERVATION_CACHE_PREFIX = "reservations:product:";
+
     // 기타
     public static final int REPORT_COUNT = 5;
     public static final int LOCAL_PAGE_DEFAULT = 1;
