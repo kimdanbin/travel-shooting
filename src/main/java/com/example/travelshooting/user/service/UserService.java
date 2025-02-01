@@ -90,8 +90,14 @@ public class UserService {
         return new JwtAuthResDto(AuthenticationScheme.BEARER.getName(), accessToken, refreshToken);
     }
     // 로그아웃
-    public void logout(String email) {
-        redisTemplate.delete(email); // Redis에서 해당 이메일의 Refresh Token 삭제
+    @Transactional
+    public void logout() {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication(); // 현재 인증된 사용자 정보 가져오기
+        String email = authentication.getName(); // 유저 이메일 가져오기
+
+        // Redis에서 Refresh Token 삭제
+        redisTemplate.delete(email);
     }
 
 
