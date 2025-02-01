@@ -70,6 +70,8 @@ public class ReservationService {
         String lockKey = LockKeyUtil.getReservationLockKey(reservationDate, part.getId());
         RLock lock = redissonClient.getLock(lockKey);
 
+        log.info("lock 시도: {}", lockKey);
+
         try {
             boolean available = lock.tryLock(Const.RESERVATION_LOCK_WAIT_TIME, Const.RESERVATION_LOCK_LEASE_TIME, TimeUnit.SECONDS);
 
@@ -83,6 +85,7 @@ public class ReservationService {
         } finally {
             if (lock.isHeldByCurrentThread()) {
                 lock.unlock();
+                log.info("unlock 성공: {}", lock.getName());
             }
         }
     }
@@ -252,6 +255,10 @@ public class ReservationService {
 
         if (product.getSaleStartAt().isAfter(reservationDate) || product.getSaleEndAt().isBefore(reservationDate)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "예약 날짜는 상품의 판매 기간 중에서만 선택할 수 있습니다.");
+        }
+
+        if (LocalDate.now().isAfter(reservationDate)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "지난 날짜는 예약할 수 없습니다.");
         }
 
         if (LocalDate.now().equals(reservationDate) && LocalTime.now().isAfter(part.getOpenAt())) {

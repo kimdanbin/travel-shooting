@@ -27,8 +27,8 @@ public class Const {
     // 동시성 제어
     public static final String REDISSON_PREFIX = "redis://";
     public static final String RESERVATION_LOCK_PREFIX = "lock:reservation:";
-    public static final int RESERVATION_LOCK_WAIT_TIME = 10;
-    public static final int RESERVATION_LOCK_LEASE_TIME = 15;
+    public static final int RESERVATION_LOCK_WAIT_TIME = 5;
+    public static final int RESERVATION_LOCK_LEASE_TIME = 10;
 
     // 기타
     public static final int REPORT_COUNT = 5;
