@@ -95,6 +95,11 @@ public class PaymentService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 결제된 예약입니다.");
         }
 
+        // 다시 결제 요청을 할 경우, 기존 결제 정보 삭제
+        if (payment != null && payment.getStatus().equals(PaymentStatus.READY)) {
+            paymentRepository.delete(payment);
+        }
+
         // 결제 정보 저장
         Payment savedPayment = savePayment(reservation, user.getId(), reservation.getTotalPrice());
 
@@ -289,10 +294,10 @@ public class PaymentService {
                 return paymentCancelResDto;
             } catch (Exception e) {
                 e.printStackTrace();
-                throw new RuntimeException("카카오페이 결제 승인 응답 처리 중 오류가 발생했습니다.");
+                throw new RuntimeException("카카오페이 결제 취소 응답 처리 중 오류가 발생했습니다.");
             }
         } else {
-            throw new RuntimeException("카카오페이 결제 승인 요청 실패");
+            throw new RuntimeException("카카오페이 결제 취소 요청 실패");
         }
     }
 
