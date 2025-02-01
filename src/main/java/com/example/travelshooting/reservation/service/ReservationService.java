@@ -69,7 +69,6 @@ public class ReservationService {
 
         String lockKey = LockKeyUtil.getReservationLockKey(reservationDate, part.getId());
         RLock lock = redissonClient.getLock(lockKey);
-
         log.info("lock 시도: {}", lockKey);
 
         try {
@@ -79,6 +78,7 @@ public class ReservationService {
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "현재 예약 요청이 많아 다시 시도해 주세요.");
             }
 
+            log.info("lock 획득 성공: {}", lockKey);
             return processReservation(user, product, part, reservationDate, headCount);
         } catch (InterruptedException e) {
             throw new RuntimeException("예약 도중 오류가 발생했습니다.");
@@ -86,6 +86,8 @@ public class ReservationService {
             if (lock.isHeldByCurrentThread()) {
                 lock.unlock();
                 log.info("unlock 성공: {}", lock.getName());
+            } else {
+                log.warn("unlock 시도: lock을 소유하지 않음: {}", lock.getName());
             }
         }
     }
