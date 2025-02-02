@@ -168,10 +168,14 @@ public class ReservationPartnerService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 수락 또는 거절 상태입니다.");
         }
 
-        reservation.updateStatus(ReservationStatus.valueOf(status));
+        if (ReservationStatus.REJECTED.name().equals(status)) {
+            reservation.updateReservation(ReservationStatus.valueOf(status));
+        } else {
+            reservation.updateStatus(ReservationStatus.valueOf(status));
+        }
+
         Reservation updatedReservation = reservationRepository.save(reservation);
 
-        // 메일
         reservationMailService.sendMail(reservation.getUser(), reservation.getPart().getProduct(), reservation.getPart(), reservation, reservation.getUser().getName());
 
         // 상태 업데이트 시 첫 번째 페이지 캐시 삭제
