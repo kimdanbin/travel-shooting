@@ -125,7 +125,7 @@
 </details>
 
 <details>
-  <summary><b>메일 및 알림</b></summary>
+  <summary><b>메일 전송 및 알림</b></summary>
   <div markdown="1">
     <p></p>
     <li>예약 관련해 사용자와 업체는 메일을 받을 수 있습니다.</li>
@@ -134,6 +134,16 @@
     <li>30일 지난 알림은 자동으로 삭제 처리 됩니다.</li>
   </div>
 </details>
+
+---------
+
+# 👨‍💻 기능별 담당자
+|담당자|역할|기능|블로그 주소|
+|:----|:----|:----|:----|
+|[김지연](https://github.com/jiyeon0926)|리더|1. 장소 검색 <br> 2. Open API 기반 맛집 정보 저장 <br> 3. 예약 및 결제 <br> 4. 맛집 검색 <br> 5. 메일 전송 및 알림 <br>|https://velog.io/@yeoni9094/posts </br> https://blog.naver.com/yeondata|
+|[김단빈](https://github.com/kimdanbin)|부리더|1. 포스터 <br> 2. 첨부파일 <br> 3. 댓글 <br> 4. 좋아요 <br> 5. 배포|https://dreamcompass.tistory.com/|
+|[안정민](https://github.com/JeongMinAhnn)|팀원|1. JWT <br> 2. 인증/인가 <br> 3. 사용자 CRUD <br> 4. 포스터 검색|https://velog.io/@devtony/posts|
+|[이아름](https://github.com/aaahreum)|팀원|1. 협력 업체 CRUD <br> 2. 레저/티켓 상품 CRUD <br> 3. 상품의 일정 CRUD <br> 4. 신고 <br> 5. 조회 기능 캐싱|https://muerha.tistory.com/|
 
 ---------
 
@@ -164,13 +174,20 @@
 
 ---------
 
-# 👨‍💻 기능별 담당자
-|담당자|역할|기능|블로그 주소|
-|:----|:----|:----|:----|
-|[김지연](https://github.com/jiyeon0926)|리더|1. 장소 검색 <br> 2. Open API 기반 맛집 정보 저장 <br> 3. 예약 및 결제 <br> 4. 맛집 검색 <br> 5. 메일 전송 및 알림 <br>|https://velog.io/@yeoni9094/posts </br> https://blog.naver.com/yeondata|
-|[김단빈](https://github.com/kimdanbin)|부리더|1. 포스터 <br> 2. 첨부파일 <br> 3. 댓글 <br> 4. 좋아요 <br> 5. 배포|https://dreamcompass.tistory.com/|
-|[안정민](https://github.com/JeongMinAhnn)|팀원|1. JWT <br> 2. 인증/인가 <br> 3. 사용자 CRUD <br> 4. 포스터 검색|https://velog.io/@devtony/posts|
-|[이아름](https://github.com/aaahreum)|팀원|1. 협력 업체 CRUD <br> 2. 레저/티켓 상품 CRUD <br> 3. 상품의 일정 CRUD <br> 4. 신고 <br> 5. 조회 기능 캐싱|https://muerha.tistory.com/|
+# ⚙ 아키텍처 구조
+<img src="https://github.com/user-attachments/assets/d6fb7078-10f8-44fc-b787-c11884aeea84">
+
+---------
+
+# 📄 API 명세서
+[API 명세서](https://www.notion.so/teamsparta/Shooter-6-2128906a055f44c6b835197d9dbbbaae)
+
+---------
+
+# ☁ ERD
+ERD Tool : [ERDCloud](https://www.erdcloud.com/d/z6i6zETJ4Kn2ZBqhW)
+
+<img src="https://github.com/user-attachments/assets/b754e2cd-7728-4728-b23a-3021da94547d">
 
 ---------
 
