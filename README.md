@@ -1,123 +1,134 @@
 # 🗺 Travel Shooting
 - Travel Shooting은 개발자들이 Trouble Shooting을 작성하며 문제 해결 과정을 기록하듯, 사용자들도 자신의 여행 경험을 기록하자는 의미를 담았습니다.
-- 협력 업체에서 제공 해주는 레저/티켓을 사용한 사용자들은 포스터를 작성할 수 있습니다.
-- 포스터를 작성하여 다른 사용자들에게 실질적인 여행 정보를 제공하고, 유용한 여행지를 추천할 수 있습니다.
+- 협력 업체에서 제공 해주는 레저/티켓 상품을 이용한 사용자들은 포스터를 작성할 수 있습니다.
+- 포스터를 작성하여 다른 사용자들에게 실질적인 여행 정보를 제공하고, 유용한 여행지를 추천합니다.
 
 ---------
 
-# ✨ 핵심 기능
-- Refresh Token
+# 🔔 핵심 기능
+- JWT 기반의 인증/인가
 - 예약 및 결제
-- Kakao MAP 연동
-- 이미지 및 영상 업로드
-- 검색 기능 최적화
+- Kakao MAP 기반의 장소 검색
+- 포스터 작성
+- 첨부파일 업로드 및 저장
+- 조회 기능 캐싱 최적화
 
 ---------
 
-# 📚 기능 설명
-- 레저/티켓
-  - 관리자가 직접 협력 업체에 대한 검증을 하고, 업체 정보를 등록 합니다.
-    - 협력 업체는 파트너 권한을 얻을 수 있습니다.
-  - 파트너는 레저/티켓 상품을 등록할 수 있습니다.
-  - 사용자는 레저/티켓 상품에 대해 예약 신청 및 결제를 할 수 있습니다.
-    - 파트너는 예약 승인 또는 거절을 할 수 있습니다.
-    - 사용자는 예약 승인일로부터 다음 날 오후 6시 전까지 결제를 해야 합니다.
-      - 결제 시간을 놓칠 경우, 자동으로 예약 만료 처리가 됩니다.
-    - 사용자는 카카오페이를 통해 결제할 수 있습니다.
-- 여행 코스 검색
-  - 레저/티켓 서비스를 이용한 사용자는 포스터를 통해 여행 경험을 기록할 수 있습니다.
-    - 이미지 및 영상 업로드를 같이 할 수 있습니다.
-  - 포스터를 좋아요 하거나 댓글을 남길 수 있습니다.
-  - 포스터를 기반으로 다양한 여행 코스를 검색할 수 있습니다.
-- 장소 검색
-  - 여행 계획 시간을 줄일 수 있도록 장소 검색 기능도 제공합니다.
-  - 특정 키워드를 통해 여러 장소를 검색할 수 있습니다.
-- 맛집 검색
-  - 사용자가 포스터에 같이 작성한 맛집을 기준으로 맛집 검색을 할 수 있습니다.
-   
----------
+# 📖 기능 설명
 
-# 📅 최종 프로젝트 일정
-## 2025.01.02 ~ 2025.01.20
-- 주제 및 기술스택 선정
-- 요구사항 작성
-- 설계
-  - 와이어프레임
-  - ERD
-  - API 명세서
-  - 아키텍처 구조
-- 1차 기능 구현
-- 리팩토링
-- 중간 발표회 자료 제작 및 제출
-
-## 2025.01.21 ~ 2025.02.09
-- 중간 발표회
-- 중간 발표 피드백 개선
-- 2차 기능 구현
-- 화면 구현
-- 리팩토링
-- 최종 발표회 자료 제작 및 제출
-
-## 2025.02.10
-- 최종 발표회
 
 ---------
 
-# ⚙ 기술 스택
-![Spring](https://img.shields.io/badge/Spring-6DB33F.svg?&style=for-the-badge&logo=Spring&logoColor=white)
-<img src="https://img.shields.io/badge/spring%20security-5.7.0-green?logo=springsecurity&logoColor=white" alt="Spring Security Badge">
-![MySQL](https://img.shields.io/badge/MySQL-4479A1.svg?&style=for-the-badge&logo=MySQL&logoColor=white)
-<img src="https://img.shields.io/badge/redis-5.0+-red?logo=redis&logoColor=white" alt="Redis Badge">
-<img src="https://img.shields.io/badge/docker-latest-blue?logo=docker&logoColor=white" alt="Docker Badge">
-<img src="https://img.shields.io/badge/AWS-Active-brightgreen?logo=amazonaws&logoColor=white" alt="AWS Badge">
-<img src="https://img.shields.io/badge/KakaoPay-Active-brightgreen?logo=kakaopay&logoColor=white" alt="KakaoPay Badge">
-<img src="https://img.shields.io/badge/Kakao%20Map-Active-brightgreen?logo=kakao&logoColor=white" alt="Kakao Map Badge">
-<img src="https://img.shields.io/badge/AWS%20Route%2053-Active-brightgreen?logo=aws&logoColor=white" alt="AWS Route 53 Badge">
+# 🛠 기술 스택
+<p align="center">
+  <img src="https://godekdls.github.io/images/springboot/logo.png" width="100px">
+  <img src="https://www.vectorlogo.zone/logos/java/java-icon.svg" width="80px">
+  <img src="https://resources.jetbrains.com/storage/products/company/brand/logos/IntelliJ_IDEA_icon.svg" width="80px">
+  <img src="https://www.mysql.com/common/logos/logo-mysql-170x115.png" width="110px">
+  <img src="https://developers.kakao.com/tool/resource/static/img/logo/map/kakaomap_vertical_en.png" width="70px" height="90px">
+  <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQuVjQMv_0hv7zTIQA9GV0VyRzWbtm7yseRYg&s" width="100px">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/6/64/Logo-redis.svg" width="130px" height="140px">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/9/93/Amazon_Web_Services_Logo.svg" width="110px" height="120px">
+  <img src="https://www.docker.com/wp-content/uploads/2022/03/Moby-logo.png" width="110px" height="85px">
+</p>
 
-- Spring Boot : 3.4.1
-- Java : 17
-- IDE : IntelliJ
-- DB : MySQL
+- Spring Boot 3.4.1
+- Java 21
+- IntelliJ
+- MySQL
+- GitHub
+- Spring Security
+- Spring Boot Mail
 - Open API
 - Redis
-- Spring Security
 - AWS
 - Docker
-
-## 💡 Q&A 
-**👨‍🏫 Q1. Spring 프레임워크를 선택한 이유가 무엇인가요? </br>**
-👩 Spring은 객체 지향 언어가 가진 특징을 최대로 활용할 수 있는 프레임워크 입니다. 내장 서버(Tomcat 등)를 지원하기 때문에 별도의 웹 서버 설정 없이 실행할 수 있고, 통합 테스트와 단위 테스트를 지원하기 때문에 테스트 가능한 애플리케이션을 구현할 수 있습니다.
-
-**👨‍🏫 Q2. 객체 지향 언어의 특징은 무엇인가요? </br>**
-👩 객체 지향 언어의 특징으로 캡슐화, 상속, 추상화, 다형성이 있습니다.
-- 외부에서 직접 데이터 및 메서드에 접근하지 못하도록 제한할 수 있습니다. 
-- 부모 클래스에 정의된 변수 및 메서드를 자식 클래스에서 상속받아 사용함으로써 코드를 재사용 하거나 재정의 할 수 있습니다.
-- 공통 기능을 정의하여 여러 클래스에서 일관되게 사용할 수 있습니다.
-- 동일한 이름의 메서드를 파라미터만 다르게 정의할 수 있고, 상속받은 메서드를 자식 클래스에서 재정의 할 수 있습니다.
-
-**👨‍🏫 Q3. MySQL 데이터베이스를 선택한 이유가 무엇인가요? </br>**
-👩 MySQL 데이터베이스는 여러 기업에서 많이 사용하고 있는 오픈 소스 관계형 데이터베이스이며 안정적이고 사용하기 쉽습니다. 그리고 모든 팀원이 익숙한 데이터베이스이기 때문에 MySQL 데이터베이스를 사용하였습니다.
-
-**👨‍🏫 Q4. Spring Security를 선택한 이유가 무엇인가요? </br>**
-👩 Spring Security는 Spring 프레임워크에서 애플리케이션의 보안을 관리할 때 사용합니다. Spring Security를 적용함으로써 사용자의 인증 및 권한에 따른 인가를 관리할 수 있습니다. 필요에 따라 커스터마이징하여 세부적으로 관리할 수도 있습니다.
-
-**👨‍🏫 Q5. Redis를 선택한 이유가 무엇인가요? </br>**
-👩 여러 사람이 동시에 결제할 때 동시성 이슈가 발생할 수 있습니다. Redis는 분산 락을 구현할 수 있는 다양한 라이브러리와 기능을 제공하기 때문에 동시에 자원에 접근하는 현상을 제어할 수 있습니다.
-
-**👨‍🏫 Q6. 어떤 배포 방법을 선택했나요? </br>**
-👩 GitHub Action을 이용한 CI/CD 방법을 선택했습니다. 배포 과정에서 Docker와 AWS EC2를 사용합니다.
 
 ---------
 
 # 👨‍💻 기능별 담당자
-|담당자|역할|기능|블로그 주소|깃허브 주소|
-|:----|:----|:----|:----|:----|
-|김지연|리더|1. 장소 검색 <br> 2. Open API 기반 음식점 정보 저장 <br> 3. 레저/티켓 예약 CRUD <br> 4. 레저/티켓 결제 <br> 5. 맛집 검색|https://velog.io/@yeoni9094/posts </br> https://blog.naver.com/yeondata|https://github.com/jiyeon0926|
-|김단빈|부리더|1. 포스터 CUD <br> 2. 첨부파일 <br> 3. 배포 <br> 4. 댓글 CRUD <br> 5. 좋아요|https://dreamcompass.tistory.com/|https://github.com/kimdanbin|
-|안정민|팀원|1. JWT <br> 2. 인증/인가 <br> 3. 사용자 CRUD <br> 4. 여행 코스 검색|https://velog.io/@devtony/posts|https://github.com/JeongMinAhnn|
-|이아름|팀원|1. 레저/티켓 업체 CRUD <br> 2. 레저/티켓 상품 CRUD <br> 3. 포스터 및 댓글 신고 <br> 4. 검색 기능 최적화|https://muerha.tistory.com/|https://github.com/aaahreum|
+|담당자|역할|기능|블로그 주소|
+|:----|:----|:----|:----|
+|[김지연](https://github.com/jiyeon0926)|리더|1. 장소 검색 <br> 2. Open API 기반 맛집 정보 저장 <br> 3. 예약 및 결제 <br> 4. 맛집 검색 <br> 5. 메일 전송 및 알림 <br>|https://velog.io/@yeoni9094/posts </br> https://blog.naver.com/yeondata|
+|[김단빈](https://github.com/kimdanbin)|부리더|1. 포스터 <br> 2. 첨부파일 <br> 3. 댓글 <br> 4. 좋아요 <br> 5. 배포|https://dreamcompass.tistory.com/|
+|[안정민](https://github.com/JeongMinAhnn)|팀원|1. JWT <br> 2. 인증/인가 <br> 3. 사용자 CRUD <br> 4. 포스터 검색|https://velog.io/@devtony/posts|
+|[이아름](https://github.com/aaahreum)|팀원|1. 협력 업체 CRUD <br> 2. 레저/티켓 상품 CRUD <br> 3. 상품의 일정 CRUD <br> 4. 신고 <br> 5. 조회 기능 캐싱|https://muerha.tistory.com/|
 
 ---------
 
-# 📝 API 명세서 및 ERD
-- https://www.notion.so/teamsparta/6-2128906a055f44c6b835197d9dbbbaae
+# 💡 Q&A 
+<details>
+  <summary><b>Q1. Spring 프레임워크를 선택한 이유가 무엇인가요?</b></summary>
+  <div markdown="1">
+    <p></p>
+    <p>
+      Spring은 객체 지향 언어가 가진 특징을 최대로 활용할 수 있는 프레임워크 입니다.</br>
+      내장 서버(Tomcat 등)를 지원하기 때문에 별도의 웹 서버 설정 없이 실행할 수 있고, 통합 테스트와 단위 테스트를 지원하기 때문에 테스트 가능한 애플리케이션을 구현할 수 있습니다.
+    </p>
+  </div>
+</details>
+
+<details>
+  <summary><b>Q2. 객체 지향 언어의 특징은 무엇인가요?</b></summary>
+  <div markdown="1">
+    <p></p>
+    <p>객체 지향 언어의 특징으로 캡슐화, 상속, 추상화, 다형성이 있습니다.</p>
+    <li>외부에서 직접 데이터 및 메서드에 접근하지 못하도록 제한할 수 있습니다.</li>
+    <li>부모 클래스에 정의된 변수 및 메서드를 자식 클래스에서 상속받아 사용함으로써 코드를 재사용 하거나 재정의 할 수 있습니다.</li>
+    <li>공통 기능을 정의하여 여러 클래스에서 일관되게 사용할 수 있습니다.</li>
+    <li>동일한 이름의 메서드를 파라미터만 다르게 정의할 수 있고, 상속받은 메서드를 자식 클래스에서 재정의 할 수 있습니다.</li>
+  </div>
+</details>
+
+<details>
+  <summary><b>Q3. MySQL 데이터베이스를 선택한 이유가 무엇인가요?</b></summary>
+  <div markdown="1">
+    <p></p>
+    <p>
+      MySQL 데이터베이스는 여러 기업에서 많이 사용하고 있는 오픈 소스 관계형 데이터베이스이며 안정적이고 사용하기 쉽습니다.</br>
+      그리고 모든 팀원이 익숙한 데이터베이스이기 때문에 MySQL 데이터베이스를 사용하였습니다.
+    </p>
+  </div>
+</details>
+
+<details>
+  <summary><b>Q4. Spring Security를 선택한 이유가 무엇인가요?</b></summary>
+  <div markdown="1">
+    <p></p>
+    <p>
+      Spring Security는 Spring 프레임워크에서 애플리케이션의 보안을 관리할 때 사용합니다.</br>
+      Spring Security를 적용함으로써 사용자의 인증 및 권한에 따른 인가를 쉽게 관리할 수 있습니다.</br>
+      필요에 따라 커스터마이징하여 세부적으로 관리할 수도 있습니다.
+    </p>
+  </div>
+</details>
+
+<details>
+  <summary><b>Q5. Redis를 선택한 이유가 무엇인가요?</b></summary>
+  <div markdown="1">
+    <p></p>
+    <p>
+      첫 번째 이유는 예약 시스템의 동시성 문제를 해결하기 위해서입니다.</br>
+      각 일정에는 인원 수가 제한되어 있고, 같은 일정과 동일한 예약 날짜에 대해 여러 사용자가 동시에 예약 시도를 할 수 있습니다.</br>
+      이러한 동시성 문제를 해결하기 위해 Redis를 기반으로 한 Redisson 라이브러리를 활용해 분산 락을 적용했습니다.</br>
+      Redisson의 RLock을 사용하면 쉽게 분산 락을 구현할 수 있고, 여러 사용자가 동시에 예약 시도를 해도 최대 인원 제한을 초과하지 않도록 보장할 수 있습니다.
+    </p>
+    <p>
+      두 번째 이유는 조회 기능을 캐싱하기 위해서입니다.</br>
+      자주 조회되는 부분을 캐싱하여 응답 속도를 개선함으로써 사용자 및 업체에게 보다 빠른 서비스를 제공할 수 있습니다.</br>
+      현재 저희 서비스에서는 데이터 변경이 자주 없는 조회 기능의 첫 번째 페이지를 캐싱하였습니다.
+    </p>
+  </div>
+</details>
+
+<details>
+  <summary><b>Q6. 어떤 배포 방법을 선택했나요?</b></summary>
+  <div markdown="1">
+    <p></p>
+    <p>
+      GitHub Action을 이용한 CI/CD 방법을 선택했습니다.</br>
+      배포 과정에서 Docker와 AWS EC2를 사용합니다.
+    </p>
+  </div>
+</details>
