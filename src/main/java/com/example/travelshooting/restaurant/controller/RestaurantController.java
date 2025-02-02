@@ -9,8 +9,6 @@ import com.example.travelshooting.restaurant.service.RestaurantService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -39,7 +37,7 @@ public class RestaurantController {
     public ResponseEntity<CommonListResDto<RestaurantSearchResDto>> findAllById(@RequestParam(required = false) String placeName,
                                                                                 @RequestParam(required = false) String region,
                                                                                 @RequestParam(required = false) String city,
-                                                                                @PageableDefault(size = 10, page = 0, sort = "placeName", direction = Sort.Direction.ASC) Pageable pageable) {
+                                                                                Pageable pageable) {
         Page<RestaurantSearchResDto> restaurants = restaurantService.findAllById(placeName, region, city, pageable);
         List<RestaurantSearchResDto> content = restaurants.getContent();
 
