@@ -93,7 +93,7 @@ public class UserService {
     }
     // 로그아웃
     @Transactional
-    public void logout() {
+    public void logout(String accessToken) {
         // 인증된 사용자 정보 가져오기
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
@@ -112,6 +112,9 @@ public class UserService {
         }
 
         log.info("User with email '{}' successfully logged out.", email);
+
+        jwtProvider.blacklistToken(accessToken);
+        log.info("User '{}' 로그아웃 처리 완료. Access Token 블랙리스트에 추가되었습니다.", email);
     }
 
     @Transactional

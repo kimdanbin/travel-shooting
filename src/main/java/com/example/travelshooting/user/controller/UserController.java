@@ -38,8 +38,9 @@ public class UserController {
 
   // 로그아웃
   @PostMapping("/logout")
-  public ResponseEntity<String> logout() {
-    userService.logout(); // 서비스 레이어 호출
+  public ResponseEntity<String> logout(@RequestHeader("Authorization") String token) {
+    String accessToken = token.replace("Bearer ", "");
+    userService.logout(accessToken); // 서비스 레이어 호출
     return ResponseEntity.ok("로그아웃 되었습니다.");
   }
 

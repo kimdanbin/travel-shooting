@@ -74,19 +74,57 @@ public class JwtProvider {
 
     return claims.getSubject();
   }
-
+  // 토큰 검증 임시 코드
+  //  public boolean validToken(String token) throws JwtException {
+//    try {
+//      return !this.tokenExpired(token);
+//    } catch (MalformedJwtException e) {
+//      log.error("잘못된 JWT 토큰입니다.: {}", e.getMessage());
+//    } catch (ExpiredJwtException e) {
+//      log.error("JWT 토큰이 만료되었습니다.: {}", e.getMessage());
+//    } catch (UnsupportedJwtException e) {
+//      log.error("지원되지 않는 JWT 토큰입니다.: {}", e.getMessage());
+//    }
+//
+//    return false;
+//  }
   public boolean validToken(String token) throws JwtException {
     try {
-      return !this.tokenExpired(token);
-    } catch (MalformedJwtException e) {
-      log.error("잘못된 JWT 토큰입니다.: {}", e.getMessage());
-    } catch (ExpiredJwtException e) {
-      log.error("JWT 토큰이 만료되었습니다.: {}", e.getMessage());
-    } catch (UnsupportedJwtException e) {
-      log.error("지원되지 않는 JWT 토큰입니다.: {}", e.getMessage());
-    }
+      // 블랙리스트 확인
+      if (isTokenBlacklisted(token)) {
+        throw new JwtException("블랙리스트에 등록된 토큰입니다.");
+      }
 
-    return false;
+      // 토큰 검증
+      Jwts.parser()
+          .setSigningKey(Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8)))
+          .build()
+          .parseClaimsJws(token);
+      return true;
+    } catch (JwtException e) {
+      log.error("JWT 검증 실패: {}", e.getMessage());
+      return false;
+    }
+  }
+
+  private boolean isTokenBlacklisted(String token) {
+    return redisTemplate.opsForValue().get(token) != null;
+  }
+
+  public void blacklistToken(String token) {
+    // Access Token 남은 유효기간 계산
+    long remainingTime = getRemainingTime(token);
+    if (remainingTime > 0) {
+      redisTemplate.opsForValue().set(token, "blacklisted", remainingTime, TimeUnit.MILLISECONDS);
+      log.info("Token '{}' 블랙리스트에 추가되었습니다.", token);
+    } else {
+      log.warn("토큰 '{}' 이미 만료되었습니다, 블랙리스트 추가 생략.", token);
+    }
+  }
+
+  private long getRemainingTime(String token) {
+    Date expiration = getExpirationDateFromToken(token);
+    return expiration.getTime() - System.currentTimeMillis();
   }
 
   private String generateAccessTokenBy(String email) {
@@ -108,6 +146,7 @@ public class JwtProvider {
         .signWith(Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8)), Jwts.SIG.HS256) // 비밀 키 생성 , 문자열을 바이트 배열로 변환
         .compact(); // 토큰 생성
   }
+
   // 리프레시 토큰 생성
   public String generateRefreshTokenBy(String email) {
     Optional<User> user = userRepository.findByEmail(email);
@@ -146,25 +185,25 @@ public class JwtProvider {
   }
 
   // 리프레시 토큰 검증
-public boolean validateRefreshToken(String email, String refreshToken) {
-  ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
-  String savedToken = valueOperations.get(email);
+  public boolean validateRefreshToken(String email, String refreshToken) {
+    ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
+    String savedToken = valueOperations.get(email);
 
-  if (savedToken == null || !savedToken.equals(refreshToken)) {
-    return false;
-  }
+    if (savedToken == null || !savedToken.equals(refreshToken)) {
+      return false;
+    }
 
-  try {
-    Jwts.parser()
-        .setSigningKey(Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8)))
-        .build()
-        .parseClaimsJws(refreshToken);
-    return true;
-  } catch (JwtException e) {
-    log.error("Invalid Refresh Token: {}", e.getMessage());
-    return false;
+    try {
+      Jwts.parser()
+          .setSigningKey(Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8)))
+          .build()
+          .parseClaimsJws(refreshToken);
+      return true;
+    } catch (JwtException e) {
+      log.error("Invalid Refresh Token: {}", e.getMessage());
+      return false;
+    }
   }
-}
 
   private Date getExpirationDateFromToken(String token) {
     return resolveClaims(token, Claims::getExpiration);
