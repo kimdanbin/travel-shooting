@@ -5,7 +5,6 @@ import com.example.travelshooting.user.dto.*;
 import com.example.travelshooting.user.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -38,33 +37,12 @@ public class UserController {
   }
 
   // 로그아웃
-//  @PostMapping("/logout")
-//  public ResponseEntity<CommonResDto<String>> logout(HttpServletRequest request,
-//                                                     HttpServletResponse response, Authentication authentication)
-//      throws UsernameNotFoundException {
-//    // 인증 정보가 있다면 로그아웃 처리.
-//    if (authentication != null && authentication.isAuthenticated()) {
-//      new SecurityContextLogoutHandler().logout(request, response, authentication);
-//
-//      return ResponseEntity.ok(new CommonResDto<>("로그아웃 성공."));
-//    }
-//    throw new UsernameNotFoundException("로그인이 먼저 필요합니다.");
-//  }
   @PostMapping("/logout")
-  public ResponseEntity<String> logout(Authentication authentication) {
+  public ResponseEntity<String> logout() {
     userService.logout(); // 서비스 레이어 호출
     return ResponseEntity.ok("로그아웃 되었습니다.");
   }
 
-  // 비밀번호 확인 후 회원탈퇴
-//    @DeleteMapping("/{userId}")
-//    public ResponseEntity<String> deleteUser(
-//            @PathVariable Long userId,
-//            @RequestBody PasswordVrfReqDto requestDto) {
-//        userService.deleteUser(userId, requestDto);
-//
-//        return new ResponseEntity<>("회원 탈퇴 성공", HttpStatus.OK);
-//    }
   // 비밀번호 확인
   @PostMapping("/{userId}/verify-password")
   public ResponseEntity<String> verifyPassword(
@@ -98,14 +76,7 @@ public class UserController {
 
     return new ResponseEntity<>("비밀번호 변경 완료", HttpStatus.OK);
   }
-
-  //    @PostMapping("/refresh")
-//    public ResponseEntity<CommonResDto<TokenDto>> refreshAccessToken(@Valid @RequestBody TokenDto dto) {
-//
-//        TokenDto result = userService.refresh(dto.getAccessToken(), dto.getRefreshToken());
-//
-//        return new ResponseEntity<>(new CommonResDto<>("토큰 재발급 완료", result), HttpStatus.CREATED);
-//    }
+  // Access token 재발급
   @PostMapping("/refresh")
   public ResponseEntity<JwtAuthResDto> refreshAccessToken(@Valid @RequestBody TokenDto tokenDto) {
     JwtAuthResDto response = userService.refreshAccessToken(tokenDto.getRefreshToken());
