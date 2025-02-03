@@ -69,18 +69,6 @@ public class JwtProvider {
     return refreshToken;
   }
 
-  // Refresh token
-//  public TokenDto generateToken(Authentication authentication) throws EntityNotFoundException {
-//
-//    String email = authentication.getName();
-//
-//    String accessToken = this.generateTokenBy(email);
-//    String refreshToken = this.generateRefreshToken(email);
-//
-//    return new TokenDto(accessToken, refreshToken);
-//  }
-
-
   public String getUsername(String token) {
     Claims claims = this.getClaims(token);
 
@@ -157,17 +145,6 @@ public class JwtProvider {
     return expiration.before(new Date());
   }
 
-
-//  // 리프레시 토큰 검증
-//  public boolean validRefreshToken(String token) {
-//    try {
-//      Claims claims = this.getClaims(token);
-//      return claims.getExpiration().after(new Date());
-//    } catch (JwtException e) {
-//      log.error("Invalid refresh token: {}", e.getMessage());
-//      return false;
-//    }
-//  }
   // 리프레시 토큰 검증
 public boolean validateRefreshToken(String email, String refreshToken) {
   ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
