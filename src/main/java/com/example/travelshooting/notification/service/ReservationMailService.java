@@ -49,7 +49,7 @@ public class ReservationMailService {
         contents.put("headCount", reservation.getHeadCount());
         contents.put("createdAt", reservation.getCreatedAt());
 
-        return mailService.processTemplate("/mail/reservation", contents);
+        return mailService.processTemplate("/mail/reservation.html", contents);
     }
 
     public Map<ReservationStatus, NotificationDetails> reservationDetails() {
