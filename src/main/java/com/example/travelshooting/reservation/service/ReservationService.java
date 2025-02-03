@@ -101,7 +101,6 @@ public class ReservationService {
 
         Integer totalPrice = product.getPrice() * headCount;
 
-        log.info("예약 신청");
         Reservation reservation = new Reservation(user, part, reservationDate, headCount, totalPrice);
         reservationRepository.save(reservation);
 
@@ -216,7 +215,11 @@ public class ReservationService {
         reservation.updateReservation(ReservationStatus.CANCELED);
         reservationRepository.save(reservation);
 
-        eventPublisher.publishEvent(new SendEmailEvent(this, reservation));
+        try {
+            eventPublisher.publishEvent(new SendEmailEvent(this, reservation));
+        } catch (Exception e) {
+            log.warn("메일 전송 실패");
+        }
 
         // 예약 취소 시 첫 번째 페이지 캐시 삭제
         final String cacheKey = CacheKeyUtil.getReservationProductPageKey(productId, 0);;

@@ -65,10 +65,8 @@ public class RestaurantService {
                     .filter(apiDto -> apiDto.getPlaceName() != null && !apiDto.getPlaceName().isEmpty())
                     .collect(Collectors.toList());
         } catch (ResourceAccessException e) {
-            e.printStackTrace();
             throw new ResourceAccessException("타임아웃이 발생했습니다.");
         } catch (Exception e) {
-            e.printStackTrace();
             throw new RuntimeException("XML 파싱 오류가 발생했습니다.");
         }
 
