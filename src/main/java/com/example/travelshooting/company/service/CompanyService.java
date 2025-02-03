@@ -5,6 +5,7 @@ import com.example.travelshooting.company.dto.CompanyResDto;
 import com.example.travelshooting.company.entity.Company;
 import com.example.travelshooting.company.repository.CompanyRepository;
 import com.example.travelshooting.config.util.CacheKeyUtil;
+import com.example.travelshooting.enums.UserRole;
 import com.example.travelshooting.user.entity.User;
 import com.example.travelshooting.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -39,10 +40,22 @@ public class CompanyService {
         if (user == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "유저가 존재하지 않습니다.");
         }
+
+        // 관리자는 본인 업체 등록 불가
+        if(user.getRole() == UserRole.ADMIN) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "ADMIN 계정은 PARTNER로 등록될 수 없습니다.");
+        }
+
         // 이미 등록된 업체 이름인지 확인
         if (companyRepository.existsByName(name)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "이미 등록된 업체 이름입니다.");
         }
+
+        // 삭제된 업체명으로 등록하려는 경우 예외처리
+        if (companyRepository.findByNameAndIsDeletedTrue(name).isPresent()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 삭제된 업체명은 다시 사용할 수 없습니다.");
+        }
+
         Company company = new Company(user, name, description);
         companyRepository.save(company);
         user.updateRole();
