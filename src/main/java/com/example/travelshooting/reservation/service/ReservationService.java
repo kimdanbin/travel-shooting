@@ -250,6 +250,12 @@ public class ReservationService {
         sendMail(user, product, part, reservation);
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void sendMail(User user, Product product, Part part, Reservation reservation) {
+        reservationMailService.sendMail(user, product, part, reservation, user.getName());
+        reservationMailService.sendMail(product.getCompany().getUser(), product, part, reservation, user.getName());
+    }
+
     private static void validCreateReservation(LocalDate reservationDate, Integer headCount, boolean isReservation, Product product, Part part, Integer totalHeadCount) {
         if (isReservation) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 날짜에 예약한 내역이 있습니다.");
@@ -271,11 +277,6 @@ public class ReservationService {
             Integer overHeadCount = Math.abs(part.getMaxQuantity() - totalHeadCount - headCount);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "신청 가능한 인원을 초과했습니다. 초과된 인원: " + overHeadCount);
         }
-    }
-
-    private void sendMail(User user, Product product, Part part, Reservation reservation) {
-        reservationMailService.sendMail(user, product, part, reservation, user.getName());
-        reservationMailService.sendMail(product.getCompany().getUser(), product, part, reservation, user.getName());
     }
 
     public Reservation findReservationByUserIdAndProductIdAndId(Long userId, Long productId, Long reservationId) {

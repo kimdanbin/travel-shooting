@@ -13,8 +13,6 @@ import com.example.travelshooting.reservation.entity.Reservation;
 import com.example.travelshooting.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,7 +25,6 @@ public class ReservationMailService {
     private final NotificationService notificationService;
 
     // 예약 메일 전송
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void sendMail(User user, Product product, Part part, Reservation reservation, String userName) {
         Map<ReservationStatus, NotificationDetails> detailsMap = reservationDetails();
         NotificationDetails details = detailsMap.get(reservation.getStatus());
