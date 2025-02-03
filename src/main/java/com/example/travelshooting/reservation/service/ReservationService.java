@@ -101,10 +101,15 @@ public class ReservationService {
 
         Integer totalPrice = product.getPrice() * headCount;
 
+        log.info("예약 신청");
         Reservation reservation = new Reservation(user, part, reservationDate, headCount, totalPrice);
         reservationRepository.save(reservation);
 
-        eventPublisher.publishEvent(new SendEmailEvent(this, reservation));
+        try {
+            eventPublisher.publishEvent(new SendEmailEvent(this, reservation));
+        } catch (Exception e) {
+            log.warn("메일 전송 실패");
+        }
 
         return new ReservationResDto(
                 reservation.getId(),
