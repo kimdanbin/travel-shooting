@@ -10,6 +10,7 @@ import com.example.travelshooting.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
@@ -23,6 +24,7 @@ public class LikePosterService {
     private final PosterService posterService;
 
     // 포스터에 좋아요 누르기
+    @Transactional(readOnly = true)
     public void likePoster(Long posterId) {
 
         User user = userService.findAuthenticatedUser();
@@ -46,6 +48,7 @@ public class LikePosterService {
     }
 
     // 좋아요 누른 포스터에 좋아요 취소하기
+    @Transactional(readOnly = true)
     public void unlikePoster(Long posterId) {
 
         User user = userService.findAuthenticatedUser();
