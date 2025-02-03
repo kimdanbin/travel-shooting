@@ -11,6 +11,7 @@ import com.example.travelshooting.user.dto.UserResDto;
 import com.example.travelshooting.user.entity.User;
 import com.example.travelshooting.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -27,6 +28,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserService {
 
     private final UserRepository userRepository;
@@ -92,32 +94,26 @@ public class UserService {
     // 로그아웃
     @Transactional
     public void logout() {
+        // 인증된 사용자 정보 가져오기
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "인증되지 않은 사용자입니다.");
+        }
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication(); // 현재 인증된 사용자 정보 가져오기
-        String email = authentication.getName(); // 유저 이메일 가져오기
+        // 이메일 가져오기
+        String email = authentication.getName();
 
         // Redis에서 Refresh Token 삭제
-        redisTemplate.delete(email);
+        Boolean isDeleted = redisTemplate.delete(email);
+
+        // 삭제 여부 확인
+        if (Boolean.FALSE.equals(isDeleted)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 로그아웃 되었거나 유효하지 않은 세션입니다.");
+        }
+
+        log.info("User with email '{}' successfully logged out.", email);
     }
 
-
-
-    // Refresh token 요청
-//    public TokenDto refresh(String accessToken, String refreshToken) {
-//
-//        if (!jwtProvider.validRefreshToken(refreshToken)) {
-//            throw new CustomException(ErrorCode.EXPIRED_TOKEN);
-//        }
-//
-//        String email = jwtProvider.getUsername(refreshToken);
-//        String savedRequestToken = refreshTokenRepository.getRefreshToken(email);
-//
-//        if (!refreshToken.equals(savedRequestToken)) {
-//            throw new CustomException(ErrorCode.EXPIRED_TOKEN);
-//        }
-//
-//        return jwtProvider.generateToken(email);
-//    }
     @Transactional
     public JwtAuthResDto refreshAccessToken(String refreshToken) {
         // Refresh Token 검증
@@ -158,21 +154,7 @@ public class UserService {
         userRepository.save(user);
     }
 
-    // 회원 탈퇴 v1
-//    @Transactional
-//    public void deleteUser(Long userId, PasswordVrfReqDto requestDto) {
-//        // 사용자 조회
-//        User user = userRepository.findUserById(userId);
-//
-//        // 비밀번호 확인
-//        if (!passwordEncoder.matches(requestDto.getPassword(), user.getPassword())) {
-//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "비밀번호가 일치하지 않습니다.");
-//        }
-//
-//        // 사용자 삭제
-//        userRepository.delete(user);
-//    }
-    // 회원 탈퇴 v2
+
     // 비밀번호 비교
     public boolean verifyPassword(Long userId, PasswordVrfReqDto requestDto) {
         User user = userRepository.findById(userId)
