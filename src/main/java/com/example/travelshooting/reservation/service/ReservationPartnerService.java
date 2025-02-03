@@ -4,7 +4,7 @@ import com.example.travelshooting.common.Const;
 import com.example.travelshooting.company.entity.QCompany;
 import com.example.travelshooting.config.util.CacheKeyUtil;
 import com.example.travelshooting.enums.ReservationStatus;
-import com.example.travelshooting.notification.service.ReservationMailService;
+import com.example.travelshooting.notification.service.SendEmailEvent;
 import com.example.travelshooting.part.entity.QPart;
 import com.example.travelshooting.product.entity.QProduct;
 import com.example.travelshooting.reservation.dto.QReservationResDto;
@@ -21,6 +21,7 @@ import com.querydsl.core.QueryResults;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -42,9 +43,9 @@ public class ReservationPartnerService {
     private final ReservationRepository reservationRepository;
     private final JPAQueryFactory jpaQueryFactory;
     private final UserService userService;
-    private final ReservationMailService reservationMailService;
     private final RedisTemplate<String, Object> redisObjectTemplate;
     private final ObjectMapper objectMapper;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional(readOnly = true)
     public Page<ReservationResDto> findAllByProductIdAndUserId(Long productId, Pageable pageable) {
@@ -176,7 +177,7 @@ public class ReservationPartnerService {
 
         Reservation updatedReservation = reservationRepository.save(reservation);
 
-        reservationMailService.sendMail(reservation.getUser(), reservation.getPart().getProduct(), reservation.getPart(), reservation, reservation.getUser().getName());
+        eventPublisher.publishEvent(new SendEmailEvent(this, reservation));
 
         // 상태 업데이트 시 첫 번째 페이지 캐시 삭제
         final String cacheKey = CacheKeyUtil.getReservationProductPageKey(productId, 0);

@@ -13,6 +13,9 @@ import com.example.travelshooting.reservation.entity.Reservation;
 import com.example.travelshooting.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,6 +26,14 @@ public class ReservationMailService {
 
     private final MailService mailService;
     private final NotificationService notificationService;
+
+    @TransactionalEventListener
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void sendReservationMail(SendEmailEvent<Reservation> event) {
+        Reservation reservation = event.getData();
+
+        sendMail(reservation.getUser(), reservation.getPart().getProduct(), reservation.getPart(), reservation, reservation.getUser().getName());
+    }
 
     // 예약 메일 전송
     public void sendMail(User user, Product product, Part part, Reservation reservation, String userName) {

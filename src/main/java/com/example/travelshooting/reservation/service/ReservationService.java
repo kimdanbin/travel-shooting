@@ -104,7 +104,7 @@ public class ReservationService {
         Reservation reservation = new Reservation(user, part, reservationDate, headCount, totalPrice);
         reservationRepository.save(reservation);
 
-        sendMail(user, product, part, reservation);
+        eventPublisher.publishEvent(new SendEmailEvent(this, reservation));
 
         return new ReservationResDto(
                 reservation.getId(),
@@ -211,7 +211,7 @@ public class ReservationService {
         reservation.updateReservation(ReservationStatus.CANCELED);
         reservationRepository.save(reservation);
 
-        sendMail(user, product, reservation.getPart(), reservation);
+        eventPublisher.publishEvent(new SendEmailEvent(this, reservation));
 
         // 예약 취소 시 첫 번째 페이지 캐시 삭제
         final String cacheKey = CacheKeyUtil.getReservationProductPageKey(productId, 0);;
@@ -247,11 +247,6 @@ public class ReservationService {
         Product product = productService.findProductByPartId(part.getId());
         User user = userService.findUserByReservationId(reservation.getId());
 
-        sendMail(user, product, part, reservation);
-    }
-
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void sendMail(User user, Product product, Part part, Reservation reservation) {
         reservationMailService.sendMail(user, product, part, reservation, user.getName());
         reservationMailService.sendMail(product.getCompany().getUser(), product, part, reservation, user.getName());
     }
