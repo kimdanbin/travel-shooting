@@ -68,7 +68,12 @@ public class ReportService {
     }
 
     @Transactional
-    public ReportResDto reportComment(Long commentId, String reason) {
+    public ReportResDto reportComment(Long posterId, Long commentId, String reason) {
+
+        if (!commentService.isPosterIdValid(posterId, commentId)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 포스터에 없는 댓글입니다.");
+        }
+
         Comment findComment = commentService.findCommentById(commentId);
         User user = userService.findAuthenticatedUser();
         // 본인이 작성한 댓글을 본인이 신고하려는 경우
@@ -86,7 +91,7 @@ public class ReportService {
         int reportCount = reportRepository.countByFkIdAndType(commentId, DomainType.COMMENT);
 
         if (reportCount >= Const.REPORT_COUNT && report.getType().equals(DomainType.COMMENT)) {
-            commentService.deleteComment(findComment.getPoster().getId() , commentId);
+            commentService.deleteCommentsById(commentId);
         }
 
         return new ReportResDto(

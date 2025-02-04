@@ -104,4 +104,9 @@ public class CommentService {
     public void deleteCommentsByPosterId(Long posterId) {
         commentRepository.deleteByPosterId(posterId);
     }
+
+    // commentId로 댓글 삭제
+    public void deleteCommentsById(Long commentId) {
+        commentRepository.deleteById(commentId);
+    }
 }
