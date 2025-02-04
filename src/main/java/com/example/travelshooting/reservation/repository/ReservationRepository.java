@@ -2,7 +2,6 @@ package com.example.travelshooting.reservation.repository;
 
 import com.example.travelshooting.enums.ReservationStatus;
 import com.example.travelshooting.reservation.entity.Reservation;
-import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -24,10 +23,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long>,
     Integer findTotalHeadCountByPartIdAndReservationDate(@Param("partId") Long partId, @Param("reservationDate") LocalDate reservationDate);
 
     boolean existsReservationByUserIdAndReservationDate(Long userId, LocalDate reservationDate);
-
-    @EntityGraph(attributePaths = {"part", "part.product", "user"})
-    @Query("SELECT r FROM Reservation r WHERE r.user.id = :userId AND r.part.product.id = :productId AND r.id = :reservationId")
-    Reservation findReservationByUserIdAndProductIdAndId(@Param("userId") Long userId, @Param("productId") Long productId, @Param("reservationId") Long reservationId);
 
     @Query("SELECT r FROM Reservation r INNER JOIN Payment p ON r.id = p.reservation.id WHERE p.id = :paymentId AND p.userId = :userId")
     Reservation findReservationByPaymentIdAndUserId(@Param("paymentId") Long paymentId, @Param("userId") Long userId);

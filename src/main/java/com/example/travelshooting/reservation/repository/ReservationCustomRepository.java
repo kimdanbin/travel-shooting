@@ -9,9 +9,9 @@ public interface ReservationCustomRepository {
 
     Page<ReservationResDto> findAllByUserIdAndProductId(Long productId, User authenticatedUser, Pageable pageable);
 
-    ReservationResDto findReservationByProductIdAndId(Long productId, Long reservationId, User authenticatedUser);
+    <T> T findReservationByProductIdAndId(Long productId, Long reservationId, Long userId);
 
-    Page<ReservationResDto> findAllByProductIdAndUserId(Long productId, User authenticatedUser, Pageable pageable);
+    Page<ReservationResDto> findPartnerReservationsByProductIdAndUserId(Long productId, User authenticatedUser, Pageable pageable);
 
     ReservationResDto findPartnerReservationByProductIdAndId(Long productId, Long reservationId, User authenticatedUser);
 }

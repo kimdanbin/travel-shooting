@@ -39,7 +39,7 @@ public class ReservationPartnerService {
     private final ApplicationEventPublisher eventPublisher;
 
     @Transactional(readOnly = true)
-    public Page<ReservationResDto> findAllByProductIdAndUserId(Long productId, Pageable pageable) {
+    public Page<ReservationResDto> findPartnerReservationsByProductIdAndUserId(Long productId, Pageable pageable) {
         User authenticatedUser = userService.findAuthenticatedUser();
 
         if(pageable.getPageSize() != Const.PAGE_SIZE) {
@@ -70,7 +70,7 @@ public class ReservationPartnerService {
 
         }
 
-        Page<ReservationResDto> reservations = reservationRepository.findAllByProductIdAndUserId(productId, authenticatedUser, pageable);
+        Page<ReservationResDto> reservations = reservationRepository.findPartnerReservationsByProductIdAndUserId(productId, authenticatedUser, pageable);
 
         // 첫 번째 페이지일 경우 캐시에 저장
         if (pageable.getPageNumber() == 0) {

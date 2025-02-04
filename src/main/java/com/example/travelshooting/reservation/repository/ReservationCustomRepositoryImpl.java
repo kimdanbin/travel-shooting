@@ -59,7 +59,7 @@ public class ReservationCustomRepositoryImpl implements ReservationCustomReposit
     }
 
     @Override
-    public ReservationResDto findReservationByProductIdAndId(Long productId, Long reservationId, User authenticatedUser) {
+    public ReservationResDto findReservationByProductIdAndId(Long productId, Long reservationId, Long userId) {
         QReservation reservation = QReservation.reservation;
         QUser user = QUser.user;
         QProduct product = QProduct.product;
@@ -68,7 +68,7 @@ public class ReservationCustomRepositoryImpl implements ReservationCustomReposit
         BooleanBuilder conditions = new BooleanBuilder();
 
         conditions.and(product.id.eq(productId));
-        conditions.and(user.id.eq(authenticatedUser.getId()));
+        conditions.and(user.id.eq(userId));
         conditions.and(reservation.id.eq(reservationId));
 
         return jpaQueryFactory
@@ -92,7 +92,7 @@ public class ReservationCustomRepositoryImpl implements ReservationCustomReposit
     }
 
     @Override
-    public Page<ReservationResDto> findAllByProductIdAndUserId(Long productId, User authenticatedUser, Pageable pageable) {
+    public Page<ReservationResDto> findPartnerReservationsByProductIdAndUserId(Long productId, User authenticatedUser, Pageable pageable) {
         QReservation reservation = QReservation.reservation;
         QCompany company = QCompany.company;
         QProduct product = QProduct.product;
