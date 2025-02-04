@@ -1,6 +1,8 @@
 package com.example.travelshooting.reservation.repository;
 
+import com.example.travelshooting.enums.ReservationStatus;
 import com.example.travelshooting.reservation.dto.ReservationResDto;
+import com.example.travelshooting.reservation.entity.Reservation;
 import com.example.travelshooting.user.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,4 +20,6 @@ public interface ReservationCustomRepository {
     ReservationResDto findPartnerReservationByProductIdAndId(Long productId, Long reservationId, User authenticatedUser);
 
     Integer findTotalHeadCountByPartIdAndReservationDate(Long partId, LocalDate reservationDate);
+
+    Reservation updateStatusAndIsDeleted(Long reservationId, ReservationStatus status, boolean isDeleted);
 }

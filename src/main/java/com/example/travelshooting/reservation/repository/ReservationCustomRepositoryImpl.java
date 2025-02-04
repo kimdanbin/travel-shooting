@@ -1,11 +1,13 @@
 package com.example.travelshooting.reservation.repository;
 
 import com.example.travelshooting.company.entity.QCompany;
+import com.example.travelshooting.enums.ReservationStatus;
 import com.example.travelshooting.part.entity.QPart;
 import com.example.travelshooting.product.entity.QProduct;
 import com.example.travelshooting.reservation.dto.QReservationResDto;
 import com.example.travelshooting.reservation.dto.ReservationResDto;
 import com.example.travelshooting.reservation.entity.QReservation;
+import com.example.travelshooting.reservation.entity.Reservation;
 import com.example.travelshooting.user.entity.QUser;
 import com.example.travelshooting.user.entity.User;
 import com.querydsl.core.BooleanBuilder;
@@ -176,6 +178,23 @@ public class ReservationCustomRepositoryImpl implements ReservationCustomReposit
                 .select(reservation.headCount.sum().coalesce(0))
                 .from(reservation)
                 .where(conditions)
+                .fetchOne();
+    }
+
+    @Override
+    public Reservation updateStatusAndIsDeleted(Long reservationId, ReservationStatus status, boolean isDeleted) {
+        QReservation reservation = QReservation.reservation;
+
+        jpaQueryFactory
+                .update(reservation)
+                .set(reservation.status, status)
+                .set(reservation.isDeleted, isDeleted)
+                .where(reservation.id.eq(reservationId))
+                .execute();
+
+        return jpaQueryFactory
+                .selectFrom(reservation)
+                .where(reservation.id.eq(reservationId))
                 .fetchOne();
     }
 }
