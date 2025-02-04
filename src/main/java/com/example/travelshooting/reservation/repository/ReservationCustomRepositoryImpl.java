@@ -202,4 +202,27 @@ public class ReservationCustomRepositoryImpl implements ReservationCustomReposit
                 .where(reservation.id.eq(reservationId))
                 .fetchOne();
     }
+
+    @Override
+    public Reservation findReservationByProductIdAndIdAndUserId(Long productId, Long reservationId, Long userId) {
+        QReservation reservation = QReservation.reservation;
+        QUser user = QUser.user;
+        QProduct product = QProduct.product;
+        QPart part = QPart.part;
+
+        BooleanBuilder conditions = new BooleanBuilder();
+
+        conditions.and(product.id.eq(productId));
+        conditions.and(user.id.eq(userId));
+        conditions.and(reservation.id.eq(reservationId));
+        conditions.and(reservation.isDeleted.eq(false));
+
+        return jpaQueryFactory
+                .selectFrom(reservation)
+                .innerJoin(reservation.user, user).fetchJoin()
+                .innerJoin(reservation.part, part).fetchJoin()
+                .innerJoin(part.product, product).fetchJoin()
+                .where(conditions)
+                .fetchOne();
+    }
 }

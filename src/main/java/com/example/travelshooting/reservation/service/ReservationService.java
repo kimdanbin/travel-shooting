@@ -198,11 +198,11 @@ public class ReservationService {
         }
     }
 
-    public Reservation findReservationByProductIdAndIdAndUserId(Long productId, Long reservationId, Long userId) {
-        return reservationRepository.findReservationByProductIdAndId(productId, reservationId, userId);
-    }
-
     public Reservation findReservationByPaymentIdAndUserId(Long paymentId, Long userId) {
         return reservationRepository.findReservationByPaymentIdAndUserId(paymentId, userId);
+    }
+
+    public Reservation findReservationByProductIdAndIdAndUserId(Long productId, Long reservationId, Long userId) {
+        return reservationRepository.findReservationByProductIdAndIdAndUserId(productId, reservationId, userId);
     }
 }
