@@ -180,7 +180,7 @@ public class ReservationPartnerService {
         try {
             eventPublisher.publishEvent(new SendEmailEvent(this, reservation));
         } catch (Exception e) {
-            log.warn("메일 전송 실패");
+            log.warn("메일 전송을 실패하였습니다.");
         }
 
         // 상태 업데이트 시 첫 번째 페이지 캐시 삭제

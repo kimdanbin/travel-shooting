@@ -33,6 +33,7 @@ public class ReservationMailService {
         Reservation reservation = event.getData();
 
         sendMail(reservation.getUser(), reservation.getPart().getProduct(), reservation.getPart(), reservation, reservation.getUser().getName());
+        sendMail(reservation.getPart().getProduct().getCompany().getUser(), reservation.getPart().getProduct(), reservation.getPart(), reservation, reservation.getUser().getName());
     }
 
     // 예약 메일 전송
