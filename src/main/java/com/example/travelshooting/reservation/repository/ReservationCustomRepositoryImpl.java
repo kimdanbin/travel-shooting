@@ -166,11 +166,10 @@ public class ReservationCustomRepositoryImpl implements ReservationCustomReposit
     @Override
     public Integer findTotalHeadCountByPartIdAndReservationDate(Long partId, LocalDate reservationDate) {
         QReservation reservation = QReservation.reservation;
-        QPart part = QPart.part;
 
         BooleanBuilder conditions = new BooleanBuilder();
 
-        conditions.and(part.id.eq(partId));
+        conditions.and(reservation.part.id.eq(partId));
         conditions.and(reservation.reservationDate.eq(reservationDate));
 
         return jpaQueryFactory
