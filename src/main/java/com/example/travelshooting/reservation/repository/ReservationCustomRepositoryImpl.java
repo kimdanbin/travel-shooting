@@ -1,5 +1,6 @@
 package com.example.travelshooting.reservation.repository;
 
+import com.example.travelshooting.company.entity.QCompany;
 import com.example.travelshooting.part.entity.QPart;
 import com.example.travelshooting.product.entity.QProduct;
 import com.example.travelshooting.reservation.dto.QReservationResDto;
@@ -86,6 +87,76 @@ public class ReservationCustomRepositoryImpl implements ReservationCustomReposit
                 .innerJoin(user).on(reservation.user.id.eq(user.id)).fetchJoin()
                 .innerJoin(part).on(reservation.part.id.eq(part.id)).fetchJoin()
                 .innerJoin(product).on(part.product.id.eq(product.id)).fetchJoin()
+                .where(conditions)
+                .fetchOne();
+    }
+
+    @Override
+    public Page<ReservationResDto> findAllByProductIdAndUserId(Long productId, User authenticatedUser, Pageable pageable) {
+        QReservation reservation = QReservation.reservation;
+        QCompany company = QCompany.company;
+        QProduct product = QProduct.product;
+        QPart part = QPart.part;
+
+        BooleanBuilder conditions = new BooleanBuilder();
+
+        conditions.and(product.id.eq(productId));
+        conditions.and(company.user.id.eq(authenticatedUser.getId()));
+
+        QueryResults<ReservationResDto> queryResults = jpaQueryFactory
+                .select(new QReservationResDto(
+                        reservation.id,
+                        reservation.user.id,
+                        product.id,
+                        part.id,
+                        reservation.reservationDate,
+                        reservation.headCount,
+                        reservation.totalPrice,
+                        reservation.status,
+                        reservation.createdAt,
+                        reservation.updatedAt))
+                .from(reservation)
+                .innerJoin(part).on(reservation.part.id.eq(part.id)).fetchJoin()
+                .innerJoin(product).on(part.product.id.eq(product.id)).fetchJoin()
+                .innerJoin(company).on(product.company.id.eq(company.id)).fetchJoin()
+                .where(conditions)
+                .orderBy(reservation.id.asc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetchResults();
+
+        return new PageImpl<>(queryResults.getResults(), pageable, queryResults.getTotal());
+    }
+
+    @Override
+    public ReservationResDto findPartnerReservationByProductIdAndId(Long productId, Long reservationId, User authenticatedUser) {
+        QReservation reservation = QReservation.reservation;
+        QCompany company = QCompany.company;
+        QProduct product = QProduct.product;
+        QPart part = QPart.part;
+
+        BooleanBuilder conditions = new BooleanBuilder();
+
+        conditions.and(product.id.eq(productId));
+        conditions.and(company.user.id.eq(authenticatedUser.getId()));
+        conditions.and(reservation.id.eq(reservationId));
+
+        return jpaQueryFactory
+                .select(new QReservationResDto(
+                        reservation.id,
+                        reservation.user.id,
+                        product.id,
+                        part.id,
+                        reservation.reservationDate,
+                        reservation.headCount,
+                        reservation.totalPrice,
+                        reservation.status,
+                        reservation.createdAt,
+                        reservation.updatedAt))
+                .from(reservation)
+                .innerJoin(part).on(reservation.part.id.eq(part.id)).fetchJoin()
+                .innerJoin(product).on(part.product.id.eq(product.id)).fetchJoin()
+                .innerJoin(company).on(product.company.id.eq(company.id)).fetchJoin()
                 .where(conditions)
                 .fetchOne();
     }
