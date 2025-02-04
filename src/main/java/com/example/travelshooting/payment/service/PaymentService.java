@@ -72,7 +72,7 @@ public class PaymentService {
     public PaymentReadyResDto payReady(Long productId, Long reservationId) {
         Product product = productService.findProductById(productId);
         User user = userService.findAuthenticatedUser();
-        Reservation reservation = reservationService.findReservationByProductIdAndId(product.getId(), reservationId, user.getId());
+        Reservation reservation = reservationService.findReservationByProductIdAndIdAndUserId(product.getId(), reservationId, user.getId());
 
         if (reservation == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "예약 내역을 찾을 수 없습니다.");
@@ -156,7 +156,7 @@ public class PaymentService {
     public PaymentCompletedResDto payCompleted(Long productId, Long reservationId, String pgToken) {
         Product product = productService.findProductById(productId);
         Payment payment = paymentRepository.findPaymentByReservationId(reservationId);
-        Reservation reservation = reservationService.findReservationByProductIdAndId(product.getId(), reservationId, payment.getUserId());
+        Reservation reservation = reservationService.findReservationByProductIdAndIdAndUserId(product.getId(), reservationId, payment.getUserId());
 
         Map<String, String> body = new HashMap<>();
         body.put("cid", Const.KAKAO_PAY_TEST_CID);

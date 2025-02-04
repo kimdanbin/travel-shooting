@@ -133,15 +133,8 @@ public class ReservationService {
 
     @Transactional
     public void deleteReservation(Long productId, Long reservationId) {
-        User user = userService.findAuthenticatedUser();
-        Reservation reservation = reservationRepository.findReservationByProductIdAndId(productId, reservationId, user.getId());
-
-        if (reservation == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "예약 내역이 없습니다.");
-        }
-
-        reservation.updateReservation(ReservationStatus.CANCELED);
-        reservationRepository.save(reservation);
+        findReservationByProductIdAndId(productId, reservationId);
+        Reservation reservation = reservationRepository.updateStatusAndIsDeleted(reservationId, ReservationStatus.CANCELED, true);
 
         try {
             eventPublisher.publishEvent(new SendEmailEvent(this, reservation));
@@ -205,7 +198,7 @@ public class ReservationService {
         }
     }
 
-    public Reservation findReservationByProductIdAndId(Long productId, Long reservationId, Long userId) {
+    public Reservation findReservationByProductIdAndIdAndUserId(Long productId, Long reservationId, Long userId) {
         return reservationRepository.findReservationByProductIdAndId(productId, reservationId, userId);
     }
 
