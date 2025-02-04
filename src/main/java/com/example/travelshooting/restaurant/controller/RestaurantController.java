@@ -34,11 +34,11 @@ public class RestaurantController {
 
     // 맛집 검색
     @GetMapping("/search")
-    public ResponseEntity<CommonListResDto<RestaurantSearchResDto>> findAllById(@RequestParam(required = false) String placeName,
+    public ResponseEntity<CommonListResDto<RestaurantSearchResDto>> findRestaurants(@RequestParam(required = false) String placeName,
                                                                                 @RequestParam(required = false) String region,
                                                                                 @RequestParam(required = false) String city,
                                                                                 Pageable pageable) {
-        Page<RestaurantSearchResDto> restaurants = restaurantService.findAllById(placeName, region, city, pageable);
+        Page<RestaurantSearchResDto> restaurants = restaurantService.findRestaurants(placeName, region, city, pageable);
         List<RestaurantSearchResDto> content = restaurants.getContent();
 
         return new ResponseEntity<>(new CommonListResDto<>("맛집 검색 완료", content), HttpStatus.OK);
