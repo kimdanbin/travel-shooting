@@ -11,8 +11,6 @@ import com.example.travelshooting.payment.dto.PaymentReadyResDto;
 import com.example.travelshooting.payment.dto.PaymentResDto;
 import com.example.travelshooting.payment.entity.Payment;
 import com.example.travelshooting.payment.repository.PaymentRepository;
-import com.example.travelshooting.product.entity.Product;
-import com.example.travelshooting.product.service.ProductService;
 import com.example.travelshooting.reservation.entity.Reservation;
 import com.example.travelshooting.reservation.service.ReservationService;
 import com.example.travelshooting.user.entity.User;
@@ -41,7 +39,6 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final ReservationService reservationService;
     private final UserService userService;
-    private final ProductService productService;
 
     @Value("${kakao.api.pay.key}")
     private String secretKey;
@@ -144,8 +141,8 @@ public class PaymentService {
         }
     }
 
-    public Payment savePayment(Reservation reservation, Long partnerUserId, Integer totalPrice) {
-        Payment payment = new Payment(reservation, partnerUserId, totalPrice);
+    public Payment savePayment(Reservation reservation, Long userId, Integer totalPrice) {
+        Payment payment = new Payment(reservation, userId, totalPrice);
 
         return paymentRepository.save(payment);
     }
@@ -153,9 +150,8 @@ public class PaymentService {
     // 최종적으로 결제 완료 처리를 하는 단계
     @Transactional
     public PaymentCompletedResDto payCompleted(Long productId, Long reservationId, String pgToken) {
-        Product product = productService.findProductById(productId);
         Payment payment = paymentRepository.findPaymentByReservationId(reservationId);
-        Reservation reservation = reservationService.findReservationByProductIdAndIdAndUserId(product.getId(), reservationId, payment.getUserId());
+        Reservation reservation = reservationService.findReservationByProductIdAndIdAndUserId(productId, reservationId, payment.getUserId());
 
         Map<String, String> body = new HashMap<>();
         body.put("cid", Const.KAKAO_PAY_TEST_CID);
