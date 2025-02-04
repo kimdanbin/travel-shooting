@@ -73,6 +73,11 @@ public class CompanyService {
 
     @Transactional(readOnly = true)
     public Page<CompanyResDto> findAllCompanies(Pageable pageable) {
+
+        if(pageable.getPageSize() != Const.PAGE_SIZE) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "페이지 사이즈는 20 만 가능합니다.");
+        }
+
         final String cacheKey = CacheKeyUtil.getCompanyPageKey(pageable.getPageNumber());
 
         if (pageable.getPageNumber() == 0) {

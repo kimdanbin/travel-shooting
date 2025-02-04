@@ -40,4 +40,5 @@ public class Const {
     public static final int RESERVATION_EXPIRED_DAY = 1;
     public static final int RESERVATION_EXPIRED_HOUR = 18;
     public static final int NOTIFICATION_EXPIRED_DAY = 30;
+    public static final int PAGE_SIZE = 20;
 }
