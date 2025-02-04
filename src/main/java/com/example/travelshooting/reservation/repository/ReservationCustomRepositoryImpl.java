@@ -16,6 +16,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDate;
+
 @RequiredArgsConstructor
 public class ReservationCustomRepositoryImpl implements ReservationCustomRepository {
 
@@ -59,7 +61,7 @@ public class ReservationCustomRepositoryImpl implements ReservationCustomReposit
     }
 
     @Override
-    public ReservationResDto findReservationByProductIdAndId(Long productId, Long reservationId, User authenticatedUser) {
+    public ReservationResDto findReservationByProductIdAndId(Long productId, Long reservationId, Long userId) {
         QReservation reservation = QReservation.reservation;
         QUser user = QUser.user;
         QProduct product = QProduct.product;
@@ -68,7 +70,7 @@ public class ReservationCustomRepositoryImpl implements ReservationCustomReposit
         BooleanBuilder conditions = new BooleanBuilder();
 
         conditions.and(product.id.eq(productId));
-        conditions.and(user.id.eq(authenticatedUser.getId()));
+        conditions.and(user.id.eq(userId));
         conditions.and(reservation.id.eq(reservationId));
 
         return jpaQueryFactory
@@ -92,7 +94,7 @@ public class ReservationCustomRepositoryImpl implements ReservationCustomReposit
     }
 
     @Override
-    public Page<ReservationResDto> findAllByProductIdAndUserId(Long productId, User authenticatedUser, Pageable pageable) {
+    public Page<ReservationResDto> findPartnerReservationsByProductIdAndUserId(Long productId, User authenticatedUser, Pageable pageable) {
         QReservation reservation = QReservation.reservation;
         QCompany company = QCompany.company;
         QProduct product = QProduct.product;
@@ -157,6 +159,22 @@ public class ReservationCustomRepositoryImpl implements ReservationCustomReposit
                 .innerJoin(part).on(reservation.part.id.eq(part.id)).fetchJoin()
                 .innerJoin(product).on(part.product.id.eq(product.id)).fetchJoin()
                 .innerJoin(company).on(product.company.id.eq(company.id)).fetchJoin()
+                .where(conditions)
+                .fetchOne();
+    }
+
+    @Override
+    public Integer findTotalHeadCountByPartIdAndReservationDate(Long partId, LocalDate reservationDate) {
+        QReservation reservation = QReservation.reservation;
+
+        BooleanBuilder conditions = new BooleanBuilder();
+
+        conditions.and(reservation.part.id.eq(partId));
+        conditions.and(reservation.reservationDate.eq(reservationDate));
+
+        return jpaQueryFactory
+                .select(reservation.headCount.sum().coalesce(0))
+                .from(reservation)
                 .where(conditions)
                 .fetchOne();
     }
