@@ -95,27 +95,17 @@ public class ReservationPartnerService {
 
     @Transactional
     public ReservationResDto updateReservationStatus(Long productId, Long reservationId, String status) {
-        findPartnerReservationByProductIdAndId(productId, reservationId);
-        Reservation reservation = reservationRepository.findReservationById(reservationId);
-
-        if (reservation == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "예약 내역이 없습니다.");
-        }
+        ReservationResDto reservation = findPartnerReservationByProductIdAndId(productId, reservationId);
 
         if (!reservation.getStatus().equals(ReservationStatus.PENDING)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 수락 또는 거절 상태입니다.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 승인된 예약입니다.");
         }
 
-        if (ReservationStatus.REJECTED.name().equals(status)) {
-            reservation.updateReservation(ReservationStatus.valueOf(status));
-        } else {
-            reservation.updateStatus(ReservationStatus.valueOf(status));
-        }
-
-        Reservation updatedReservation = reservationRepository.save(reservation);
+        boolean isDeleted = ReservationStatus.REJECTED.name().equals(status);
+        Reservation updatedReservation = reservationRepository.updateStatusAndIsDeleted(reservationId, ReservationStatus.valueOf(status), isDeleted);
 
         try {
-            eventPublisher.publishEvent(new SendEmailEvent(this, reservation));
+            eventPublisher.publishEvent(new SendEmailEvent(this, updatedReservation));
         } catch (Exception e) {
             log.warn("메일 전송을 실패하였습니다.");
         }
@@ -128,7 +118,7 @@ public class ReservationPartnerService {
         return new ReservationResDto(
                 updatedReservation.getId(),
                 updatedReservation.getUser().getId(),
-                reservation.getPart().getProduct().getId(),
+                updatedReservation.getPart().getProduct().getId(),
                 updatedReservation.getPart().getId(),
                 updatedReservation.getReservationDate(),
                 updatedReservation.getHeadCount(),
