@@ -43,10 +43,11 @@ public class ReportController {
      */
     @PostMapping("/comments/{commentId}/reports")
     public ResponseEntity<CommonResDto<ReportResDto>> reportComment(
+            @PathVariable Long posterId,
             @PathVariable Long commentId,
             @Valid @RequestBody ReportReqDto reportReqDto
     ) {
-        ReportResDto result = reportService.reportComment(commentId, reportReqDto.getReason());
+        ReportResDto result = reportService.reportComment(posterId, commentId, reportReqDto.getReason());
 
         return new ResponseEntity<>(new CommonResDto<>("댓글 신고 완료", result), HttpStatus.OK);
     }
