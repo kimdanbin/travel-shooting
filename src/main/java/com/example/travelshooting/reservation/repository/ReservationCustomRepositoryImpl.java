@@ -16,6 +16,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDate;
+
 @RequiredArgsConstructor
 public class ReservationCustomRepositoryImpl implements ReservationCustomRepository {
 
@@ -157,6 +159,23 @@ public class ReservationCustomRepositoryImpl implements ReservationCustomReposit
                 .innerJoin(part).on(reservation.part.id.eq(part.id)).fetchJoin()
                 .innerJoin(product).on(part.product.id.eq(product.id)).fetchJoin()
                 .innerJoin(company).on(product.company.id.eq(company.id)).fetchJoin()
+                .where(conditions)
+                .fetchOne();
+    }
+
+    @Override
+    public Integer findTotalHeadCountByPartIdAndReservationDate(Long partId, LocalDate reservationDate) {
+        QReservation reservation = QReservation.reservation;
+        QPart part = QPart.part;
+
+        BooleanBuilder conditions = new BooleanBuilder();
+
+        conditions.and(part.id.eq(partId));
+        conditions.and(reservation.reservationDate.eq(reservationDate));
+
+        return jpaQueryFactory
+                .select(reservation.headCount.sum().coalesce(0))
+                .from(reservation)
                 .where(conditions)
                 .fetchOne();
     }
