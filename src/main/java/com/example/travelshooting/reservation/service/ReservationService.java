@@ -5,7 +5,6 @@ import com.example.travelshooting.config.util.CacheKeyUtil;
 import com.example.travelshooting.config.util.LockKeyUtil;
 import com.example.travelshooting.enums.PaymentStatus;
 import com.example.travelshooting.enums.ReservationStatus;
-import com.example.travelshooting.notification.service.ReservationMailService;
 import com.example.travelshooting.notification.service.SendEmailEvent;
 import com.example.travelshooting.part.entity.Part;
 import com.example.travelshooting.part.entity.QPart;
@@ -35,9 +34,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.event.TransactionalEventListener;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
@@ -56,7 +53,6 @@ public class ReservationService {
     private final UserService userService;
     private final ProductService productService;
     private final PartService partService;
-    private final ReservationMailService reservationMailService;
     private final ApplicationEventPublisher eventPublisher;
     private final RedisTemplate<String, Object> redisObjectTemplate;
     private final RedissonClient redissonClient;
@@ -101,14 +97,13 @@ public class ReservationService {
 
         Integer totalPrice = product.getPrice() * headCount;
 
-        log.info("예약 신청");
         Reservation reservation = new Reservation(user, part, reservationDate, headCount, totalPrice);
         reservationRepository.save(reservation);
 
         try {
             eventPublisher.publishEvent(new SendEmailEvent(this, reservation));
         } catch (Exception e) {
-            log.warn("메일 전송 실패");
+            log.warn("메일 전송을 실패하였습니다.");
         }
 
         return new ReservationResDto(
@@ -206,8 +201,7 @@ public class ReservationService {
     @Transactional
     public void deleteReservation(Long productId, Long reservationId) {
         User user = userService.findAuthenticatedUser();
-        Product product = productService.findProductById(productId);
-        Reservation reservation = reservationRepository.findReservationByUserIdAndProductIdAndId(user.getId(), product.getId(), reservationId);
+        Reservation reservation = reservationRepository.findReservationByUserIdAndProductIdAndId(user.getId(), productId, reservationId);
 
         if (reservation == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "예약 내역이 없습니다.");
@@ -216,7 +210,11 @@ public class ReservationService {
         reservation.updateReservation(ReservationStatus.CANCELED);
         reservationRepository.save(reservation);
 
-        eventPublisher.publishEvent(new SendEmailEvent(this, reservation));
+        try {
+            eventPublisher.publishEvent(new SendEmailEvent(this, reservation));
+        } catch (Exception e) {
+            log.warn("메일 전송을 실패하였습니다.");
+        }
 
         // 예약 취소 시 첫 번째 페이지 캐시 삭제
         final String cacheKey = CacheKeyUtil.getReservationProductPageKey(productId, 0);;
@@ -238,22 +236,13 @@ public class ReservationService {
                 reservation.updateReservation(ReservationStatus.EXPIRED);
                 reservationRepository.save(reservation);
 
-                eventPublisher.publishEvent(new SendEmailEvent(this, reservation));
+                try {
+                    eventPublisher.publishEvent(new SendEmailEvent(this, reservation));
+                } catch (Exception e) {
+                    log.warn("메일 전송을 실패하였습니다.");
+                }
             }
         });
-    }
-
-    @TransactionalEventListener
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void sendExpiredReservationMail(SendEmailEvent<Reservation> event) {
-        Reservation reservation = event.getData();
-
-        Part part = partService.findPartByReservationId(reservation.getId());
-        Product product = productService.findProductByPartId(part.getId());
-        User user = userService.findUserByReservationId(reservation.getId());
-
-        reservationMailService.sendMail(user, product, part, reservation, user.getName());
-        reservationMailService.sendMail(product.getCompany().getUser(), product, part, reservation, user.getName());
     }
 
     private static void validCreateReservation(LocalDate reservationDate, Integer headCount, boolean isReservation, Product product, Part part, Integer totalHeadCount) {

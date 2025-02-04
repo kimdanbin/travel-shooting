@@ -145,7 +145,6 @@ public class PaymentService {
 
                 return new PaymentReadyResDto(redirectUrl);
             } catch (Exception e) {
-                e.printStackTrace();
                 throw new RuntimeException("카카오페이 결제 준비 응답 처리 중 오류 발생");
             }
         } else {
@@ -212,7 +211,6 @@ public class PaymentService {
 
                 return paymentCompletedResDto;
             } catch (Exception e) {
-                e.printStackTrace();
                 throw new RuntimeException("카카오페이 결제 승인 응답 처리 중 오류가 발생했습니다.");
             }
         } else {
@@ -293,7 +291,6 @@ public class PaymentService {
 
                 return paymentCancelResDto;
             } catch (Exception e) {
-                e.printStackTrace();
                 throw new RuntimeException("카카오페이 결제 취소 응답 처리 중 오류가 발생했습니다.");
             }
         } else {
