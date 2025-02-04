@@ -5,11 +5,11 @@ import com.example.travelshooting.config.util.CacheKeyUtil;
 import com.example.travelshooting.config.util.LockKeyUtil;
 import com.example.travelshooting.enums.PaymentStatus;
 import com.example.travelshooting.enums.ReservationStatus;
+import com.example.travelshooting.enums.UserRole;
 import com.example.travelshooting.notification.service.SendEmailEvent;
 import com.example.travelshooting.part.entity.Part;
 import com.example.travelshooting.part.service.PartService;
 import com.example.travelshooting.product.entity.Product;
-import com.example.travelshooting.product.service.ProductService;
 import com.example.travelshooting.reservation.dto.ReservationResDto;
 import com.example.travelshooting.reservation.entity.Reservation;
 import com.example.travelshooting.reservation.repository.ReservationRepository;
@@ -41,7 +41,6 @@ public class ReservationService {
 
     private final ReservationRepository reservationRepository;
     private final UserService userService;
-    private final ProductService productService;
     private final PartService partService;
     private final ApplicationEventPublisher eventPublisher;
     private final RedisTemplate<String, Object> redisObjectTemplate;
@@ -49,9 +48,11 @@ public class ReservationService {
 
     @Transactional
     public ReservationResDto createReservation(Long productId, Long partId, LocalDate reservationDate, Integer headCount) {
-        Product product = productService.findProductById(productId);
-        User user = userService.findAuthenticatedUser();
-        Part part = partService.findPartById(partId);
+        Part part = partService.findPartByIdAndProductId(partId, productId);
+
+        if (part == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 상품에 대한 일정이 존재하지 않습니다.");
+        }
 
         String lockKey = LockKeyUtil.getReservationLockKey(reservationDate, part.getId());
         RLock lock = redissonClient.getLock(lockKey);
@@ -65,7 +66,7 @@ public class ReservationService {
             }
 
             log.info("lock 획득 성공: {}", lockKey);
-            return processReservation(user, product, part, reservationDate, headCount);
+            return processReservation(part.getProduct(), part, reservationDate, headCount);
         } catch (InterruptedException e) {
             throw new RuntimeException("예약 도중 오류가 발생했습니다.");
         } finally {
@@ -79,11 +80,12 @@ public class ReservationService {
     }
 
     @Transactional
-    public ReservationResDto processReservation(User user, Product product, Part part, LocalDate reservationDate, Integer headCount) {
+    public ReservationResDto processReservation(Product product, Part part, LocalDate reservationDate, Integer headCount) {
+        User user = userService.findAuthenticatedUser();
         boolean isReservation = reservationRepository.existsReservationByUserIdAndReservationDate(user.getId(), reservationDate);
         Integer totalHeadCount = reservationRepository.findTotalHeadCountByPartIdAndReservationDate(part.getId(), reservationDate);
 
-        validCreateReservation(reservationDate, headCount, isReservation, product, part, totalHeadCount);
+        validCreateReservation(reservationDate, headCount, isReservation, product, part, totalHeadCount, user);
 
         Integer totalPrice = product.getPrice() * headCount;
 
@@ -176,7 +178,11 @@ public class ReservationService {
         });
     }
 
-    private static void validCreateReservation(LocalDate reservationDate, Integer headCount, boolean isReservation, Product product, Part part, Integer totalHeadCount) {
+    private static void validCreateReservation(LocalDate reservationDate, Integer headCount, boolean isReservation, Product product, Part part, Integer totalHeadCount, User user) {
+        if (user.getRole().equals(UserRole.PARTNER)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "사용자만 예약할 수 있습니다.");
+        }
+
         if (isReservation) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 날짜에 예약한 내역이 있습니다.");
         }
