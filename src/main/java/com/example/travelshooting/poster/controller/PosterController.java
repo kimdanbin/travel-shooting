@@ -54,14 +54,14 @@ public class PosterController {
 
     // 포스터 전체 조회
     @GetMapping("/search")
-    public ResponseEntity<CommonListResDto<PosterResDto>> findAll(@RequestParam(required = false) Integer minExpenses,
+    public ResponseEntity<CommonListResDto<PosterResDto>> findPosters(@RequestParam(required = false) Integer minExpenses,
                                                                   @RequestParam(required = false) Integer maxExpenses,
                                                                   @RequestParam(required = false) LocalDate travelStartAt,
                                                                   @RequestParam(required = false) LocalDate travelEndAt,
                                                                   @RequestParam(required = false) Integer days,
                                                                   @RequestParam(required = false) Integer month,
                                                                   Pageable pageable) {
-        Page<PosterResDto> posters = posterService.findAll(minExpenses, maxExpenses, travelStartAt, travelEndAt, days, month, pageable);
+        Page<PosterResDto> posters = posterService.findPosters(minExpenses, maxExpenses, travelStartAt, travelEndAt, days, month, pageable);
         List<PosterResDto> content = posters.getContent();
 
         return new ResponseEntity<>(new CommonListResDto<>("여행 코스 검색 완료", content), HttpStatus.OK);
