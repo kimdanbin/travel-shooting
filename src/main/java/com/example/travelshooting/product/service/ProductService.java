@@ -13,7 +13,6 @@ import com.example.travelshooting.user.entity.User;
 import com.example.travelshooting.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -63,32 +62,8 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
-    public List<ProductResDto> findAllProducts(int page, int size, String productName) {
-        Pageable pageable = PageRequest.of(page, size);
-        Page<Product> productPage;
-
-        // 상품명 검색을 통한 검색 결과 조회
-        if (productName != null && !productName.isEmpty()) {
-            productPage = productRepository.findByNameContaining(productName, pageable);
-        } else {
-            productPage = productRepository.findAll(pageable);
-        }
-
-        return productPage.getContent().stream()
-                .map(product -> new ProductResDto(
-                        product.getId(),
-                        product.getCompany().getId(),
-                        product.getName(),
-                        product.getDescription(),
-                        product.getPrice(),
-                        product.getAddress(),
-                        product.getSaleStartAt(),
-                        product.getSaleEndAt(),
-                        product.getCreatedAt(),
-                        product.getUpdatedAt()
-                ))
-                .collect(Collectors.toList());
-
+    public Page<ProductResDto> findAllProducts(Pageable pageable, String productName) {
+        return productRepository.findAllProducts(pageable, productName);
     }
 
     @Transactional(readOnly = true)
