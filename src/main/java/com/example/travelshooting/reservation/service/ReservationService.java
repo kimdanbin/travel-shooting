@@ -7,29 +7,20 @@ import com.example.travelshooting.enums.PaymentStatus;
 import com.example.travelshooting.enums.ReservationStatus;
 import com.example.travelshooting.notification.service.SendEmailEvent;
 import com.example.travelshooting.part.entity.Part;
-import com.example.travelshooting.part.entity.QPart;
 import com.example.travelshooting.part.service.PartService;
 import com.example.travelshooting.product.entity.Product;
-import com.example.travelshooting.product.entity.QProduct;
 import com.example.travelshooting.product.service.ProductService;
-import com.example.travelshooting.reservation.dto.QReservationResDto;
 import com.example.travelshooting.reservation.dto.ReservationResDto;
-import com.example.travelshooting.reservation.entity.QReservation;
 import com.example.travelshooting.reservation.entity.Reservation;
 import com.example.travelshooting.reservation.repository.ReservationRepository;
-import com.example.travelshooting.user.entity.QUser;
 import com.example.travelshooting.user.entity.User;
 import com.example.travelshooting.user.service.UserService;
-import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.QueryResults;
-import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
@@ -49,7 +40,6 @@ import java.util.concurrent.TimeUnit;
 public class ReservationService {
 
     private final ReservationRepository reservationRepository;
-    private final JPAQueryFactory jpaQueryFactory;
     private final UserService userService;
     private final ProductService productService;
     private final PartService partService;
@@ -122,80 +112,21 @@ public class ReservationService {
 
     @Transactional(readOnly = true)
     public Page<ReservationResDto> findAllByUserIdAndProductId(Long productId, Pageable pageable) {
-        QReservation reservation = QReservation.reservation;
-        QUser user = QUser.user;
-        QProduct product = QProduct.product;
-        QPart part = QPart.part;
-
-        BooleanBuilder conditions = new BooleanBuilder();
         User authenticatedUser = userService.findAuthenticatedUser();
 
-        conditions.and(product.id.eq(productId));
-        conditions.and(user.id.eq(authenticatedUser.getId()));
-
-        QueryResults<ReservationResDto> queryResults = jpaQueryFactory
-                .select(new QReservationResDto(
-                        reservation.id,
-                        user.id,
-                        product.id,
-                        part.id,
-                        reservation.reservationDate,
-                        reservation.headCount,
-                        reservation.totalPrice,
-                        reservation.status,
-                        reservation.createdAt,
-                        reservation.updatedAt))
-                .from(reservation)
-                .innerJoin(user).on(reservation.user.id.eq(user.id)).fetchJoin()
-                .innerJoin(part).on(reservation.part.id.eq(part.id)).fetchJoin()
-                .innerJoin(product).on(part.product.id.eq(product.id)).fetchJoin()
-                .where(conditions)
-                .orderBy(reservation.id.asc())
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetchResults();
-
-        return new PageImpl<>(queryResults.getResults(), pageable, queryResults.getTotal());
+        return reservationRepository.findAllByUserIdAndProductId(productId, authenticatedUser, pageable);
     }
 
     @Transactional(readOnly = true)
     public ReservationResDto findReservationByProductIdAndId(Long productId, Long reservationId) {
-        QReservation reservation = QReservation.reservation;
-        QUser user = QUser.user;
-        QProduct product = QProduct.product;
-        QPart part = QPart.part;
-
-        BooleanBuilder conditions = new BooleanBuilder();
         User authenticatedUser = userService.findAuthenticatedUser();
+        ReservationResDto reservation = reservationRepository.findReservationByProductIdAndId(productId, reservationId, authenticatedUser);
 
-        conditions.and(product.id.eq(productId));
-        conditions.and(user.id.eq(authenticatedUser.getId()));
-        conditions.and(reservation.id.eq(reservationId));
-
-        ReservationResDto result = jpaQueryFactory
-                .select(new QReservationResDto(
-                        reservation.id,
-                        user.id,
-                        product.id,
-                        part.id,
-                        reservation.reservationDate,
-                        reservation.headCount,
-                        reservation.totalPrice,
-                        reservation.status,
-                        reservation.createdAt,
-                        reservation.updatedAt))
-                .from(reservation)
-                .innerJoin(user).on(reservation.user.id.eq(user.id)).fetchJoin()
-                .innerJoin(part).on(reservation.part.id.eq(part.id)).fetchJoin()
-                .innerJoin(product).on(part.product.id.eq(product.id)).fetchJoin()
-                .where(conditions)
-                .fetchOne();
-
-        if (result == null) {
+        if (reservation == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "예약 내역이 없습니다.");
         }
 
-        return result;
+        return reservation;
     }
 
     @Transactional

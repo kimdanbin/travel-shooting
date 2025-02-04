@@ -57,8 +57,8 @@ public class PaymentController {
 
     // 사용자 결제 내역 전체 조회
     @GetMapping("/payments")
-    public ResponseEntity<CommonListResDto<PaymentResDto>> findAll(Pageable pageable) {
-        Page<PaymentResDto> payments = paymentService.findAll(pageable);
+    public ResponseEntity<CommonListResDto<PaymentResDto>> findPayments(Pageable pageable) {
+        Page<PaymentResDto> payments = paymentService.findPayments(pageable);
         List<PaymentResDto> content = payments.getContent();
 
         return new ResponseEntity<>(new CommonListResDto<>("결제 내역 전체 조회 완료", content), HttpStatus.OK);
