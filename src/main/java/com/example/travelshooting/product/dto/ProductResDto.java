@@ -1,14 +1,13 @@
 package com.example.travelshooting.product.dto;
 
 import com.example.travelshooting.common.BaseDtoDataType;
+import com.querydsl.core.annotations.QueryProjection;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
-@RequiredArgsConstructor
 public class ProductResDto implements BaseDtoDataType {
 
     private final Long id;
@@ -22,4 +21,18 @@ public class ProductResDto implements BaseDtoDataType {
     private final LocalDateTime createdAt;
     private final LocalDateTime updatedAt;
 
+    @QueryProjection
+    public ProductResDto(Long id, Long companyId, String name, String description, Integer price, String address,
+                         LocalDate saleStartAt, LocalDate saleEndAt, LocalDateTime createdAt, LocalDateTime updatedAt) {
+        this.id = id;
+        this.companyId = companyId;
+        this.name = name;
+        this.description = description;
+        this.price = price;
+        this.address =address;
+        this.saleStartAt = saleStartAt;
+        this.saleEndAt  = saleEndAt;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+    }
 }
