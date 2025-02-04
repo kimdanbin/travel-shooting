@@ -50,6 +50,10 @@ public class ReservationPartnerService {
     @Transactional(readOnly = true)
     public Page<ReservationResDto> findAllByProductIdAndUserId(Long productId, Pageable pageable) {
 
+        if(pageable.getPageSize() != Const.PAGE_SIZE) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "페이지 사이즈는 20 만 가능합니다.");
+        }
+
         final String cacheKey = CacheKeyUtil.getReservationProductPageKey(productId, pageable.getPageNumber());
 
         // 캐시에서 데이터 가져오기
