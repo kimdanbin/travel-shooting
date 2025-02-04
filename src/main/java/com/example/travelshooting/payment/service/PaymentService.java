@@ -70,9 +70,8 @@ public class PaymentService {
     // 카카오페이 결제창 연결
     @Transactional
     public PaymentReadyResDto payReady(Long productId, Long reservationId) {
-        Product product = productService.findProductById(productId);
         User user = userService.findAuthenticatedUser();
-        Reservation reservation = reservationService.findReservationByProductIdAndIdAndUserId(product.getId(), reservationId, user.getId());
+        Reservation reservation = reservationService.findReservationByProductIdAndIdAndUserId(productId, reservationId, user.getId());
 
         if (reservation == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "예약 내역을 찾을 수 없습니다.");
@@ -98,7 +97,7 @@ public class PaymentService {
 
         String approvalUrl = String.format(
                 paymentCompletedUrl,
-                product.getId(),
+                reservation.getPart().getProduct().getId(),
                 reservation.getId()
         );
 
@@ -111,7 +110,7 @@ public class PaymentService {
         body.put("cid", Const.KAKAO_PAY_TEST_CID);
         body.put("partner_order_id", reservation.getId().toString());
         body.put("partner_user_id", user.getId().toString());
-        body.put("item_name", product.getName());
+        body.put("item_name", reservation.getPart().getProduct().getName());
         body.put("quantity", String.valueOf(reservation.getHeadCount()));
         body.put("total_amount", String.valueOf(reservation.getTotalPrice()));
         body.put("tax_free_amount", "0");

@@ -13,7 +13,7 @@ public interface ReservationCustomRepository {
 
     Page<ReservationResDto> findAllByUserIdAndProductId(Long productId, User authenticatedUser, Pageable pageable);
 
-    <T> T findReservationByProductIdAndId(Long productId, Long reservationId, Long userId);
+    ReservationResDto findReservationByProductIdAndId(Long productId, Long reservationId, Long userId);
 
     Page<ReservationResDto> findPartnerReservationsByProductIdAndUserId(Long productId, User authenticatedUser, Pageable pageable);
 
@@ -22,4 +22,6 @@ public interface ReservationCustomRepository {
     Integer findTotalHeadCountByPartIdAndReservationDate(Long partId, LocalDate reservationDate);
 
     Reservation updateStatusAndIsDeleted(Long reservationId, ReservationStatus status, boolean isDeleted);
+
+    Reservation findReservationByProductIdAndIdAndUserId(Long productId, Long reservationId, Long userId);
 }
