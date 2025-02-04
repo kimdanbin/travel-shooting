@@ -10,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Optional;
+
 @Repository
 public interface CompanyRepository extends JpaRepository<Company, Long> {
 
@@ -28,4 +30,7 @@ public interface CompanyRepository extends JpaRepository<Company, Long> {
 
     @Query("SELECT c FROM Company c JOIN FETCH c.products p WHERE p.id = :productId ")
     Company findCompanyByProductId(@Param("productId") Long productId);
+
+    @Query(value = "SELECT * FROM leisure_company c WHERE c.name = :name AND c.is_deleted = true", nativeQuery = true)
+    Optional<Company> findByNameAndIsDeletedTrue(@Param("name") String name);
 }
