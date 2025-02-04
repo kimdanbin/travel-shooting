@@ -177,7 +177,11 @@ public class ReservationPartnerService {
 
         Reservation updatedReservation = reservationRepository.save(reservation);
 
-        eventPublisher.publishEvent(new SendEmailEvent(this, reservation));
+        try {
+            eventPublisher.publishEvent(new SendEmailEvent(this, reservation));
+        } catch (Exception e) {
+            log.warn("메일 전송을 실패하였습니다.");
+        }
 
         // 상태 업데이트 시 첫 번째 페이지 캐시 삭제
         final String cacheKey = CacheKeyUtil.getReservationProductPageKey(productId, 0);

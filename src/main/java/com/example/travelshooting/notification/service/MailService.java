@@ -35,7 +35,6 @@ public class MailService {
 
             mailSender.send(mimeMessage);
         } catch (MessagingException e) {
-            e.printStackTrace();
             throw new RuntimeException("메일 전송 중 오류가 발생했습니다.");
         }
     }
