@@ -36,6 +36,7 @@ public class ReservationCustomRepositoryImpl implements ReservationCustomReposit
 
         conditions.and(product.id.eq(productId));
         conditions.and(user.id.eq(authenticatedUser.getId()));
+        conditions.and(reservation.isDeleted.eq(false));
 
         QueryResults<ReservationResDto> queryResults = jpaQueryFactory
                 .select(new QReservationResDto(
@@ -74,6 +75,7 @@ public class ReservationCustomRepositoryImpl implements ReservationCustomReposit
         conditions.and(product.id.eq(productId));
         conditions.and(user.id.eq(userId));
         conditions.and(reservation.id.eq(reservationId));
+        conditions.and(reservation.isDeleted.eq(false));
 
         return jpaQueryFactory
                 .select(new QReservationResDto(
@@ -106,6 +108,7 @@ public class ReservationCustomRepositoryImpl implements ReservationCustomReposit
 
         conditions.and(product.id.eq(productId));
         conditions.and(company.user.id.eq(authenticatedUser.getId()));
+        conditions.and(reservation.isDeleted.eq(false));
 
         QueryResults<ReservationResDto> queryResults = jpaQueryFactory
                 .select(new QReservationResDto(
@@ -144,6 +147,7 @@ public class ReservationCustomRepositoryImpl implements ReservationCustomReposit
         conditions.and(product.id.eq(productId));
         conditions.and(company.user.id.eq(authenticatedUser.getId()));
         conditions.and(reservation.id.eq(reservationId));
+        conditions.and(reservation.isDeleted.eq(false));
 
         return jpaQueryFactory
                 .select(new QReservationResDto(
@@ -173,6 +177,7 @@ public class ReservationCustomRepositoryImpl implements ReservationCustomReposit
 
         conditions.and(reservation.part.id.eq(partId));
         conditions.and(reservation.reservationDate.eq(reservationDate));
+        conditions.and(reservation.isDeleted.eq(false));
 
         return jpaQueryFactory
                 .select(reservation.headCount.sum().coalesce(0))

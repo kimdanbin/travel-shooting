@@ -82,7 +82,7 @@ public class ReservationService {
     @Transactional
     public ReservationResDto processReservation(Product product, Part part, LocalDate reservationDate, Integer headCount) {
         User user = userService.findAuthenticatedUser();
-        boolean isReservation = reservationRepository.existsReservationByUserIdAndReservationDate(user.getId(), reservationDate);
+        boolean isReservation = reservationRepository.existsReservationByUserIdAndReservationDateAndIsDeleted(user.getId(), reservationDate, false);
         Integer totalHeadCount = reservationRepository.findTotalHeadCountByPartIdAndReservationDate(part.getId(), reservationDate);
 
         validCreateReservation(reservationDate, headCount, isReservation, product, part, totalHeadCount, user);
