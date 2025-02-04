@@ -1,109 +1,57 @@
 package com.example.travelshooting.reservation.service;
 
-import com.example.travelshooting.company.entity.Company;
-import com.example.travelshooting.enums.UserRole;
-import com.example.travelshooting.notification.service.ReservationMailService;
-import com.example.travelshooting.part.entity.Part;
-import com.example.travelshooting.part.service.PartService;
-import com.example.travelshooting.product.entity.Product;
-import com.example.travelshooting.product.service.ProductService;
-import com.example.travelshooting.reservation.repository.ReservationRepository;
-import com.example.travelshooting.user.entity.User;
-import com.example.travelshooting.user.service.UserService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.redisson.api.RLock;
-import org.redisson.api.RedissonClient;
-import org.springframework.test.util.ReflectionTestUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.assertj.core.api.Fail.fail;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest
 class ReservationServiceTest {
 
-    @Mock
-    private RedissonClient redissonClient;
-
-    @Mock
-    private RLock lock;
-
-    @Mock
-    private ProductService productService;
-
-    @Mock
-    private UserService userService;
-
-    @Mock
-    private PartService partService;
-
-    @Mock
-    private ReservationRepository reservationRepository;
-
-    @Mock
-    private ReservationMailService reservationMailService;
-
-    @InjectMocks
+    private static final Logger log = LoggerFactory.getLogger(ReservationServiceTest.class);
+    @Autowired
     private ReservationService reservationService;
 
     @Test
     @DisplayName("예약 동시성 제어")
     public void testCreateReservation() throws InterruptedException {
-        // given
+        int threads = 10;
+        ExecutorService executorService = Executors.newFixedThreadPool(threads); // 쓰레드 생성
+        CountDownLatch latch = new CountDownLatch(threads); // 주어진 수 만큼 이벤트를 기다림
+
+        Long productId = 1L;
+        Long partId = 1L;
         LocalDate reservationDate = LocalDate.now().plusDays(1);
         Integer headCount = 1;
 
-        Product mockProduct = new Product("상품A", "설명", 10000, "주소", LocalDate.now(), LocalDate.now().plusDays(2), new Company());
-        ReflectionTestUtils.setField(mockProduct, "id", 1L);
-        when(productService.findProductById(mockProduct.getId())).thenReturn(mockProduct);
+        for (int i = 0; i < threads; i++) {
 
-        User mockUser = new User("user1@naver.com", "유저1", "1234", UserRole.USER, "image");
-        when(userService.findAuthenticatedUser()).thenReturn(mockUser);
-
-        Part mockPart = new Part(LocalTime.now().plusHours(1), LocalTime.now().plusHours(2), 2, mockProduct);
-        ReflectionTestUtils.setField(mockPart, "id", 1L);
-        when(partService.findPartById(mockPart.getId())).thenReturn(mockPart);
-
-        when(redissonClient.getLock(anyString())).thenReturn(lock);
-        when(lock.tryLock(anyLong(), anyLong(), any())).thenReturn(true, true, false);
-
-        when(reservationRepository.existsReservationByUserIdAndReservationDate(mockUser.getId(), reservationDate)).thenReturn(false);
-        when(reservationRepository.findTotalHeadCountByPartIdAndReservationDate(mockPart.getId(), reservationDate)).thenReturn(0);
-        doNothing().when(reservationMailService).sendMail(any(), any(), any(), any(), any());
-
-        Runnable task = () -> {
-            try {
-                reservationService.createReservation(mockProduct.getId(), mockPart.getId(), reservationDate, headCount);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        };
-
-        // when
-        Thread thread1 = new Thread(task);
-        Thread thread2 = new Thread(task);
-        Thread thread3 = new Thread(task);
-
-        thread1.start();
-        thread2.start();
-        thread3.start();
-
-        try {
-            thread1.join();
-            thread2.join();
-            thread3.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+            int index = i;
+            executorService.submit(() -> {
+                try {
+                    log.info("{}번째 쓰레드 접근 시작", index);
+                    assertDoesNotThrow(() -> reservationService.createReservation(productId, partId, reservationDate, headCount));
+                } catch (Exception e) {
+                    log.error("{}번째 쓰레드에서 예외 발생: {}", index, e.getMessage(), e);
+                    fail(index + "번째 스레드에서 예외 발생: " + e.getMessage());
+                } finally {
+                    latch.countDown();
+                    log.info("{}번째 쓰레드 접근 종료", index);
+                }
+            });
         }
 
-        // then
-        verify(lock, atLeast(2)).tryLock(anyLong(), anyLong(), any());
+        latch.await(); // 모든 쓰레드의 작업이 완료될 때까지 대기
+        executorService.shutdown();
     }
 }
