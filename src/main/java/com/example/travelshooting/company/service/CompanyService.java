@@ -11,7 +11,7 @@ import com.example.travelshooting.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
@@ -72,20 +72,23 @@ public class CompanyService {
     }
 
     @Transactional(readOnly = true)
-    public List<CompanyResDto> findAllCompanies(int page, int size) {
-        final String cacheKey = CacheKeyUtil.getCompanyPageKey(page);
+    public Page<CompanyResDto> findAllCompanies(Pageable pageable) {
 
-        if (page == 0) {
+        if(pageable.getPageSize() != Const.PAGE_SIZE) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "페이지 사이즈는 20 만 가능합니다.");
+        }
+
+        final String cacheKey = CacheKeyUtil.getCompanyPageKey(pageable.getPageNumber());
+
+        if (pageable.getPageNumber() == 0) {
             @SuppressWarnings("unchecked")
             List<CompanyResDto> cachedCompanies = (List<CompanyResDto>) redisObjectTemplate.opsForValue().get(cacheKey);
             if (cachedCompanies != null) {
                 log.info("캐시에서 첫 번째 페이지 조회: {}", cacheKey);
-                return cachedCompanies;
+                return new PageImpl<>(cachedCompanies, pageable, cachedCompanies.size());
             }
         }
 
-        // 페이지 번호와 크기를 기반으로 Pageable 객체 생성
-        Pageable pageable = PageRequest.of(page, size);
         Page<Company> companyPage = companyRepository.findAll(pageable);
 
         List<CompanyResDto> result = companyPage.stream()
@@ -99,13 +102,15 @@ public class CompanyService {
                 ))
                 .collect(Collectors.toList());
 
+        Page<CompanyResDto> resultPage = new PageImpl<>(result, pageable, companyPage.getTotalElements());
+
         // 첫 번째 페이지 캐시에 저장
-        if (page == 0) {
+        if (pageable.getPageNumber() == 0) {
             redisObjectTemplate.opsForValue().set(cacheKey, result, Const.COMPANY_CASH_TIMEOUT, TimeUnit.MINUTES);
             log.info("첫 번째 페이지 캐시 저장: {}", cacheKey);
         }
 
-        return result;
+        return resultPage;
     }
 
     @Transactional(readOnly = true)
