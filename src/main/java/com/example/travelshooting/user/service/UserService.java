@@ -3,7 +3,7 @@ package com.example.travelshooting.user.service;
 import com.example.travelshooting.config.util.JwtProvider;
 import com.example.travelshooting.enums.AuthenticationScheme;
 import com.example.travelshooting.enums.UserRole;
-import com.example.travelshooting.s3.S3Service;
+import com.example.travelshooting.file.service.S3Service;
 import com.example.travelshooting.user.dto.ChangePasswordReqDto;
 import com.example.travelshooting.user.dto.JwtAuthResDto;
 import com.example.travelshooting.user.dto.PasswordVrfReqDto;

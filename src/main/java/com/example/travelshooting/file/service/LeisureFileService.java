@@ -5,7 +5,6 @@ import com.example.travelshooting.file.entity.LeisureFile;
 import com.example.travelshooting.file.repository.LeisureFileRepository;
 import com.example.travelshooting.product.entity.Product;
 import com.example.travelshooting.product.service.ProductService;
-import com.example.travelshooting.s3.S3Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;

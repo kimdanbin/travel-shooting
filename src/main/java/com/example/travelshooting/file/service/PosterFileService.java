@@ -5,7 +5,6 @@ import com.example.travelshooting.file.entity.PosterFile;
 import com.example.travelshooting.file.repository.PosterFileRepository;
 import com.example.travelshooting.poster.entity.Poster;
 import com.example.travelshooting.poster.service.PosterService;
-import com.example.travelshooting.s3.S3Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
