@@ -34,6 +34,12 @@ public class Const {
     public static final String COMPANY_CACHE_PREFIX = "companies:page:";
     public static final String RESERVATION_CACHE_PREFIX = "reservations:product:";
 
+    // 메일
+    public static final String THREAD_NAME_PREFIX = "async-task-";
+    public static final int THREAD_CORE_POOL_SIZE = 5;
+    public static final int THREAD_MAX_POOL_SIZE = 10;
+    public static final int THREAD_QUEUE_CAPACITY = 20;
+
     // 기타
     public static final int REPORT_COUNT = 5;
     public static final int LOCAL_PAGE_DEFAULT = 1;
