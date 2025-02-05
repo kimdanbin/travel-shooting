@@ -7,7 +7,7 @@ import com.example.travelshooting.restaurant.dto.RestaurantResDto;
 import com.example.travelshooting.restaurant.dto.RestaurantSearchResDto;
 import com.example.travelshooting.restaurant.entity.Restaurant;
 import com.example.travelshooting.restaurant.repository.RestaurantRepository;
-import com.example.travelshooting.s3.S3Service;
+import com.example.travelshooting.file.service.S3Service;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
