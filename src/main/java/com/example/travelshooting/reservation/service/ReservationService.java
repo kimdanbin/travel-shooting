@@ -133,8 +133,15 @@ public class ReservationService {
 
     @Transactional
     public void deleteReservation(Long productId, Long reservationId) {
-        findReservationByProductIdAndId(productId, reservationId);
-        Reservation reservation = reservationRepository.updateStatusAndIsDeleted(reservationId, ReservationStatus.CANCELED, true);
+        User user = userService.findAuthenticatedUser();
+        Reservation reservation = reservationRepository.findReservationByProductIdAndIdAndUserId(productId, reservationId, user.getId());
+
+        if (reservation == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "예약 내역이 없습니다.");
+        }
+
+        reservation.updateReservation(ReservationStatus.CANCELED, true);
+        reservationRepository.save(reservation);
 
         try {
             eventPublisher.publishEvent(new SendEmailEvent(this, reservation));
@@ -159,7 +166,7 @@ public class ReservationService {
             LocalDateTime expirationTime = reservation.getUpdatedAt().plusDays(Const.RESERVATION_EXPIRED_DAY).withHour(Const.RESERVATION_EXPIRED_HOUR).withMinute(0).withSecond(0).withNano(0);
 
             if (!isPaid && LocalDateTime.now().isAfter(expirationTime)) {
-                reservation.updateReservation(ReservationStatus.EXPIRED);
+                reservation.updateReservation(ReservationStatus.EXPIRED, true);
                 reservationRepository.save(reservation);
 
                 try {

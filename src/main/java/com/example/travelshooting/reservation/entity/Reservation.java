@@ -57,8 +57,8 @@ public class Reservation extends BaseEntity {
         this.totalPrice = totalPrice;
     }
 
-    public void updateReservation(ReservationStatus status) {
-        this.isDeleted = true;
+    public void updateReservation(ReservationStatus status, boolean isDeleted) {
         this.status = status;
+        this.isDeleted = isDeleted;
     }
 }

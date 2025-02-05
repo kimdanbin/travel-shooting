@@ -1,7 +1,6 @@
 package com.example.travelshooting.reservation.repository;
 
 import com.example.travelshooting.company.entity.QCompany;
-import com.example.travelshooting.enums.ReservationStatus;
 import com.example.travelshooting.part.entity.QPart;
 import com.example.travelshooting.product.entity.QProduct;
 import com.example.travelshooting.reservation.dto.QReservationResDto;
@@ -187,23 +186,6 @@ public class ReservationCustomRepositoryImpl implements ReservationCustomReposit
     }
 
     @Override
-    public Reservation updateStatusAndIsDeleted(Long reservationId, ReservationStatus status, boolean isDeleted) {
-        QReservation reservation = QReservation.reservation;
-
-        jpaQueryFactory
-                .update(reservation)
-                .set(reservation.status, status)
-                .set(reservation.isDeleted, isDeleted)
-                .where(reservation.id.eq(reservationId))
-                .execute();
-
-        return jpaQueryFactory
-                .selectFrom(reservation)
-                .where(reservation.id.eq(reservationId))
-                .fetchOne();
-    }
-
-    @Override
     public Reservation findReservationByProductIdAndIdAndUserId(Long productId, Long reservationId, Long userId) {
         QReservation reservation = QReservation.reservation;
         QUser user = QUser.user;
@@ -219,9 +201,32 @@ public class ReservationCustomRepositoryImpl implements ReservationCustomReposit
 
         return jpaQueryFactory
                 .selectFrom(reservation)
-                .innerJoin(reservation.user, user).fetchJoin()
-                .innerJoin(reservation.part, part).fetchJoin()
-                .innerJoin(part.product, product).fetchJoin()
+                .innerJoin(part).on(reservation.part.id.eq(part.id)).fetchJoin()
+                .innerJoin(product).on(part.product.id.eq(product.id)).fetchJoin()
+                .where(conditions)
+                .fetchOne();
+    }
+
+    @Override
+    public Reservation findPartnerReservationByProductIdAndIdAndUserId(Long productId, Long reservationId, User authenticatedUser) {
+        QReservation reservation = QReservation.reservation;
+        QCompany company = QCompany.company;
+        QProduct product = QProduct.product;
+        QPart part = QPart.part;
+
+        BooleanBuilder conditions = new BooleanBuilder();
+
+        conditions.and(product.id.eq(productId));
+        conditions.and(company.user.id.eq(authenticatedUser.getId()));
+        conditions.and(reservation.id.eq(reservationId));
+        conditions.and(reservation.isDeleted.eq(false));
+
+        return jpaQueryFactory
+                .selectFrom(reservation)
+                .from(reservation)
+                .innerJoin(part).on(reservation.part.id.eq(part.id)).fetchJoin()
+                .innerJoin(product).on(part.product.id.eq(product.id)).fetchJoin()
+                .innerJoin(company).on(product.company.id.eq(company.id)).fetchJoin()
                 .where(conditions)
                 .fetchOne();
     }
