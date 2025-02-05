@@ -5,29 +5,21 @@ import com.example.travelshooting.enums.PaymentStatus;
 import com.example.travelshooting.enums.RefundPolicy;
 import com.example.travelshooting.enums.RefundType;
 import com.example.travelshooting.enums.ReservationStatus;
-import com.example.travelshooting.part.entity.QPart;
-import com.example.travelshooting.payment.dto.*;
+import com.example.travelshooting.payment.dto.PaymentCancelResDto;
+import com.example.travelshooting.payment.dto.PaymentCompletedResDto;
+import com.example.travelshooting.payment.dto.PaymentReadyResDto;
+import com.example.travelshooting.payment.dto.PaymentResDto;
 import com.example.travelshooting.payment.entity.Payment;
-import com.example.travelshooting.payment.entity.QPayment;
 import com.example.travelshooting.payment.repository.PaymentRepository;
-import com.example.travelshooting.product.entity.Product;
-import com.example.travelshooting.product.entity.QProduct;
-import com.example.travelshooting.product.service.ProductService;
-import com.example.travelshooting.reservation.entity.QReservation;
 import com.example.travelshooting.reservation.entity.Reservation;
 import com.example.travelshooting.reservation.service.ReservationService;
-import com.example.travelshooting.user.entity.QUser;
 import com.example.travelshooting.user.entity.User;
 import com.example.travelshooting.user.service.UserService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.QueryResults;
-import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -47,8 +39,6 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final ReservationService reservationService;
     private final UserService userService;
-    private final ProductService productService;
-    private final JPAQueryFactory jpaQueryFactory;
 
     @Value("${kakao.api.pay.key}")
     private String secretKey;
@@ -77,9 +67,8 @@ public class PaymentService {
     // 카카오페이 결제창 연결
     @Transactional
     public PaymentReadyResDto payReady(Long productId, Long reservationId) {
-        Product product = productService.findProductById(productId);
         User user = userService.findAuthenticatedUser();
-        Reservation reservation = reservationService.findReservationByUserIdAndProductIdAndId(user.getId(), product.getId(), reservationId);
+        Reservation reservation = reservationService.findReservationByProductIdAndIdAndUserId(productId, reservationId, user.getId());
 
         if (reservation == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "예약 내역을 찾을 수 없습니다.");
@@ -105,7 +94,7 @@ public class PaymentService {
 
         String approvalUrl = String.format(
                 paymentCompletedUrl,
-                product.getId(),
+                reservation.getPart().getProduct().getId(),
                 reservation.getId()
         );
 
@@ -118,7 +107,7 @@ public class PaymentService {
         body.put("cid", Const.KAKAO_PAY_TEST_CID);
         body.put("partner_order_id", reservation.getId().toString());
         body.put("partner_user_id", user.getId().toString());
-        body.put("item_name", product.getName());
+        body.put("item_name", reservation.getPart().getProduct().getName());
         body.put("quantity", String.valueOf(reservation.getHeadCount()));
         body.put("total_amount", String.valueOf(reservation.getTotalPrice()));
         body.put("tax_free_amount", "0");
@@ -152,8 +141,8 @@ public class PaymentService {
         }
     }
 
-    public Payment savePayment(Reservation reservation, Long partnerUserId, Integer totalPrice) {
-        Payment payment = new Payment(reservation, partnerUserId, totalPrice);
+    public Payment savePayment(Reservation reservation, Long userId, Integer totalPrice) {
+        Payment payment = new Payment(reservation, userId, totalPrice);
 
         return paymentRepository.save(payment);
     }
@@ -161,9 +150,8 @@ public class PaymentService {
     // 최종적으로 결제 완료 처리를 하는 단계
     @Transactional
     public PaymentCompletedResDto payCompleted(Long productId, Long reservationId, String pgToken) {
-        Product product = productService.findProductById(productId);
         Payment payment = paymentRepository.findPaymentByReservationId(reservationId);
-        Reservation reservation = reservationService.findReservationByUserIdAndProductIdAndId(payment.getUserId(), product.getId(), reservationId);
+        Reservation reservation = reservationService.findReservationByProductIdAndIdAndUserId(productId, reservationId, payment.getUserId());
 
         Map<String, String> body = new HashMap<>();
         body.put("cid", Const.KAKAO_PAY_TEST_CID);
@@ -299,76 +287,18 @@ public class PaymentService {
     }
 
     @Transactional(readOnly = true)
-    public Page<PaymentResDto> findAll(Pageable pageable) {
-        QPayment payment = QPayment.payment;
-        QProduct product = QProduct.product;
-        QPart part = QPart.part;
-        QUser user = QUser.user;
-        QReservation reservation = QReservation.reservation;
+    public Page<PaymentResDto> findPayments(Pageable pageable) {
         User authenticatedUser = userService.findAuthenticatedUser();
 
-        QueryResults<PaymentResDto> queryResults = jpaQueryFactory
-                .select(new QPaymentResDto(
-                        payment.id,
-                        reservation.id,
-                        product.name,
-                        reservation.headCount,
-                        payment.totalPrice,
-                        payment.type,
-                        payment.status,
-                        payment.refundType,
-                        payment.cancelPrice,
-                        payment.createdAt,
-                        payment.updatedAt))
-                .from(payment)
-                .innerJoin(reservation).on(payment.reservation.id.eq(reservation.id)).fetchJoin()
-                .innerJoin(user).on(reservation.user.id.eq(user.id)).fetchJoin()
-                .innerJoin(part).on(reservation.part.id.eq(part.id)).fetchJoin()
-                .innerJoin(product).on(part.product.id.eq(product.id)).fetchJoin()
-                .where(user.id.eq(authenticatedUser.getId()))
-                .orderBy(payment.id.asc())
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetchResults();
-
-        return new PageImpl<>(queryResults.getResults(), pageable, queryResults.getTotal());
+        return paymentRepository.findPayments(authenticatedUser, pageable);
     }
 
     @Transactional(readOnly = true)
     public PaymentResDto findPaymentByIdAndUserId(Long paymentId) {
-        QPayment payment = QPayment.payment;
-        QProduct product = QProduct.product;
-        QPart part = QPart.part;
-        QUser user = QUser.user;
-        QReservation reservation = QReservation.reservation;
-
-        BooleanBuilder conditions = new BooleanBuilder();
-        Payment findPayment = paymentRepository.findPaymentById(paymentId);
+        Payment existingPayment = paymentRepository.findPaymentById(paymentId);
         User authenticatedUser = userService.findAuthenticatedUser();
 
-        conditions.and(payment.id.eq(findPayment.getId()));
-        conditions.and(user.id.eq(authenticatedUser.getId()));
-
-        return jpaQueryFactory
-                .select(new QPaymentResDto(
-                        payment.id,
-                        reservation.id,
-                        product.name,
-                        reservation.headCount,
-                        payment.totalPrice,
-                        payment.type,
-                        payment.status,
-                        payment.refundType,
-                        payment.cancelPrice,
-                        payment.createdAt,
-                        payment.updatedAt))
-                .from(payment)
-                .innerJoin(reservation).on(payment.reservation.id.eq(reservation.id)).fetchJoin()
-                .innerJoin(user).on(reservation.user.id.eq(user.id)).fetchJoin()
-                .innerJoin(part).on(reservation.part.id.eq(part.id)).fetchJoin()
-                .innerJoin(product).on(part.product.id.eq(product.id)).fetchJoin()
-                .where(conditions)
-                .fetchOne();
+        return paymentRepository.findPaymentByIdAndUserId(existingPayment, authenticatedUser);
     }
 
     private HttpHeaders httpHeaders() {

@@ -24,8 +24,8 @@ public class ReservationPartnerController {
 
     // 레저/티켓 예약 전체 조회
     @GetMapping
-    public ResponseEntity<CommonListResDto<ReservationResDto>> findAllByProductIdAndUserId(@PathVariable Long productId, Pageable pageable) {
-        Page<ReservationResDto> reservations = reservationPartnerService.findAllByProductIdAndUserId(productId, pageable);
+    public ResponseEntity<CommonListResDto<ReservationResDto>> findPartnerReservationsByProductIdAndUserId(@PathVariable Long productId, Pageable pageable) {
+        Page<ReservationResDto> reservations = reservationPartnerService.findPartnerReservationsByProductIdAndUserId(productId, pageable);
         List<ReservationResDto> content = reservations.getContent();
 
         return new ResponseEntity<>(new CommonListResDto<>("레저/티켓 예약 전체 조회 완료", content), HttpStatus.OK);
@@ -33,9 +33,9 @@ public class ReservationPartnerController {
 
     // 레저/티켓 예약 단 건 조회
     @GetMapping("/{reservationId}")
-    public ResponseEntity<CommonResDto<ReservationResDto>> findReservationByProductIdAndId(@PathVariable Long productId,
+    public ResponseEntity<CommonResDto<ReservationResDto>> findPartnerReservationByProductIdAndId(@PathVariable Long productId,
                                                                                            @PathVariable Long reservationId) {
-        ReservationResDto reservation = reservationPartnerService.findReservationByProductIdAndId(productId, reservationId);
+        ReservationResDto reservation = reservationPartnerService.findPartnerReservationByProductIdAndId(productId, reservationId);
 
         return new ResponseEntity<>(new CommonResDto<>("레저/티켓 예약 단 건 조회 완료", reservation), HttpStatus.OK);
     }

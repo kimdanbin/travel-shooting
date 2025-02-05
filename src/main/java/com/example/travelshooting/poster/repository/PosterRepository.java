@@ -9,9 +9,8 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface PosterRepository extends JpaRepository<Poster,Long> {
+public interface PosterRepository extends JpaRepository<Poster,Long>, PosterCustomRepository {
 
     @Query("SELECT p FROM Poster p WHERE p.id = :id")
     Optional<Poster> findByIdIncludeDeleted(@Param("id") Long id);
-
 }

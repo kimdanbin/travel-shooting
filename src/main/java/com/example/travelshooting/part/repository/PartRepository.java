@@ -29,6 +29,5 @@ public interface PartRepository extends JpaRepository<Part, Long> {
     @Query("SELECT p FROM Part p JOIN FETCH p.reservations r WHERE p.id = :partId ")
     Part findReservationById(@Param("partId") Long partId);
 
-    @Query("SELECT p FROM Part p INNER JOIN Reservation r ON p.id = r.part.id WHERE r.id = :reservationId")
-    Part findPartByReservationId(@Param("reservationId") Long reservationId);
+    Part findPartByIdAndProductId(Long partId, Long productId);
 }
