@@ -24,7 +24,7 @@ public class LikePosterService {
     private final PosterService posterService;
 
     // 포스터에 좋아요 누르기
-    @Transactional(readOnly = true)
+    @Transactional
     public void likePoster(Long posterId) {
 
         User user = userService.findAuthenticatedUser();
@@ -48,7 +48,7 @@ public class LikePosterService {
     }
 
     // 좋아요 누른 포스터에 좋아요 취소하기
-    @Transactional(readOnly = true)
+    @Transactional
     public void unlikePoster(Long posterId) {
 
         User user = userService.findAuthenticatedUser();
@@ -67,6 +67,7 @@ public class LikePosterService {
     }
 
     // 본인이 좋아요 한 포스터만 전체 조회
+    @Transactional(readOnly = true)
     public List<PosterResDto> findAllByLikedPoster() {
 
         User user = userService.findAuthenticatedUser();
