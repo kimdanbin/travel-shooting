@@ -147,8 +147,4 @@ public class ProductService {
     public Product findProductByProductIdAndUserId(Long productId, Long userId) {
         return productRepository.findProductByIdAndUserId(productId, userId);
     }
-
-    public Product findProductByPartId(Long partId) {
-        return productRepository.findProductByPartId(partId);
-    }
 }

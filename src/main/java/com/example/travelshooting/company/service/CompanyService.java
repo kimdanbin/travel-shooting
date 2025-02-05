@@ -165,15 +165,7 @@ public class CompanyService {
         log.info("업체 삭제 시 첫 번째 페이지 캐시 삭제: {}", cacheKey);
     }
 
-    public Company findCompanyById(Long companyId) {
-        return companyRepository.findCompanyById(companyId);
-    }
-
     public Company findCompanyByIdAndUserId(Long companyId, Long userId) {
         return companyRepository.findCompanyByIdAndUserId(companyId, userId);
-    }
-
-    public Company findCompanyByProductId(Long productId) {
-        return companyRepository.findCompanyByProductId(productId);
     }
 }

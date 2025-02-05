@@ -28,9 +28,6 @@ public interface CompanyRepository extends JpaRepository<Company, Long> {
     @Query("SELECT c FROM Company c JOIN FETCH c.products p WHERE c.id = :companyId ")
     Company findProductById(@Param("companyId") Long companyId);
 
-    @Query("SELECT c FROM Company c JOIN FETCH c.products p WHERE p.id = :productId ")
-    Company findCompanyByProductId(@Param("productId") Long productId);
-
     @Query(value = "SELECT * FROM leisure_company c WHERE c.name = :name AND c.is_deleted = true", nativeQuery = true)
     Optional<Company> findByNameAndIsDeletedTrue(@Param("name") String name);
 }
