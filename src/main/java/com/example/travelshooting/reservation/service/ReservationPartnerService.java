@@ -95,17 +95,23 @@ public class ReservationPartnerService {
 
     @Transactional
     public ReservationResDto updateReservationStatus(Long productId, Long reservationId, String status) {
-        ReservationResDto reservation = findPartnerReservationByProductIdAndId(productId, reservationId);
+        User user = userService.findAuthenticatedUser();
+        Reservation reservation = reservationRepository.findPartnerReservationByProductIdAndIdAndUserId(productId, reservationId, user);
+
+        if (reservation == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "예약 내역이 없습니다.");
+        }
 
         if (!reservation.getStatus().equals(ReservationStatus.PENDING)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 승인된 예약입니다.");
         }
 
         boolean isDeleted = ReservationStatus.REJECTED.name().equals(status);
-        Reservation updatedReservation = reservationRepository.updateStatusAndIsDeleted(reservationId, ReservationStatus.valueOf(status), isDeleted);
+        reservation.updateReservation(ReservationStatus.valueOf(status), isDeleted);
+        reservationRepository.save(reservation);
 
         try {
-            eventPublisher.publishEvent(new SendEmailEvent(this, updatedReservation));
+            eventPublisher.publishEvent(new SendEmailEvent(this, reservation));
         } catch (Exception e) {
             log.warn("메일 전송을 실패하였습니다.");
         }
@@ -116,16 +122,16 @@ public class ReservationPartnerService {
         log.info("예약 업데이트 시 첫 번째 페이지 캐시 삭제: {}", cacheKey);
 
         return new ReservationResDto(
-                updatedReservation.getId(),
-                updatedReservation.getUser().getId(),
-                updatedReservation.getPart().getProduct().getId(),
-                updatedReservation.getPart().getId(),
-                updatedReservation.getReservationDate(),
-                updatedReservation.getHeadCount(),
-                updatedReservation.getTotalPrice(),
-                updatedReservation.getStatus(),
-                updatedReservation.getCreatedAt(),
-                updatedReservation.getUpdatedAt()
+                reservation.getId(),
+                reservation.getUser().getId(),
+                reservation.getPart().getProduct().getId(),
+                reservation.getPart().getId(),
+                reservation.getReservationDate(),
+                reservation.getHeadCount(),
+                reservation.getTotalPrice(),
+                reservation.getStatus(),
+                reservation.getCreatedAt(),
+                reservation.getUpdatedAt()
         );
     }
 }
