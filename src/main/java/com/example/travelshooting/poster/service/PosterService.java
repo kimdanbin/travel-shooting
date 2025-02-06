@@ -1,7 +1,6 @@
 package com.example.travelshooting.poster.service;
 
 import com.example.travelshooting.enums.UserRole;
-import com.example.travelshooting.file.service.PosterFileService;
 import com.example.travelshooting.payment.entity.Payment;
 import com.example.travelshooting.payment.service.PaymentService;
 import com.example.travelshooting.poster.dto.PosterResDto;
@@ -21,6 +20,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -41,6 +41,12 @@ public class PosterService {
         // 로그인 유저가 결제한 내역이 아닐 경우
         if (!user.getId().equals(payment.getReservation().getUser().getId())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "본인이 결제한 항목이 아닙니다.");
+        }
+
+        // 한 결제내역 당 하나의 포스터만 작성가능
+        List<Poster> allByPaymentId = posterRepository.findAllByPaymentId(paymentId);
+        if (!allByPaymentId.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 결제 내역에 대한 포스터를 이미 작성하였습니다.");
         }
 
         Poster poster = Poster.builder()
