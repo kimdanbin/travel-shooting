@@ -1,6 +1,7 @@
 package com.example.travelshooting.poster.service;
 
 import com.example.travelshooting.enums.UserRole;
+import com.example.travelshooting.file.service.PosterFileService;
 import com.example.travelshooting.payment.entity.Payment;
 import com.example.travelshooting.payment.service.PaymentService;
 import com.example.travelshooting.poster.dto.PosterResDto;
@@ -16,10 +17,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -29,9 +32,10 @@ public class PosterService {
     private final UserService userService;
     private final RestaurantService restaurantService;
     private final PaymentService paymentService;
+    private final PosterFileService posterFileService;
 
     // 포스터 생성
-    public PosterResDto createPoster(Long restaurantId, Long paymentId, int expenses, String title, String content, LocalDateTime travelStartAt, LocalDateTime travelEndAt) {
+    public PosterResDto createPoster(Long restaurantId, Long paymentId, int expenses, String title, String content, LocalDateTime travelStartAt, LocalDateTime travelEndAt, List<MultipartFile> files) {
 
         User user = userService.findAuthenticatedUser();
         Restaurant restaurant = restaurantId != null ? restaurantService.findRestaurantById(restaurantId) : null;
@@ -53,7 +57,10 @@ public class PosterService {
                 .travelEndAt(travelEndAt)
                 .build();
 
-        return new PosterResDto(posterRepository.save(poster));
+        Poster savedPoster = posterRepository.save(poster);
+        posterFileService.uploadFile(savedPoster.getId(), files);
+
+        return new PosterResDto(savedPoster);
     }
 
     // 포스터 단건 조회
@@ -69,7 +76,7 @@ public class PosterService {
 
     // 포스터 수정
     @Transactional
-    public PosterResDto updatePoster(Long posterId, Long restaurantId, Long paymentId, int expenses, String title, String content, LocalDateTime travelStartAt, LocalDateTime travelEndAt) {
+    public PosterResDto updatePoster(Long posterId, Long restaurantId, Long paymentId, int expenses, String title, String content, LocalDateTime travelStartAt, LocalDateTime travelEndAt, List<MultipartFile> files) {
 
         User user = userService.findAuthenticatedUser();
         Poster poster = findPosterById(posterId);
@@ -95,7 +102,10 @@ public class PosterService {
         poster.updateTravelStartAt(travelStartAt);
         poster.updateTravelEndAt(travelEndAt);
 
-        return new PosterResDto(posterRepository.save(poster));
+        Poster savedPoster = posterRepository.save(poster);
+        posterFileService.uploadFile(savedPoster.getId(), files);
+
+        return new PosterResDto(savedPoster);
     }
 
     // 포스터 삭제

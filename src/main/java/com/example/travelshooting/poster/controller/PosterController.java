@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -25,6 +26,7 @@ public class PosterController {
     // 포스터 생성
     @PostMapping()
     public ResponseEntity<CommonResDto<PosterResDto>> createPoster(
+            @RequestPart(required = false) List<MultipartFile> files,
             @Valid @RequestBody PosterReqDto posterReqDto
     ) {
 
@@ -35,7 +37,8 @@ public class PosterController {
                 posterReqDto.getTitle(),
                 posterReqDto.getContent(),
                 posterReqDto.getTravelStartAt(),
-                posterReqDto.getTravelEndAt()
+                posterReqDto.getTravelEndAt(),
+                files
         );
 
         return new ResponseEntity<>(new CommonResDto<>("포스터 생성 완료", posterResDto), HttpStatus.CREATED);
@@ -70,6 +73,7 @@ public class PosterController {
     // 포스터 수정
     @PatchMapping("/{posterId}")
     public ResponseEntity<CommonResDto<PosterResDto>> updatePoster(
+            @RequestPart(required = false) List<MultipartFile> files,
             @PathVariable Long posterId,
             @Valid @RequestBody PosterReqDto posterReqDto
     ) {
@@ -82,7 +86,8 @@ public class PosterController {
                 posterReqDto.getTitle(),
                 posterReqDto.getContent(),
                 posterReqDto.getTravelStartAt(),
-                posterReqDto.getTravelEndAt()
+                posterReqDto.getTravelEndAt(),
+                files
         );
 
         return new ResponseEntity<>(new CommonResDto<>("포스터 수정 완료", posterResDto), HttpStatus.OK);
