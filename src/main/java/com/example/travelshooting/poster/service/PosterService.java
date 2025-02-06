@@ -30,7 +30,6 @@ public class PosterService {
     private final UserService userService;
     private final RestaurantService restaurantService;
     private final PaymentService paymentService;
-    private final PosterFileService posterFileService;
 
     // 포스터 생성
     public PosterResDto createPoster(Long restaurantId, Long paymentId, int expenses, String title, String content, LocalDateTime travelStartAt, LocalDateTime travelEndAt) {
