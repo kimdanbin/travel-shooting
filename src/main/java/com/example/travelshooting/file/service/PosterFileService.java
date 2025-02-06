@@ -62,6 +62,18 @@ public class PosterFileService {
         posterFileRepository.deleteById(attachmentId);
     }
 
+    // 한 포스터의 모든 파일 조회
+    public List<FileResDto> findPosterFiles(Long posterId) {
+        List<PosterFile> posterFiles = posterFileRepository.findAllByPosterId(posterId);
+        List<FileResDto> posterFileDtos = new ArrayList<>();
+
+        for (PosterFile posterFile : posterFiles) {
+            posterFileDtos.add(new FileResDto(posterFile));
+        }
+
+        return posterFileDtos;
+    }
+
     // 최신 shorts 5개 조회
     public List<FileResDto> getNewFiveShorts() {
 
