@@ -1,7 +1,6 @@
 package com.example.travelshooting.reservation.service;
 
 import com.example.travelshooting.common.Const;
-import com.example.travelshooting.config.util.CacheKeyUtil;
 import com.example.travelshooting.config.util.LockKeyUtil;
 import com.example.travelshooting.enums.PaymentStatus;
 import com.example.travelshooting.enums.ReservationStatus;
@@ -22,7 +21,6 @@ import org.redisson.api.RedissonClient;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,7 +41,6 @@ public class ReservationService {
     private final UserService userService;
     private final PartService partService;
     private final ApplicationEventPublisher eventPublisher;
-    private final RedisTemplate<String, Object> redisObjectTemplate;
     private final RedissonClient redissonClient;
 
     @Transactional
@@ -148,11 +145,6 @@ public class ReservationService {
         } catch (Exception e) {
             log.warn("메일 전송을 실패하였습니다.");
         }
-
-        // 예약 취소 시 첫 번째 페이지 캐시 삭제
-        final String cacheKey = CacheKeyUtil.getReservationProductPageKey(productId, 0);;
-        redisObjectTemplate.delete(cacheKey);
-        log.info("예약 취소 시 첫 번째 페이지 캐시 삭제: {}", cacheKey);
     }
 
     @Transactional
