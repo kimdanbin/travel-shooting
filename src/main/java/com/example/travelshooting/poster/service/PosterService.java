@@ -17,12 +17,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -35,7 +33,7 @@ public class PosterService {
     private final PosterFileService posterFileService;
 
     // 포스터 생성
-    public PosterResDto createPoster(Long restaurantId, Long paymentId, int expenses, String title, String content, LocalDateTime travelStartAt, LocalDateTime travelEndAt, List<MultipartFile> files) {
+    public PosterResDto createPoster(Long restaurantId, Long paymentId, int expenses, String title, String content, LocalDateTime travelStartAt, LocalDateTime travelEndAt) {
 
         User user = userService.findAuthenticatedUser();
         Restaurant restaurant = restaurantId != null ? restaurantService.findRestaurantById(restaurantId) : null;
@@ -58,7 +56,6 @@ public class PosterService {
                 .build();
 
         Poster savedPoster = posterRepository.save(poster);
-        posterFileService.uploadFile(savedPoster.getId(), files);
 
         return new PosterResDto(savedPoster);
     }
@@ -76,7 +73,7 @@ public class PosterService {
 
     // 포스터 수정
     @Transactional
-    public PosterResDto updatePoster(Long posterId, Long restaurantId, Long paymentId, int expenses, String title, String content, LocalDateTime travelStartAt, LocalDateTime travelEndAt, List<MultipartFile> files) {
+    public PosterResDto updatePoster(Long posterId, Long restaurantId, Long paymentId, int expenses, String title, String content, LocalDateTime travelStartAt, LocalDateTime travelEndAt) {
 
         User user = userService.findAuthenticatedUser();
         Poster poster = findPosterById(posterId);
@@ -103,7 +100,6 @@ public class PosterService {
         poster.updateTravelEndAt(travelEndAt);
 
         Poster savedPoster = posterRepository.save(poster);
-        posterFileService.uploadFile(savedPoster.getId(), files);
 
         return new PosterResDto(savedPoster);
     }
