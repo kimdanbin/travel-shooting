@@ -15,6 +15,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
@@ -36,7 +37,7 @@ public class WebConfig {
             "/admins",
             "/products/{productId}/reservations/{reservationId}/payments/completed",
             "/attachments",
-            "/posters", // 포스터 전체조회
+            "/posters/search", // 포스터 전체조회
             "/posters/{posterId}", // 포스터 단건 조회
             "/posters/{posterId}/comments", // 댓글 전체 조회
             "/locals", // 장소 검색
@@ -71,6 +72,7 @@ public class WebConfig {
                  * request를 넘겨 JwtAuthFilter에서 발생한 예외를 처리시키기 위해 ExceptionTranslationFilter 다음에 수행하도록 순서를 설정.
                  */
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+        SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
 
         return http.build();
     }
