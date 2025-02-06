@@ -1,6 +1,7 @@
 package com.example.travelshooting.poster.service;
 
 import com.example.travelshooting.enums.UserRole;
+import com.example.travelshooting.file.service.PosterFileService;
 import com.example.travelshooting.payment.entity.Payment;
 import com.example.travelshooting.payment.service.PaymentService;
 import com.example.travelshooting.poster.dto.PosterResDto;
@@ -53,7 +54,9 @@ public class PosterService {
                 .travelEndAt(travelEndAt)
                 .build();
 
-        return new PosterResDto(posterRepository.save(poster));
+        Poster savedPoster = posterRepository.save(poster);
+
+        return new PosterResDto(savedPoster);
     }
 
     // 포스터 단건 조회
@@ -95,7 +98,9 @@ public class PosterService {
         poster.updateTravelStartAt(travelStartAt);
         poster.updateTravelEndAt(travelEndAt);
 
-        return new PosterResDto(posterRepository.save(poster));
+        Poster savedPoster = posterRepository.save(poster);
+
+        return new PosterResDto(savedPoster);
     }
 
     // 포스터 삭제
