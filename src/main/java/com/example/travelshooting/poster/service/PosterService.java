@@ -1,5 +1,6 @@
 package com.example.travelshooting.poster.service;
 
+import com.example.travelshooting.enums.PaymentStatus;
 import com.example.travelshooting.enums.UserRole;
 import com.example.travelshooting.payment.entity.Payment;
 import com.example.travelshooting.payment.service.PaymentService;
@@ -38,9 +39,9 @@ public class PosterService {
         Restaurant restaurant = restaurantId != null ? restaurantService.findRestaurantById(restaurantId) : null;
         Payment payment = paymentService.findPaymentById(paymentId);
 
-        // 로그인 유저가 결제한 내역이 아닐 경우
-        if (!user.getId().equals(payment.getReservation().getUser().getId())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "본인이 결제한 항목이 아닙니다.");
+        // 로그인 유저가 결제한 내역이 아닐 경우, 결제가 진행된 예약이 아닐경우
+        if (!user.getId().equals(payment.getReservation().getUser().getId()) || payment.getStatus() != PaymentStatus.APPROVED) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "본인이 결제한 항목이 아니거나 결제가 안된 예약입니다.");
         }
 
         // 한 결제내역 당 하나의 포스터만 작성가능
