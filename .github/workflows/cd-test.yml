@@ -1,9 +1,7 @@
 name: Deploy to ECR and EC2
 on:
   push:
-    branches: [ "develop" ]
-  pull_request:
-    branches: [ "develop" ]
+    branches: [ "main" ]
 jobs:
   docker-build-and-push:
     runs-on: ubuntu-latest
