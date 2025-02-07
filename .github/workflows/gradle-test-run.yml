@@ -1,0 +1,43 @@
+name: CI Workflow for Gradle
+on:
+  push:
+    branches:
+      - '**' # 모든 브랜치에서 push 이벤트 감지
+  pull_request:
+    branches:
+      - develop
+      - main # PR이 develop 또는 main으로 병합될 때 실행
+jobs:
+  run-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+      - name: Set up JDK 21
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+      - name: Grant execute permission for Gradlew
+        run: |
+          chmod +x ./gradlew
+      - name: Run Gradle test
+        env:
+          AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
+          AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_KEY }}
+          DDL_AUTO: ${{ secrets.DDL_AUTO }}
+          GGFOOD_API_KEY: ${{ secrets.GGFOOD_API_KEY }}
+          GGFOOD_API_URL: ${{ secrets.GGFOOD_API_URL }}
+          JWT_EXPIRY_MILLIS_KEY: ${{ secrets.JWT_EXPIRY_MILLIS_KEY }}
+          JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
+          KAKAO_MAP_KEY: ${{ secrets.KAKAO_MAP_KEY }}
+          KAKAO_MAP_URL: ${{ secrets.KAKAO_MAP_URL }}
+          KAKAO_PAY_APPROVE_URL: ${{ secrets.KAKAO_PAY_APPROVE_URL }}
+          KAKAO_PAY_CANCEL_URL: ${{ secrets.KAKAO_PAY_CANCEL_URL }}
+          KAKAO_PAY_COMPLETED_URL: ${{ secrets.KAKAO_PAY_COMPLETED_URL }}
+          KAKAO_PAY_FAIL_URL: ${{ secrets.KAKAO_PAY_FAIL_URL }}
+          KAKAO_PAY_KEY: ${{ secrets.KAKAO_PAY_KEY }}
+          KAKAO_PAY_NEXT_URL: ${{ secrets.KAKAO_PAY_NEXT_URL }}
+          KAKAO_PAY_READY_URL: ${{ secrets.KAKAO_PAY_READY_URL }}
+        run: |
+          ./gradlew clean test

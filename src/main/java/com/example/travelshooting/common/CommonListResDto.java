@@ -5,7 +5,7 @@ import lombok.Getter;
 import java.util.List;
 
 @Getter
-public class CommonListResDto<T> {
+public class CommonListResDto<T extends BaseDtoDataType> {
 
     private final String message;
     private final List<T> data;
