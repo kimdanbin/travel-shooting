@@ -24,9 +24,6 @@ public class CreateProductReqDto {
     @NotBlank(message = "활동 지역 주소를 입력해주세요.")
     private final String address;
 
-//    @NotNull(message = "판매 개수를 입력해주세요.")
-//    private final Integer quantity;
-
     @JsonFormat(pattern = "yyyy-MM-dd")
     @NotNull(message = "판매 시작 일자를 입력해주세요.")
     private LocalDate saleStartAt;

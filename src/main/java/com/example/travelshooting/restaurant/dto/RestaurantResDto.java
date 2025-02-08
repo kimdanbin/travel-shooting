@@ -8,14 +8,23 @@ import lombok.Getter;
 public class RestaurantResDto implements BaseDtoDataType {
 
     private final Long id;
+
     private final String region;
+
     private final String city;
+
     private final String placeName;
+
     private final String addressName;
+
     private final String roadAddressName;
+
     private final String phone;
+
     private final String longitude;
+
     private final String latitude;
+
     private final String imageUrl;
 
     @QueryProjection

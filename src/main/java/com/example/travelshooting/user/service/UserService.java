@@ -136,7 +136,6 @@ public class UserService {
         );
     }
 
-
     //비밀번호 변경
     @Transactional
     public void changePassword(Long userId, ChangePasswordReqDto passwordRequestDto) {
@@ -162,7 +161,6 @@ public class UserService {
     public boolean verifyPassword(Long userId, PasswordVrfReqDto requestDto) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 ID의 사용자를 찾을 수 없습니다."));
-
 
         return passwordEncoder.matches(requestDto.getPassword(), user.getPassword());
     }
@@ -219,13 +217,5 @@ public class UserService {
         Optional<User> user = userRepository.findByEmail(authEmail);
 
         return user.get();
-    }
-
-    public User findUserByCompanyId(Long companyId) {
-        return userRepository.findUserByCompanyId(companyId);
-    }
-
-    public User findUserByReservationId(Long reservationId) {
-        return userRepository.findUserByReservationId(reservationId);
     }
 }

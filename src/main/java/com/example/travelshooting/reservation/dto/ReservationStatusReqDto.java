@@ -6,6 +6,6 @@ import lombok.Getter;
 @Getter
 public class ReservationStatusReqDto {
 
-    @Pattern(regexp = "^(APPROVED|REJECTED)$", message = "수락 또는 거절만 허용합니다.")
+    @Pattern(regexp = "^(APPROVED|REJECTED)$", message = "APPROVED 또는 REJECTED만 허용합니다.")
     String status;
 }

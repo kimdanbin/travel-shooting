@@ -12,10 +12,14 @@ import java.time.LocalDateTime;
 public class ReportResDto implements BaseDtoDataType {
 
     private final Long id;
-    private final Long userId;
-    private final DomainType type;
-    private final Long fkId;
-    private final String reason;
-    private final LocalDateTime createdAt;
 
+    private final Long userId;
+
+    private final DomainType type;
+
+    private final Long fkId;
+
+    private final String reason;
+
+    private final LocalDateTime createdAt;
 }

@@ -31,7 +31,6 @@ public class Const {
 
     // 캐싱
     public static final String COMPANY_CACHE_PREFIX = "companies:page:";
-    public static final String RESERVATION_CACHE_PREFIX = "reservations:product:";
 
     // 메일
     public static final String THREAD_NAME_PREFIX = "async-task-";
