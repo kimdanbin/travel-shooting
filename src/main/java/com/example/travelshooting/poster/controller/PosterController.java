@@ -20,6 +20,7 @@ import java.util.List;
 @RequestMapping("/posters")
 @RequiredArgsConstructor
 public class PosterController {
+
     private final PosterService posterService;
 
     // 포스터 생성

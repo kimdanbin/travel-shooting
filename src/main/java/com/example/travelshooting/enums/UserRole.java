@@ -8,7 +8,6 @@ public enum UserRole {
     PARTNER,
     ADMIN;
 
-
     public static UserRole of(String roleName) throws IllegalArgumentException {
         for (UserRole role : values()) {
             if (role.name().equals(roleName)) {

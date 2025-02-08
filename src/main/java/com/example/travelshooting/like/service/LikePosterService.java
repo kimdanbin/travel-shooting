@@ -19,6 +19,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class LikePosterService {
+
     private final LikePosterRepository likePosterRepository;
     private final UserService userService;
     private final PosterService posterService;

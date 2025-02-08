@@ -8,12 +8,12 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class JwtAuthResDto implements BaseDtoDataType {
 
-  // access token 인증 방식.
-  private final String tokenAuthScheme;
+    // access token 인증 방식.
+    private final String tokenAuthScheme;
 
-  // access token.
-  private final String accessToken;
+    // access token.
+    private final String accessToken;
 
-  // refresh token.
-  private final String refreshToken;
+    // refresh token.
+    private final String refreshToken;
 }

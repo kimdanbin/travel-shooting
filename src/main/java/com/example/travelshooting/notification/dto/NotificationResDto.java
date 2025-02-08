@@ -13,9 +13,14 @@ import java.time.LocalDateTime;
 public class NotificationResDto implements BaseDtoDataType {
 
     private final Long id;
+
     private final DomainType domainType;
+
     private final Long fkId;
+
     private final String subject;
+
     private final NotificationType notificationType;
+
     private final LocalDateTime createdAt;
 }

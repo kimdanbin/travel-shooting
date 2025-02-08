@@ -37,14 +37,17 @@ public class ReportService {
 
         Poster findPoster = posterService.findPosterById(posterId);
         User user = userService.findAuthenticatedUser();
+
         // 본인이 작성한 글을 본인이 신고하려는 경우
         if(findPoster.getUser().getId().equals(user.getId())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "본인이 작성한 글은 신고할 수 없습니다.");
         }
+
         // 신고한 글을 또 신고하려는 경우
         if(reportRepository.existsByTypeAndFkIdAndUserId(DomainType.POSTER, posterId, user.getId())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "이미 신고한 포스터입니다.");
         }
+
         Report report = new Report(user, DomainType.POSTER, posterId, reason);
         reportRepository.save(report);
 
@@ -76,14 +79,17 @@ public class ReportService {
 
         Comment findComment = commentService.findCommentById(commentId);
         User user = userService.findAuthenticatedUser();
+
         // 본인이 작성한 댓글을 본인이 신고하려는 경우
         if(findComment.getUser().getId().equals(user.getId())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "본인이 작성한 댓글은 신고할 수 없습니다.");
         }
+
         // 신고한 댓글을 또 신고하려는 경우
         if(reportRepository.existsByTypeAndFkIdAndUserId(DomainType.COMMENT, commentId, user.getId())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "이미 신고한 댓글입니다.");
         }
+
         Report report = new Report(user, DomainType.COMMENT, commentId, reason);
         reportRepository.save(report);
 
@@ -107,6 +113,7 @@ public class ReportService {
     @Transactional(readOnly = true)
     public List<ReportResDto> findAllReports(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
+
         // isDeleted = false인 글과 댓글 신고 내역 조회
         Page<Report> reportPage = reportRepository.findAllActiveReports(pageable);
         return reportPage.stream()

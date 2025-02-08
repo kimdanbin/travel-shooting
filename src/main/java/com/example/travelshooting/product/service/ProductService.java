@@ -72,6 +72,7 @@ public class ProductService {
         if (findProduct == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 업체가 가진 해당 ID의 상품이 없습니다.");
         }
+
         List<PartResDto> parts = findProduct.getParts().stream()
                 .map(part -> new PartResDto(part.getId(), part.getOpenAt(), part.getCloseAt(), part.getMaxQuantity()))
                 .collect(Collectors.toList());
@@ -91,13 +92,13 @@ public class ProductService {
         );
     }
 
-
     @Transactional
     public UpdateProductResDto updateProduct(Long companyId, Long productId, String description, Integer price, String address, LocalDate saleStartAt, LocalDate saleEndAt) {
         Product findProduct = productRepository.findByCompanyIdAndId(companyId, productId);
         if (findProduct == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 업체가 가진 해당 ID의 상품이 없습니다.");
         }
+
         User user = userService.findAuthenticatedUser();
         Product product = productRepository.findProductByIdAndUserId(findProduct.getId(), user.getId());
         if (product == null) {
@@ -127,16 +128,19 @@ public class ProductService {
         if (findProduct == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 업체가 가진 해당 ID의 상품이 없습니다.");
         }
+
         User user = userService.findAuthenticatedUser();
         Product product = productRepository.findProductByIdAndUserId(findProduct.getId(), user.getId());
         if (product == null) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "업체의 소유자만 상품을 삭제할 수 있습니다.");
         }
+
         // 해당 상품에 일정이 존재하면 삭제할 수 없음
         Product reservation = productRepository.findPartById(productId);
         if(reservation != null) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "이미 일정이 존재하여 삭제할 수 없습니다.");
         }
+
         productRepository.delete(findProduct);
     }
 

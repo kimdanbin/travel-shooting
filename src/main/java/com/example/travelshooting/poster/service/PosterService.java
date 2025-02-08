@@ -27,6 +27,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Service
 public class PosterService {
+
     private final PosterRepository posterRepository;
     private final UserService userService;
     private final RestaurantService restaurantService;

@@ -12,15 +12,25 @@ import java.time.LocalDateTime;
 public class PaymentResDto implements BaseDtoDataType {
 
     private final Long id;
+
     private final Long reservationId;
+
     private final String productName;
+
     private final Integer headCount;
+
     private final Integer totalPrice;
+
     private final String type;
+
     private final PaymentStatus status;
+
     private final RefundType refundType;
+
     private final Integer cancelPrice;
+
     private final LocalDateTime createdAt;
+
     private final LocalDateTime updatedAt;
 
     @QueryProjection

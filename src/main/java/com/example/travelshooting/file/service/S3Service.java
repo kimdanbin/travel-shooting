@@ -33,12 +33,12 @@ public class S3Service {
         metadata.setContentType(multipartFile.getContentType()); // 파일의 타입을 설정
 
         amazonS3.putObject(bucket, uniqueFilename, multipartFile.getInputStream(), metadata);
+
         return amazonS3.getUrl(bucket, uniqueFilename).toString();
     }
 
     @Transactional
     public void deleteFile(String fileUrl) {
         amazonS3.deleteObject(bucket, fileUrl);
-
     }
 }
