@@ -1,8 +1,8 @@
 package com.example.travelshooting.part.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -21,7 +21,7 @@ public class UpdatePartReqDto {
     private final LocalTime closeAt;
 
     @NotNull(message = "인원을 입력해주세요.")
-    @Size(max = 999)
+    @Max(999)
     private final Integer maxQuantity;
 
 }

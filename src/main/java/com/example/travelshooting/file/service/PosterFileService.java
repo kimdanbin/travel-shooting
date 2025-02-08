@@ -5,7 +5,6 @@ import com.example.travelshooting.file.entity.PosterFile;
 import com.example.travelshooting.file.repository.PosterFileRepository;
 import com.example.travelshooting.poster.entity.Poster;
 import com.example.travelshooting.poster.service.PosterService;
-import com.example.travelshooting.s3.S3Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -22,7 +21,6 @@ public class PosterFileService {
 
     private final S3Service s3Service;
     private final PosterFileRepository posterFileRepository;
-    // 주석은 포스터 서비스 만들어지면 추가 예정
     private final PosterService posterService;
 
     // 파일 업로드
@@ -62,6 +60,18 @@ public class PosterFileService {
         posterService.findPosterById(posterId);
         posterFileRepository.findById(attachmentId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         posterFileRepository.deleteById(attachmentId);
+    }
+
+    // 한 포스터의 모든 파일 조회
+    public List<FileResDto> findPosterFiles(Long posterId) {
+        List<PosterFile> posterFiles = posterFileRepository.findAllByPosterId(posterId);
+        List<FileResDto> posterFileDtos = new ArrayList<>();
+
+        for (PosterFile posterFile : posterFiles) {
+            posterFileDtos.add(new FileResDto(posterFile));
+        }
+
+        return posterFileDtos;
     }
 
     // 최신 shorts 5개 조회

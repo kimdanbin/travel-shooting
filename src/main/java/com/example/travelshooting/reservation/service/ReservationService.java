@@ -1,16 +1,24 @@
 package com.example.travelshooting.reservation.service;
 
+import com.example.travelshooting.common.Const;
+import com.example.travelshooting.config.util.LockKeyUtil;
+import com.example.travelshooting.enums.PaymentStatus;
 import com.example.travelshooting.enums.ReservationStatus;
+import com.example.travelshooting.enums.UserRole;
+import com.example.travelshooting.notification.service.SendEmailEvent;
 import com.example.travelshooting.part.entity.Part;
 import com.example.travelshooting.part.service.PartService;
 import com.example.travelshooting.product.entity.Product;
-import com.example.travelshooting.product.service.ProductService;
 import com.example.travelshooting.reservation.dto.ReservationResDto;
 import com.example.travelshooting.reservation.entity.Reservation;
 import com.example.travelshooting.reservation.repository.ReservationRepository;
 import com.example.travelshooting.user.entity.User;
 import com.example.travelshooting.user.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -20,48 +28,72 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.concurrent.TimeUnit;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ReservationService {
 
     private final ReservationRepository reservationRepository;
     private final UserService userService;
-    private final ProductService productService;
     private final PartService partService;
-    private final ReservationMailService reservationMailService;
+    private final ApplicationEventPublisher eventPublisher;
+    private final RedissonClient redissonClient;
 
     @Transactional
     public ReservationResDto createReservation(Long productId, Long partId, LocalDate reservationDate, Integer headCount) {
-        Product product = productService.findProductById(productId);
+        Part part = partService.findPartByIdAndProductId(partId, productId);
+
+        if (part == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 상품에 대한 일정이 존재하지 않습니다.");
+        }
+
+        String lockKey = LockKeyUtil.getReservationLockKey(reservationDate, part.getId());
+        RLock lock = redissonClient.getLock(lockKey);
+        log.info("lock 시도: {}", lockKey);
+
+        try {
+            boolean available = lock.tryLock(Const.RESERVATION_LOCK_WAIT_TIME, Const.RESERVATION_LOCK_LEASE_TIME, TimeUnit.SECONDS);
+
+            if (!available) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "현재 예약 요청이 많아 다시 시도해 주세요.");
+            }
+
+            log.info("lock 획득 성공: {}", lockKey);
+            return processReservation(part.getProduct(), part, reservationDate, headCount);
+        } catch (InterruptedException e) {
+            throw new RuntimeException("예약 도중 오류가 발생했습니다.");
+        } finally {
+            if (lock.isHeldByCurrentThread()) {
+                lock.unlock();
+                log.info("unlock 성공: {}", lock.getName());
+            } else {
+                log.warn("unlock 시도: lock을 소유하지 않음: {}", lock.getName());
+            }
+        }
+    }
+
+    @Transactional
+    public ReservationResDto processReservation(Product product, Part part, LocalDate reservationDate, Integer headCount) {
         User user = userService.findAuthenticatedUser();
-        Part part = partService.findPartById(partId);
-        Optional<Reservation> findReservation = reservationRepository.findReservationByUserIdAndReservationDate(user.getId(), reservationDate);
+        boolean isReservation = reservationRepository.existsReservationByUserIdAndReservationDateAndIsDeleted(user.getId(), reservationDate, false);
         Integer totalHeadCount = reservationRepository.findTotalHeadCountByPartIdAndReservationDate(part.getId(), reservationDate);
 
-        if (findReservation.isPresent()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 날짜에 예약한 내역이 있습니다.");
-        }
-
-        if (reservationDate.isBefore(product.getSaleStartAt()) || reservationDate.isAfter(product.getSaleEndAt())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "예약 날짜는 상품의 판매 기간 중에서만 선택할 수 있습니다.");
-        }
-
-        if (part.getMaxQuantity() < totalHeadCount + headCount) {
-            Integer overHeadCount = Math.abs(part.getMaxQuantity() - totalHeadCount - headCount);
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "신청 가능한 인원을 초과했습니다. 초과된 인원: " + overHeadCount);
-        }
+        validCreateReservation(reservationDate, headCount, isReservation, product, part, totalHeadCount, user);
 
         Integer totalPrice = product.getPrice() * headCount;
 
         Reservation reservation = new Reservation(user, part, reservationDate, headCount, totalPrice);
         reservationRepository.save(reservation);
 
-        // 사용자 예약 신청 완료 메일
-        reservationMailService.sendMail(user, product, part, reservation, user.getRole(), reservation.getStatus());
+        try {
+            eventPublisher.publishEvent(new SendEmailEvent(this, reservation));
+        } catch (Exception e) {
+            log.warn("메일 전송을 실패하였습니다.");
+        }
 
         return new ReservationResDto(
                 reservation.getId(),
@@ -75,85 +107,101 @@ public class ReservationService {
                 reservation.getCreatedAt(),
                 reservation.getUpdatedAt()
         );
+    }
+
+    @Transactional(readOnly = true)
+    public Page<ReservationResDto> findAllByUserIdAndProductId(Long productId, Pageable pageable) {
+        User authenticatedUser = userService.findAuthenticatedUser();
+
+        return reservationRepository.findAllByUserIdAndProductId(productId, authenticatedUser, pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public ReservationResDto findReservationByProductIdAndId(Long productId, Long reservationId) {
+        User user = userService.findAuthenticatedUser();
+        ReservationResDto reservation = reservationRepository.findReservationByProductIdAndId(productId, reservationId, user.getId());
+
+        if (reservation == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "예약 내역이 없습니다.");
+        }
+
+        return reservation;
     }
 
     @Transactional
     public void deleteReservation(Long productId, Long reservationId) {
         User user = userService.findAuthenticatedUser();
-        Product product = productService.findProductById(productId);
-        Reservation reservation = reservationRepository.findReservationByUserIdAndProductIdAndId(user.getId(), product.getId(), reservationId);
+        Reservation reservation = reservationRepository.findReservationByProductIdAndIdAndUserId(productId, reservationId, user.getId());
 
         if (reservation == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "예약 내역이 없습니다.");
         }
 
-        reservation.updateReservation(ReservationStatus.CANCELED);
+        reservation.updateReservation(ReservationStatus.CANCELED, true);
         reservationRepository.save(reservation);
+
+        try {
+            eventPublisher.publishEvent(new SendEmailEvent(this, reservation));
+        } catch (Exception e) {
+            log.warn("메일 전송을 실패하였습니다.");
+        }
     }
 
-    @Transactional(readOnly = true)
-    public List<ReservationResDto> findAllByUserIdAndProductId(Long productId, Pageable pageable) {
-        User user = userService.findAuthenticatedUser();
-        Product product = productService.findProductById(productId);
-        Page<Reservation> reservations = reservationRepository.findAllByUserIdAndProductId(user.getId(), product.getId(), pageable);
+    @Transactional
+    public void cancelExpiredReservations() {
+        List<Reservation> approvedReservations = reservationRepository.findAllByStatus(ReservationStatus.APPROVED);
 
-        if (reservations.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "예약 내역이 없습니다.");
+        approvedReservations.forEach(reservation -> {
+            boolean isPaid = reservation.getPayments().stream()
+                    .anyMatch(payment -> payment.getStatus() == PaymentStatus.APPROVED);
+
+            LocalDateTime expirationTime = reservation.getUpdatedAt().plusDays(Const.RESERVATION_EXPIRED_DAY).withHour(Const.RESERVATION_EXPIRED_HOUR).withMinute(0).withSecond(0).withNano(0);
+
+            if (!isPaid && LocalDateTime.now().isAfter(expirationTime)) {
+                reservation.updateReservation(ReservationStatus.EXPIRED, true);
+                reservationRepository.save(reservation);
+
+                try {
+                    eventPublisher.publishEvent(new SendEmailEvent(this, reservation));
+                } catch (Exception e) {
+                    log.warn("메일 전송을 실패하였습니다.");
+                }
+            }
+        });
+    }
+
+    private static void validCreateReservation(LocalDate reservationDate, Integer headCount, boolean isReservation, Product product, Part part, Integer totalHeadCount, User user) {
+        if (user.getRole().equals(UserRole.PARTNER)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "사용자만 예약할 수 있습니다.");
         }
 
-        return reservations.stream().map(reservation -> new ReservationResDto(
-                        reservation.getId(),
-                        reservation.getUser().getId(),
-                        product.getId(),
-                        reservation.getPart().getId(),
-                        reservation.getReservationDate(),
-                        reservation.getHeadCount(),
-                        reservation.getTotalPrice(),
-                        reservation.getStatus(),
-                        reservation.getCreatedAt(),
-                        reservation.getUpdatedAt()
-                ))
-                .collect(Collectors.toList());
-    }
-
-    @Transactional(readOnly = true)
-    public ReservationResDto findReservationByUserIdAndProductIdAndId(Long productId, Long reservationId) {
-        User user = userService.findAuthenticatedUser();
-        Product product = productService.findProductById(productId);
-        Reservation reservation = reservationRepository.findReservationByUserIdAndProductIdAndId(user.getId(), product.getId(), reservationId);
-
-        if (reservation == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "예약 내역이 없습니다.");
+        if (isReservation) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 날짜에 예약한 내역이 있습니다.");
         }
 
-        return new ReservationResDto(
-                reservation.getId(),
-                reservation.getUser().getId(),
-                product.getId(),
-                reservation.getPart().getId(),
-                reservation.getReservationDate(),
-                reservation.getHeadCount(),
-                reservation.getTotalPrice(),
-                reservation.getStatus(),
-                reservation.getCreatedAt(),
-                reservation.getUpdatedAt()
-        );
-    }
+        if (product.getSaleStartAt().isAfter(reservationDate) || product.getSaleEndAt().isBefore(reservationDate)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "예약 날짜는 상품의 판매 기간 중에서만 선택할 수 있습니다.");
+        }
 
-    public Reservation findReservationByUserIdAndProductIdAndId(Long userId, Long productId, Long reservationId) {
-        return reservationRepository.findReservationByUserIdAndProductIdAndId(userId, productId, reservationId);
-    }
+        if (LocalDate.now().isAfter(reservationDate)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "지난 날짜는 예약할 수 없습니다.");
+        }
 
-    public List<Reservation> cancelExpiredReservations() {
-        LocalDateTime expirationTime = LocalDateTime.now().minusDays(1).withHour(18).withMinute(0).withSecond(0);
-        List<Reservation> expiredReservations = reservationRepository.findExpiredReservations(expirationTime);
+        if (LocalDate.now().equals(reservationDate) && LocalTime.now().isAfter(part.getOpenAt())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 오픈 시간이 지나 예약이 불가능합니다.");
+        }
 
-        expiredReservations.forEach(reservation -> reservation.updateReservation(ReservationStatus.EXPIRED));
-
-        return reservationRepository.saveAll(expiredReservations);
+        if (part.getMaxQuantity() < totalHeadCount + headCount) {
+            Integer overHeadCount = Math.abs(part.getMaxQuantity() - totalHeadCount - headCount);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "신청 가능한 인원을 초과했습니다. 초과된 인원: " + overHeadCount);
+        }
     }
 
     public Reservation findReservationByPaymentIdAndUserId(Long paymentId, Long userId) {
         return reservationRepository.findReservationByPaymentIdAndUserId(paymentId, userId);
+    }
+
+    public Reservation findReservationByProductIdAndIdAndUserId(Long productId, Long reservationId, Long userId) {
+        return reservationRepository.findReservationByProductIdAndIdAndUserId(productId, reservationId, userId);
     }
 }

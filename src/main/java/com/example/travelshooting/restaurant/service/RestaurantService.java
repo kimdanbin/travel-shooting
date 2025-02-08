@@ -1,20 +1,17 @@
 package com.example.travelshooting.restaurant.service;
 
 import com.example.travelshooting.common.Const;
-import com.example.travelshooting.poster.entity.QPoster;
-import com.example.travelshooting.restaurant.dto.*;
-import com.example.travelshooting.restaurant.entity.QRestaurant;
+import com.example.travelshooting.restaurant.dto.GgRestaurantApiDto;
+import com.example.travelshooting.restaurant.dto.GgRestaurantResDto;
+import com.example.travelshooting.restaurant.dto.RestaurantResDto;
+import com.example.travelshooting.restaurant.dto.RestaurantSearchResDto;
 import com.example.travelshooting.restaurant.entity.Restaurant;
 import com.example.travelshooting.restaurant.repository.RestaurantRepository;
-import com.example.travelshooting.s3.S3Service;
+import com.example.travelshooting.file.service.S3Service;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.QueryResults;
-import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -36,7 +33,6 @@ public class RestaurantService {
     private final RestaurantRepository restaurantRepository;
     private final S3Service s3Service;
     private final RestTemplate restTemplate;
-    private final JPAQueryFactory jpaQueryFactory;
 
     @Value("${gg.api.food.key}")
     private String ggFoodKey;
@@ -65,10 +61,8 @@ public class RestaurantService {
                     .filter(apiDto -> apiDto.getPlaceName() != null && !apiDto.getPlaceName().isEmpty())
                     .collect(Collectors.toList());
         } catch (ResourceAccessException e) {
-            e.printStackTrace();
             throw new ResourceAccessException("타임아웃이 발생했습니다.");
         } catch (Exception e) {
-            e.printStackTrace();
             throw new RuntimeException("XML 파싱 오류가 발생했습니다.");
         }
 
@@ -120,47 +114,8 @@ public class RestaurantService {
     }
 
     @Transactional(readOnly = true)
-    public Page<RestaurantSearchResDto> findAllById(String placeName, String region, String city, Pageable pageable) {
-        QRestaurant restaurant = QRestaurant.restaurant;
-        QPoster poster = QPoster.poster;
-
-        BooleanBuilder conditions = new BooleanBuilder();
-
-        if (placeName != null) {
-            conditions.and(restaurant.placeName.containsIgnoreCase(placeName));
-        }
-
-        if (region != null) {
-            conditions.and(restaurant.region.containsIgnoreCase(region));
-        }
-
-        if (city != null) {
-            conditions.and(restaurant.city.containsIgnoreCase(city));
-        }
-
-        QueryResults<RestaurantSearchResDto> queryResults = jpaQueryFactory
-                .select(new QRestaurantSearchResDto(
-                        restaurant.id,
-                        restaurant.region,
-                        restaurant.city,
-                        restaurant.placeName,
-                        restaurant.addressName,
-                        restaurant.roadAddressName,
-                        restaurant.phone,
-                        restaurant.longitude,
-                        restaurant.latitude,
-                        restaurant.imageUrl,
-                        restaurant.count().intValue()))
-                .from(restaurant)
-                .innerJoin(poster).on(restaurant.id.eq(poster.restaurant.id)).fetchJoin()
-                .where(conditions)
-                .groupBy(restaurant.id)
-                .orderBy(poster.count().desc(), restaurant.placeName.asc())
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetchResults();
-
-        return new PageImpl<>(queryResults.getResults(), pageable, queryResults.getTotal());
+    public Page<RestaurantSearchResDto> findRestaurants(String placeName, String region, String city, Pageable pageable) {
+        return restaurantRepository.findRestaurants(placeName, region, city, pageable);
     }
 
     @Transactional

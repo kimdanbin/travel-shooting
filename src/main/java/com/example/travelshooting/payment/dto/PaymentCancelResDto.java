@@ -9,11 +9,18 @@ import lombok.RequiredArgsConstructor;
 public class PaymentCancelResDto implements BaseDtoDataType {
 
     private final String status;
+
     private final String reservationId;
+
     private final String userId;
+
     private final String type;
+
     private final String productName;
+
     private final Integer headCount;
+
     private final Integer cancelPrice;
+
     private final String canceledAt;
 }

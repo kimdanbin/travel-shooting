@@ -1,4 +1,4 @@
-package com.example.travelshooting.s3.config;
+package com.example.travelshooting.config;
 
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;

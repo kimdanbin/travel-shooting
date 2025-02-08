@@ -1,14 +1,20 @@
 package com.example.travelshooting.payment.controller;
 
+import com.example.travelshooting.common.CommonListResDto;
 import com.example.travelshooting.common.CommonResDto;
 import com.example.travelshooting.payment.dto.PaymentCancelResDto;
 import com.example.travelshooting.payment.dto.PaymentCompletedResDto;
 import com.example.travelshooting.payment.dto.PaymentReadyResDto;
+import com.example.travelshooting.payment.dto.PaymentResDto;
 import com.example.travelshooting.payment.service.PaymentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -44,8 +50,25 @@ public class PaymentController {
     }
 
     // 결제 실패
-    @GetMapping("payments/fail")
+    @GetMapping("/payments/fail")
     public ResponseEntity<String> payFail() {
         return new ResponseEntity<>("결제 실패", HttpStatus.BAD_REQUEST);
+    }
+
+    // 사용자 결제 내역 전체 조회
+    @GetMapping("/payments")
+    public ResponseEntity<CommonListResDto<PaymentResDto>> findPayments(Pageable pageable) {
+        Page<PaymentResDto> payments = paymentService.findPayments(pageable);
+        List<PaymentResDto> content = payments.getContent();
+
+        return new ResponseEntity<>(new CommonListResDto<>("결제 내역 전체 조회 완료", content), HttpStatus.OK);
+    }
+
+    // 사용자 결제 내역 단 건 조회
+    @GetMapping("/payments/{paymentId}")
+    public ResponseEntity<CommonResDto<PaymentResDto>> findPaymentByIdAndUserId(@PathVariable Long paymentId) {
+        PaymentResDto payment = paymentService.findPaymentByIdAndUserId(paymentId);
+
+        return new ResponseEntity<>(new CommonResDto<>("결제 내역 단 건 조회 완료", payment), HttpStatus.OK);
     }
 }

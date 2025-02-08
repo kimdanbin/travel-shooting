@@ -21,7 +21,7 @@ public class LocalController {
     @GetMapping("/locals")
     public ResponseEntity<CommonListResDto<LocalResDto>> searchPlaces(@RequestParam(required = false) String keyword,
                                                                       @RequestParam(defaultValue = "1") int page,
-                                                                      @RequestParam(defaultValue = "10") int size) {
+                                                                      @RequestParam int size) {
         List<LocalResDto> local = localService.searchPlaces(keyword, page, size);
 
         return new ResponseEntity<>(new CommonListResDto<>("장소 검색 완료", local), HttpStatus.OK);

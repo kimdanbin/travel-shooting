@@ -1,7 +1,7 @@
 package com.example.travelshooting.user.service;
 
 import com.example.travelshooting.enums.UserRole;
-import com.example.travelshooting.s3.S3Service;
+import com.example.travelshooting.file.service.S3Service;
 import com.example.travelshooting.user.dto.UserResDto;
 import com.example.travelshooting.user.entity.User;
 import com.example.travelshooting.user.repository.UserRepository;

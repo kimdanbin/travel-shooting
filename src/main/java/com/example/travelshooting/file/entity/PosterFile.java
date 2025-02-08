@@ -29,13 +29,6 @@ public class PosterFile extends BaseEntity {
     @JoinColumn(name = "file_type")
     private String fileType;
 
-    // 임시
-    public PosterFile(String fileName, String url, String fileType) {
-        this.fileName = fileName;
-        this.url = url;
-        this.fileType = fileType;
-    }
-
     public PosterFile(Poster poster, String fileName, String url, String fileType) {
         this.poster = poster;
         this.fileName = fileName;

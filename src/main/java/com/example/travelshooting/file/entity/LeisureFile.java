@@ -28,13 +28,6 @@ public class LeisureFile {
     @JoinColumn(name = "file_type")
     private String fileType;
 
-    // 임시
-    public LeisureFile(String fileName, String url, String fileType) {
-        this.fileName = fileName;
-        this.url = url;
-        this.fileType = fileType;
-    }
-
     public LeisureFile(Product product, String fileName, String url, String fileType) {
         this.product = product;
         this.fileName = fileName;

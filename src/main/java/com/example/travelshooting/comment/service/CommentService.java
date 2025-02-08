@@ -9,10 +9,10 @@ import com.example.travelshooting.poster.entity.Poster;
 import com.example.travelshooting.poster.service.PosterService;
 import com.example.travelshooting.user.entity.User;
 import com.example.travelshooting.user.service.UserService;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
@@ -21,6 +21,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class CommentService {
+
     private final CommentRepository commentRepository;
     private final UserService userService;
     private final PosterService posterService;
@@ -39,6 +40,7 @@ public class CommentService {
     }
 
     // 댓글 전체 조회
+    @Transactional(readOnly = true)
     public List<CommentResDto> findComments(Long posterId){
 
         List<Comment> comments = commentRepository.findAllByPosterId(posterId);
@@ -98,5 +100,15 @@ public class CommentService {
     // isDeleted 가 true 인 댓글도 포함해서 찾기
     public Optional<Comment> findByIdIncludeDeleted(Long commentId) {
         return commentRepository.findByIdIncludeDeleted(commentId);
+    }
+
+    // posterId로 댓글 삭제
+    public void deleteCommentsByPosterId(Long posterId) {
+        commentRepository.deleteByPosterId(posterId);
+    }
+
+    // commentId로 댓글 삭제
+    public void deleteCommentsById(Long commentId) {
+        commentRepository.deleteById(commentId);
     }
 }

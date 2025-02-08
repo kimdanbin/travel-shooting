@@ -6,6 +6,8 @@ import com.example.travelshooting.product.dto.*;
 import com.example.travelshooting.product.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -46,20 +48,18 @@ public class ProductController {
      * 레저/티켓 상품 전체 조회 API
      * 페이징 처리 된 상품 목록 조회. 상품명으로 검색할 수 있습니다.
      *
-     * @param page        페이지 번호
-     * @param size        페이지당 항목 수
      * @param productName 검색할 상품명
      * @return 조회된 레저/티켓 상품의 정보를 담고 있는 dto. 성공시 상태코드 201 반환
      */
     @GetMapping("/products")
     public ResponseEntity<CommonListResDto<ProductResDto>> findAllProducts(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
+            Pageable pageable,
             @RequestParam(required = false) String productName
     ) {
-        List<ProductResDto> result = productService.findAllProducts(page, size, productName);
+        Page<ProductResDto> products = productService.findAllProducts(pageable, productName);
+        List<ProductResDto> content = products.getContent();
 
-        return new ResponseEntity<>(new CommonListResDto<>("레저/티켓 전체 조회 완료", result), HttpStatus.OK);
+        return new ResponseEntity<>(new CommonListResDto<>("레저/티켓 전체 조회 완료", content), HttpStatus.OK);
     }
 
     /**

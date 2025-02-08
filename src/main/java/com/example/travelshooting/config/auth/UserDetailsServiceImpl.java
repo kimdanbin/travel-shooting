@@ -15,17 +15,17 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserDetailsServiceImpl implements UserDetailsService {
 
-  private final UserRepository userRepository;
+    private final UserRepository userRepository;
 
-  @Override
-  public UserDetails loadUserByUsername(String email) {
-    Optional<User> user = userRepository.findByEmail(email);
+    @Override
+    public UserDetails loadUserByUsername(String email) {
+        Optional<User> user = userRepository.findByEmail(email);
 
-    if (user.isEmpty()) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 존재하는 이메일입니다.");
+        if (user.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 존재하는 이메일입니다.");
+        }
+
+        return new UserDetailsImpl(user.get());
     }
-
-    return new UserDetailsImpl(user.get());
-  }
 }
 

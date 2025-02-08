@@ -16,6 +16,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -66,6 +67,10 @@ public class LocalService {
             JsonNode root = objectMapper.readTree(response.getBody());
             JsonNode documents = root.path("documents");
 
+            if (documents.isMissingNode() || !documents.isArray() || documents.size() == 0) {
+                return Collections.emptyList();
+            }
+
             // JSON 데이터를 LocalResDto로 변환
             locals = StreamSupport.stream(documents.spliterator(), false)
                     .map(document -> new LocalResDto(
@@ -80,10 +85,8 @@ public class LocalService {
                     ))
                     .collect(Collectors.toList());
         } catch (ResourceAccessException e) {
-            e.printStackTrace();
             throw new ResourceAccessException("타임아웃이 발생했습니다.");
         } catch (Exception e) {
-            e.printStackTrace();
             throw new RuntimeException("JSON 파싱 오류가 발생했습니다.");
         }
 

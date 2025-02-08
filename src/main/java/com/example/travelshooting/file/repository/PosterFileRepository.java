@@ -15,4 +15,6 @@ public interface PosterFileRepository extends JpaRepository<PosterFile, Long> {
             "ORDER BY created_at DESC " +
             "LIMIT 5", nativeQuery = true)
     List<PosterFile> getNewFiveShorts();
+
+    List<PosterFile> findAllByPosterId(Long posterId);
 }

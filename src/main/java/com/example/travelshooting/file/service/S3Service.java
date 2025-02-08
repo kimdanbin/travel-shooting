@@ -1,4 +1,4 @@
-package com.example.travelshooting.s3;
+package com.example.travelshooting.file.service;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
@@ -33,12 +33,12 @@ public class S3Service {
         metadata.setContentType(multipartFile.getContentType()); // 파일의 타입을 설정
 
         amazonS3.putObject(bucket, uniqueFilename, multipartFile.getInputStream(), metadata);
+
         return amazonS3.getUrl(bucket, uniqueFilename).toString();
     }
 
     @Transactional
     public void deleteFile(String fileUrl) {
         amazonS3.deleteObject(bucket, fileUrl);
-
     }
 }
