@@ -157,6 +157,19 @@
 
 ---------
 
+# 🧩 설계
+
+### 1️⃣ 와이어프레임
+👉 [와이어프레임](https://embed.figma.com/design/YbndMHkYnziJryWMkw9k9p/6%EC%A1%B0?node-id=0-1&t=t6jrbnQBf3RPx4pb-1&embed-host=notion&footer=false&theme=system)
+
+### 2️⃣ API 명세서
+👉 [API 명세서](https://github.com/kimdanbin/travel-shooting/wiki/API-%EB%AA%85%EC%84%B8%EC%84%9C)
+
+### 3️⃣ ERD
+<img src="https://github.com/user-attachments/assets/b754e2cd-7728-4728-b23a-3021da94547d">
+
+---------
+
 # 🛠 기술 스택
 <p align="center">
   <img src="https://godekdls.github.io/images/springboot/logo.png" width="100px">
@@ -186,15 +199,3 @@
 
 # ⚙ 아키텍처 구조
 <img src="https://github.com/user-attachments/assets/d6fb7078-10f8-44fc-b787-c11884aeea84">
-
----------
-
-# 📄 API 명세서
-👉 [API 명세서](https://github.com/kimdanbin/travel-shooting/wiki/API-%EB%AA%85%EC%84%B8%EC%84%9C)
-
----------
-
-# ☁ ERD
-ERD Tool : [ERDCloud](https://www.erdcloud.com/d/z6i6zETJ4Kn2ZBqhW)
-
-<img src="https://github.com/user-attachments/assets/b754e2cd-7728-4728-b23a-3021da94547d">
