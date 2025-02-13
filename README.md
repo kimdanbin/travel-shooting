@@ -135,6 +135,16 @@
   </div>
 </details>
 
+<details>
+  <summary><b>좋아요</b></summary>
+  <div markdown="1">
+    <p></p>
+    <li>포스터를 좋아요 할 수 있습니다.</li>
+    <li>댓글을 좋아요 할 수 있습니다.</li>
+    <li>좋아요를 취소할 수 있습니다.</li>
+  </div>
+</details>
+
 ---------
 
 # 👨‍💻 기능별 담당자
