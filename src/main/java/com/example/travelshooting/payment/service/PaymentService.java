@@ -8,10 +8,9 @@ import com.example.travelshooting.enums.ReservationStatus;
 import com.example.travelshooting.payment.dto.PaymentCancelResDto;
 import com.example.travelshooting.payment.dto.PaymentCompletedResDto;
 import com.example.travelshooting.payment.dto.PaymentReadyResDto;
+import com.example.travelshooting.payment.dto.PaymentResDto;
 import com.example.travelshooting.payment.entity.Payment;
 import com.example.travelshooting.payment.repository.PaymentRepository;
-import com.example.travelshooting.product.entity.Product;
-import com.example.travelshooting.product.service.ProductService;
 import com.example.travelshooting.reservation.entity.Reservation;
 import com.example.travelshooting.reservation.service.ReservationService;
 import com.example.travelshooting.user.entity.User;
@@ -20,6 +19,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,7 +39,6 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final ReservationService reservationService;
     private final UserService userService;
-    private final ProductService productService;
 
     @Value("${kakao.api.pay.key}")
     private String secretKey;
@@ -67,10 +67,8 @@ public class PaymentService {
     // 카카오페이 결제창 연결
     @Transactional
     public PaymentReadyResDto payReady(Long productId, Long reservationId) {
-        Product product = productService.findProductById(productId);
         User user = userService.findAuthenticatedUser();
-        Reservation reservation = reservationService.findReservationByUserIdAndProductIdAndId(user.getId(), product.getId(), reservationId);
-        Payment payment = paymentRepository.findPaymentByReservationId(reservation.getId());
+        Reservation reservation = reservationService.findReservationByProductIdAndIdAndUserId(productId, reservationId, user.getId());
 
         if (reservation == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "예약 내역을 찾을 수 없습니다.");
@@ -80,8 +78,16 @@ public class PaymentService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "예약 승인이 먼저 되어야 합니다.");
         }
 
-        if (payment != null && payment.getStatus().equals(PaymentStatus.APPROVED)) {
+        Payment approvedPayment = paymentRepository.findPaymentByReservationIdAndStatus(reservation.getId(), PaymentStatus.APPROVED);
+        Payment readyPayment = paymentRepository.findPaymentByReservationIdAndStatus(reservation.getId(), PaymentStatus.READY);
+
+        if (approvedPayment != null && approvedPayment.getStatus().equals(PaymentStatus.APPROVED)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 결제된 예약입니다.");
+        }
+
+        // 다시 결제 요청을 할 경우, 기존 결제 정보 삭제
+        if (readyPayment != null && readyPayment.getStatus().equals(PaymentStatus.READY)) {
+            paymentRepository.delete(readyPayment);
         }
 
         // 결제 정보 저장
@@ -89,7 +95,7 @@ public class PaymentService {
 
         String approvalUrl = String.format(
                 paymentCompletedUrl,
-                product.getId(),
+                reservation.getPart().getProduct().getId(),
                 reservation.getId()
         );
 
@@ -102,7 +108,7 @@ public class PaymentService {
         body.put("cid", Const.KAKAO_PAY_TEST_CID);
         body.put("partner_order_id", reservation.getId().toString());
         body.put("partner_user_id", user.getId().toString());
-        body.put("item_name", product.getName());
+        body.put("item_name", reservation.getPart().getProduct().getName());
         body.put("quantity", String.valueOf(reservation.getHeadCount()));
         body.put("total_amount", String.valueOf(reservation.getTotalPrice()));
         body.put("tax_free_amount", "0");
@@ -129,7 +135,6 @@ public class PaymentService {
 
                 return new PaymentReadyResDto(redirectUrl);
             } catch (Exception e) {
-                e.printStackTrace();
                 throw new RuntimeException("카카오페이 결제 준비 응답 처리 중 오류 발생");
             }
         } else {
@@ -137,8 +142,8 @@ public class PaymentService {
         }
     }
 
-    public Payment savePayment(Reservation reservation, Long partnerUserId, Integer totalPrice) {
-        Payment payment = new Payment(reservation, partnerUserId, totalPrice);
+    public Payment savePayment(Reservation reservation, Long userId, Integer totalPrice) {
+        Payment payment = new Payment(reservation, userId, totalPrice);
 
         return paymentRepository.save(payment);
     }
@@ -146,9 +151,8 @@ public class PaymentService {
     // 최종적으로 결제 완료 처리를 하는 단계
     @Transactional
     public PaymentCompletedResDto payCompleted(Long productId, Long reservationId, String pgToken) {
-        Product product = productService.findProductById(productId);
-        Payment payment = paymentRepository.findPaymentByReservationId(reservationId);
-        Reservation reservation = reservationService.findReservationByUserIdAndProductIdAndId(payment.getUserId(), product.getId(), reservationId);
+        Payment payment = paymentRepository.findPaymentByReservationIdAndStatus(reservationId, PaymentStatus.READY);
+        Reservation reservation = reservationService.findReservationByProductIdAndIdAndUserId(productId, reservationId, payment.getUserId());
 
         Map<String, String> body = new HashMap<>();
         body.put("cid", Const.KAKAO_PAY_TEST_CID);
@@ -196,7 +200,6 @@ public class PaymentService {
 
                 return paymentCompletedResDto;
             } catch (Exception e) {
-                e.printStackTrace();
                 throw new RuntimeException("카카오페이 결제 승인 응답 처리 중 오류가 발생했습니다.");
             }
         } else {
@@ -277,12 +280,26 @@ public class PaymentService {
 
                 return paymentCancelResDto;
             } catch (Exception e) {
-                e.printStackTrace();
-                throw new RuntimeException("카카오페이 결제 승인 응답 처리 중 오류가 발생했습니다.");
+                throw new RuntimeException("카카오페이 결제 취소 응답 처리 중 오류가 발생했습니다.");
             }
         } else {
-            throw new RuntimeException("카카오페이 결제 승인 요청 실패");
+            throw new RuntimeException("카카오페이 결제 취소 요청 실패");
         }
+    }
+
+    @Transactional(readOnly = true)
+    public Page<PaymentResDto> findPayments(Pageable pageable) {
+        User authenticatedUser = userService.findAuthenticatedUser();
+
+        return paymentRepository.findPayments(authenticatedUser, pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public PaymentResDto findPaymentByIdAndUserId(Long paymentId) {
+        Payment existingPayment = paymentRepository.findPaymentById(paymentId);
+        User authenticatedUser = userService.findAuthenticatedUser();
+
+        return paymentRepository.findPaymentByIdAndUserId(existingPayment, authenticatedUser);
     }
 
     private HttpHeaders httpHeaders() {

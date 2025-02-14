@@ -92,7 +92,7 @@ public class PartService {
         partRepository.delete(findPart);
     }
 
-    public Part findPartById(Long partId) {
-        return partRepository.findPartById(partId);
+    public Part findPartByIdAndProductId(Long partId, Long productId) {
+        return partRepository.findPartByIdAndProductId(partId, productId);
     }
 }

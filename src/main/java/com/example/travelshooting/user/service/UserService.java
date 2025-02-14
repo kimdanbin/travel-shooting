@@ -3,11 +3,16 @@ package com.example.travelshooting.user.service;
 import com.example.travelshooting.config.util.JwtProvider;
 import com.example.travelshooting.enums.AuthenticationScheme;
 import com.example.travelshooting.enums.UserRole;
-import com.example.travelshooting.s3.S3Service;
-import com.example.travelshooting.user.dto.*;
+import com.example.travelshooting.file.service.S3Service;
+import com.example.travelshooting.user.dto.ChangePasswordReqDto;
+import com.example.travelshooting.user.dto.JwtAuthResDto;
+import com.example.travelshooting.user.dto.PasswordVrfReqDto;
+import com.example.travelshooting.user.dto.UserResDto;
 import com.example.travelshooting.user.entity.User;
 import com.example.travelshooting.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,6 +28,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserService {
 
     private final UserRepository userRepository;
@@ -30,6 +36,7 @@ public class UserService {
     private final AuthenticationManager authenticationManager;
     private final JwtProvider jwtProvider;
     private final S3Service s3Service;
+    private final RedisTemplate<String, String> redisTemplate;
 
     @Transactional
     public UserResDto userSignup(String email, String password, String name, MultipartFile file) {
@@ -73,32 +80,61 @@ public class UserService {
         validatePassword(password, user.get().getPassword());
 
         // 사용자 인증 후 인증 객체를 저장
-        Authentication authentication = this.authenticationManager.authenticate(
+        Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(email, password));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         // 토큰 생성
-        String accessToken = jwtProvider.generateToken(authentication);
+        String accessToken = jwtProvider.generateAccessToken(authentication);
+        String refreshToken = jwtProvider.generateRefreshToken(authentication);
 
-        return new JwtAuthResDto(AuthenticationScheme.BEARER.getName(), accessToken);
+        return new JwtAuthResDto(AuthenticationScheme.BEARER.getName(), accessToken, refreshToken);
     }
-    // Refresh token 요청
-//    public TokenDto refresh(String accessToken, String refreshToken) {
-//
-//        if (!jwtProvider.validRefreshToken(refreshToken)) {
-//            throw new CustomException(ErrorCode.EXPIRED_TOKEN);
-//        }
-//
-//        String email = jwtProvider.getUsername(refreshToken);
-//        String savedRequestToken = refreshTokenRepository.getRefreshToken(email);
-//
-//        if (!refreshToken.equals(savedRequestToken)) {
-//            throw new CustomException(ErrorCode.EXPIRED_TOKEN);
-//        }
-//
-//        return jwtProvider.generateToken(email);
-//    }
+    // 로그아웃
+    @Transactional
+    public void logout(String accessToken) {
+        // 인증된 사용자 정보 가져오기
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "인증되지 않은 사용자입니다.");
+        }
+
+        // 이메일 가져오기
+        String email = authentication.getName();
+
+        // Redis에서 Refresh Token 삭제
+        Boolean isDeleted = redisTemplate.delete(email);
+
+        // 삭제 여부 확인
+        if (Boolean.FALSE.equals(isDeleted)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 로그아웃 되었거나 유효하지 않은 세션입니다.");
+        }
+
+        log.info("User with email '{}' successfully logged out.", email);
+
+        jwtProvider.blacklistToken(accessToken);
+        log.info("User '{}' 로그아웃 처리 완료. Access Token 블랙리스트에 추가되었습니다.", email);
+    }
+
+    @Transactional
+    public JwtAuthResDto refreshAccessToken(String refreshToken) {
+        // Refresh Token 검증
+        String email = jwtProvider.getUsername(refreshToken);
+
+        if (!jwtProvider.validateRefreshToken(email, refreshToken)) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "유효하지 않은 Refresh Token입니다.");
+        }
+
+        // Access Token 갱신
+        String newAccessToken = jwtProvider.generateAccessToken(email);
+
+        return new JwtAuthResDto(
+            AuthenticationScheme.BEARER.getName(),
+            newAccessToken,
+            refreshToken
+        );
+    }
 
     //비밀번호 변경
     @Transactional
@@ -120,26 +156,11 @@ public class UserService {
         userRepository.save(user);
     }
 
-    // 회원 탈퇴 v1
-//    @Transactional
-//    public void deleteUser(Long userId, PasswordVrfReqDto requestDto) {
-//        // 사용자 조회
-//        User user = userRepository.findUserById(userId);
-//
-//        // 비밀번호 확인
-//        if (!passwordEncoder.matches(requestDto.getPassword(), user.getPassword())) {
-//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "비밀번호가 일치하지 않습니다.");
-//        }
-//
-//        // 사용자 삭제
-//        userRepository.delete(user);
-//    }
-    // 회원 탈퇴 v2
+
     // 비밀번호 비교
     public boolean verifyPassword(Long userId, PasswordVrfReqDto requestDto) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 ID의 사용자를 찾을 수 없습니다."));
-
 
         return passwordEncoder.matches(requestDto.getPassword(), user.getPassword());
     }

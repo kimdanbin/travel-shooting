@@ -59,6 +59,8 @@ dependencies {
 
 	// Redis
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+	implementation 'org.redisson:redisson-spring-boot-starter:3.23.3'
 
 	// Mail
 	implementation 'org.springframework.boot:spring-boot-starter-mail'

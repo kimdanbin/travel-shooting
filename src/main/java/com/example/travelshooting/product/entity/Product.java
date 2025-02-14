@@ -26,7 +26,7 @@ public class Product extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "leisure_company_id", nullable = false)
     private Company company;
 
@@ -41,9 +41,6 @@ public class Product extends BaseEntity {
 
     @Column(nullable = false, length = 200)
     private String address;
-
-//    @Column(nullable = false)
-//    private Integer quantity;
 
     @Column(nullable = false)
     private LocalDate saleStartAt;

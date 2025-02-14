@@ -8,7 +8,6 @@ import com.example.travelshooting.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Where;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -18,7 +17,6 @@ import java.util.List;
 @Table(name = "reservation")
 @Getter
 @NoArgsConstructor
-@Where(clause = "is_deleted = false")
 public class Reservation extends BaseEntity {
 
     @Id
@@ -59,12 +57,8 @@ public class Reservation extends BaseEntity {
         this.totalPrice = totalPrice;
     }
 
-    public void updateStatus(ReservationStatus status) {
+    public void updateReservation(ReservationStatus status, boolean isDeleted) {
         this.status = status;
-    }
-
-    public void updateReservation(ReservationStatus status) {
-        this.isDeleted = true;
-        this.status = status;
+        this.isDeleted = isDeleted;
     }
 }

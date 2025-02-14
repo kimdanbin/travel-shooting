@@ -37,7 +37,7 @@ public class Payment extends BaseEntity {
     @Column(length = 10)
     private String type;
 
-    private Integer cancelPrice = 0;
+    private Integer cancelPrice;
 
     @Column(nullable = false)
     @Enumerated(value = EnumType.STRING)

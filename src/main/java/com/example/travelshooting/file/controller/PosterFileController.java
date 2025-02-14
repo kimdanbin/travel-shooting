@@ -41,6 +41,17 @@ public class PosterFileController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    // 파일 조회
+    @GetMapping("/posters/{posterId}/attachments")
+    public ResponseEntity<CommonListResDto<FileResDto>> uploadFile(
+            @PathVariable Long posterId
+    ) {
+
+        List<FileResDto> fileResDtos = posterFileService.findPosterFiles(posterId);
+
+        return new ResponseEntity<>(new CommonListResDto<>("포스터의 모든 파일 조회 완료", fileResDtos), HttpStatus.OK);
+    }
+
     // 최신 shorts 5개 조회
     @GetMapping("/attachments")
     public ResponseEntity<CommonListResDto<FileResDto>> getNewFiveShorts() {

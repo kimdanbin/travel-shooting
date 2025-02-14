@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class TokenDto implements BaseDtoDataType {
 
-  private final String AccessToken;
-  private final String RefreshToken;
+    private final String AccessToken;
+
+    private final String RefreshToken;
 }
