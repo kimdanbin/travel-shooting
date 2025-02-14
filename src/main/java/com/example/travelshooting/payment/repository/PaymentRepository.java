@@ -1,5 +1,6 @@
 package com.example.travelshooting.payment.repository;
 
+import com.example.travelshooting.enums.PaymentStatus;
 import com.example.travelshooting.payment.entity.Payment;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.http.HttpStatus;
@@ -14,4 +15,6 @@ public interface PaymentRepository extends JpaRepository<Payment, Long>, Payment
     }
 
     Payment findPaymentByReservationId(Long reservationId);
+
+    Payment findPaymentByReservationIdAndStatus(Long reservationId, PaymentStatus status);
 }

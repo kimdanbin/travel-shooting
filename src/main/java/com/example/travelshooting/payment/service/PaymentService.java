@@ -74,19 +74,20 @@ public class PaymentService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "예약 내역을 찾을 수 없습니다.");
         }
 
-        Payment payment = paymentRepository.findPaymentByReservationId(reservation.getId());
-
         if (!reservation.getStatus().equals(ReservationStatus.APPROVED)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "예약 승인이 먼저 되어야 합니다.");
         }
 
-        if (payment != null && payment.getStatus().equals(PaymentStatus.APPROVED)) {
+        Payment approvedPayment = paymentRepository.findPaymentByReservationIdAndStatus(reservation.getId(), PaymentStatus.APPROVED);
+        Payment readyPayment = paymentRepository.findPaymentByReservationIdAndStatus(reservation.getId(), PaymentStatus.READY);
+
+        if (approvedPayment != null && approvedPayment.getStatus().equals(PaymentStatus.APPROVED)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 결제된 예약입니다.");
         }
 
         // 다시 결제 요청을 할 경우, 기존 결제 정보 삭제
-        if (payment != null && payment.getStatus().equals(PaymentStatus.READY)) {
-            paymentRepository.delete(payment);
+        if (readyPayment != null && readyPayment.getStatus().equals(PaymentStatus.READY)) {
+            paymentRepository.delete(readyPayment);
         }
 
         // 결제 정보 저장
@@ -150,7 +151,7 @@ public class PaymentService {
     // 최종적으로 결제 완료 처리를 하는 단계
     @Transactional
     public PaymentCompletedResDto payCompleted(Long productId, Long reservationId, String pgToken) {
-        Payment payment = paymentRepository.findPaymentByReservationId(reservationId);
+        Payment payment = paymentRepository.findPaymentByReservationIdAndStatus(reservationId, PaymentStatus.READY);
         Reservation reservation = reservationService.findReservationByProductIdAndIdAndUserId(productId, reservationId, payment.getUserId());
 
         Map<String, String> body = new HashMap<>();
