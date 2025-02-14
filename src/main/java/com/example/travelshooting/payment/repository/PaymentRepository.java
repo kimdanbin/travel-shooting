@@ -14,7 +14,5 @@ public interface PaymentRepository extends JpaRepository<Payment, Long>, Payment
         return findById(paymentId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "아이디 " + paymentId + "에 해당하는 레저/티켓 결제 내역을 찾을 수 없습니다."));
     }
 
-    Payment findPaymentByReservationId(Long reservationId);
-
     Payment findPaymentByReservationIdAndStatus(Long reservationId, PaymentStatus status);
 }
